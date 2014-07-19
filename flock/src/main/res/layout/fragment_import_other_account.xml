@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+    <LinearLayout style="@style/WizardPageContainer" >
+
+        <TextView android:id="@+id/text_setup_with_other"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:text="@string/text_setup_account_with_other"/>
+
+        <LinearLayout android:orientation="vertical"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content">
+
+            <EditText android:id="@+id/href_webdav_host"
+                      android:singleLine="true"
+                      android:maxLines="1"
+                      android:layout_width="match_parent"
+                      android:layout_height="48dip"
+                      android:inputType="textUri"
+                      android:hint="@string/hint_href_webdav_host" />
+
+            <EditText android:id="@+id/account_username"
+                      android:singleLine="true"
+                      android:maxLines="1"
+                      android:layout_width="match_parent"
+                      android:layout_height="48dip"
+                      android:inputType="textEmailAddress"
+                      android:hint="@string/hint_username" />
+
+            <EditText android:id="@+id/account_password"
+                      android:singleLine="true"
+                      android:maxLines="1"
+                      android:layout_width="match_parent"
+                      android:layout_height="48dip"
+                      android:inputType="textPassword"
+                      android:hint="@string/hint_password" />
+
+            <EditText android:id="@+id/cipher_passphrase"
+                      android:singleLine="true"
+                      android:maxLines="1"
+                      android:layout_width="match_parent"
+                      android:layout_height="48dip"
+                      android:inputType="textPassword"
+                      android:hint="@string/hint_encryption_password" />
+
+            <ProgressBar android:id="@+id/progress_password_strength"
+                         android:layout_width="match_parent"
+                         android:layout_height="4dp"
+                         android:layout_marginLeft="4dp"
+                         android:layout_marginRight="4dp"
+                         android:visibility="invisible"
+                         style="?android:attr/progressBarStyleHorizontal"/>
+
+            <EditText android:id="@+id/cipher_passphrase_repeat"
+                      android:singleLine="true"
+                      android:maxLines="1"
+                      android:layout_width="match_parent"
+                      android:layout_height="48dip"
+                      android:inputType="textPassword"
+                      android:hint="@string/hint_repeat_encryption_password" />
+
+            <ProgressBar android:id="@+id/progress_password_strength_repeat"
+                         android:layout_width="match_parent"
+                         android:layout_height="4dp"
+                         android:layout_marginLeft="4dp"
+                         android:layout_marginRight="4dp"
+                         android:visibility="invisible"
+                         style="?android:attr/progressBarStyleHorizontal"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

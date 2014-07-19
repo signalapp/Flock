@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/preference_group_sync">
+        <EditTextPreference
+                android:key="pref_sync_interval_minutes"
+                android:defaultValue="60"
+                android:title="@string/preference_title_sync_frequency"
+                android:inputType="number" />
+
+        <CheckBoxPreference
+                android:key="pref_sync_on_content_change"
+                android:defaultValue="true"
+                android:title="@string/preference_title_sync_on_content_change"
+                android:summary="@string/preference_description_sync_on_content_change" />
+
+        <Preference android:title="@string/preference_title_sync_now"
+                    android:key="pref_sync_now"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/preference_group_contacts"
+                        android:key="pref_category_contacts">
+
+        <Preference android:title="@string/title_my_addressbooks"
+                    android:key="pref_addressbooks">
+            <intent android:action="org.anhonesteffort.flock.AddressbooksActivity"/>
+        </Preference>
+
+        <Preference android:title="@string/title_import_contacts">
+            <intent android:action="org.anhonesteffort.flock.ImportContactsActivity"/>
+        </Preference>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/preference_group_calendars"
+                        android:key="pref_category_calendars">
+
+        <Preference android:title="@string/title_my_calendars">
+            <intent android:action="org.anhonesteffort.flock.CalendarsActivity"/>
+        </Preference>
+
+        <Preference android:title="@string/title_import_calendars">
+            <intent android:action="org.anhonesteffort.flock.ImportCalendarsActivity"/>
+        </Preference>
+
+        <com.chiralcode.colorpicker.ColorPickerPreference
+                android:defaultValue="@color/flocktheme_color"
+                android:key="pref_default_calendar_color"
+                android:title="@string/preference_title_default_calendar_color" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/preference_group_account"
+                        android:key="pref_category_account">
+        <Preference android:title="@string/preference_title_change_encryption_password">
+            <intent android:action="org.anhonesteffort.flock.ChangeCipherPassphraseActivity"/>
+        </Preference>
+
+        <Preference android:title="Manage Subscription"
+                    android:key="pref_subscription">
+            <intent android:action="org.anhonesteffort.flock.ManageSubscriptionActivity"/>
+        </Preference>
+
+        <Preference android:title="@string/title_unregister_account"
+                    android:key="pref_delete_account">
+            <intent android:action="org.anhonesteffort.flock.RemoveAccountActivity"/>
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

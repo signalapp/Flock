@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_horizontal"
+              android:padding="8dp">
+
+    <TextView android:id="@+id/sync_status"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textAppearance="@style/StatusHeaderTextAppearance"
+              android:text="@string/status_header_sync_time" />
+
+    <TextView android:id="@+id/last_sync_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/StatusHeaderSyncTimeTextAppearance"
+        android:text="@string/status_header_sync_time" />
+
+</LinearLayout>

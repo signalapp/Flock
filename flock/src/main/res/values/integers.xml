@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="cost_per_year_usd">5</integer>
+    <integer name="auto_renew_trigger_days_remaining">7</integer>
+
+    <integer name="tag_view_holder">1337</integer>
+    <integer name="tag_collection_path">100</integer>
+    <integer name="tag_collection_selected">200</integer>
+    <integer name="tag_calendar_color">300</integer>
+    <integer name="tag_account_name">400</integer>
+    <integer name="tag_account_type">500</integer>
+    <integer name="tag_account_contact_count">600</integer>
+    <integer name="tag_calendar_local_id">700</integer>
+
+</resources>

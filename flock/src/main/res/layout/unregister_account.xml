@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingTop="16dp"
+                android:paddingRight="16dp"
+                android:paddingLeft="16dp">
+
+        <LinearLayout android:orientation="vertical"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content" >
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textAppearance="?android:textAppearanceMedium"
+                      android:text="@string/if_you_chose_to_unregister_your_account_all_flock"/>
+
+            <EditText android:id="@+id/cipher_passphrase"
+                      android:layout_width="match_parent"
+                      android:layout_height="48dip"
+                      android:layout_marginTop="24dp"
+                      android:singleLine="true"
+                      android:maxLines="1"
+                      android:inputType="textPassword"
+                      android:hint="@string/hint_encryption_password"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <View android:background="?android:attr/dividerHorizontal"
+          android:layout_height="1dp"
+          android:layout_width="match_parent" />
+
+    <LinearLayout style="?android:attr/buttonBarStyle"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal">
+
+        <Button android:id="@+id/button_delete_account"
+                style="?android:attr/buttonBarButtonStyle"
+                android:background="@color/error_red"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/title_unregister_account" />
+
+    </LinearLayout>
+</LinearLayout>

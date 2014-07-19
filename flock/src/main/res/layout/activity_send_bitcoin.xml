@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ /**
+  ~ * Copyright (C) Open 2014 Whisper Systems
+  ~ *
+  ~ * This program is free software: you can redistribute it and/or modify
+  ~ * it under the terms of the GNU General Public License as published by
+  ~ * the Free Software Foundation, either version 3 of the License, or
+  ~ * (at your option) any later version.
+  ~ *
+  ~ * This program is distributed in the hope that it will be useful,
+  ~ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ * GNU General Public License for more details.
+  ~ *
+  ~ * You should have received a copy of the GNU General Public License
+  ~ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+  ~ */
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout android:orientation="vertical"
+                  android:layout_weight="1"
+                  android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:layout_marginTop="8dp"
+                  android:layout_marginLeft="16dip"
+                  android:layout_marginRight="16dip"
+                  android:gravity="center">
+
+        <ImageView android:id="@+id/image_btc_qr_code"
+                   android:layout_width="190dp"
+                   android:layout_height="190dp"
+                   android:background="@color/disaled_grey"/>
+
+            <LinearLayout android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginTop="8dp"
+                          android:orientation="horizontal">
+
+                    <TextView android:id="@+id/mbtc_due_large"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:textColor="@color/bitcoin_orange"
+                              android:textStyle="bold"
+                              android:textAppearance="?android:textAppearanceLarge"
+                              android:textSize="32sp"/>
+
+                    <TextView android:id="@+id/mbtc_due_small"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:textColor="@color/bitcoin_orange"
+                              android:textStyle="bold"
+                              android:textAppearance="?android:textAppearanceLarge"
+                              android:textSize="22sp"/>
+
+                    <TextView android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_marginLeft="6dp"
+                              android:textSize="32sp"
+                              android:text="@string/mBTC_to"/>
+
+            </LinearLayout>
+
+        <RelativeLayout android:id="@+id/layout_btc_address"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+            <ImageView android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:layout_centerVertical="true"
+                       android:src="@drawable/content_copy" />
+
+            <LinearLayout android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:paddingLeft="18dp"
+                          android:orientation="horizontal">
+
+                <View android:id="@+id/btc_address_triangle"
+                      android:layout_width="20dp"
+                      android:layout_height="30dp"
+                      android:layout_gravity="center"
+                      android:background="@drawable/conversation_item_received_triangle_shape_grey"/>
+
+                <TextView android:id="@+id/btc_address"
+                          android:layout_width="260dp"
+                          android:layout_height="wrap_content"
+                          android:padding="8dp"
+                          android:background="@drawable/rounded_thing_grey"
+                          android:text="AAAA AAAA AAAA AAAA AAAA AAAA AAAA AAAA"
+                          android:textSize="20sp"/>
+
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="fill_parent"
+                      android:orientation="horizontal"
+                      android:gravity="center"
+                      android:clickable="true">
+
+            <RelativeLayout android:layout_width="110dp"
+                            android:layout_height="110dp">
+
+                <de.passsy.holocircularprogressbar.HoloCircularProgressBar
+                        android:id="@+id/btc_address_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                <TextView android:id="@+id/btc_minutes_remaining"
+                          android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:gravity="center"
+                          android:textColor="@color/bitcoin_orange"
+                          android:textSize="35sp"/>
+
+            </RelativeLayout>
+
+            <TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginLeft="16dp"
+                      android:textSize="22sp"
+                      android:text="@string/minutes_until_address_expires"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <View android:background="?android:attr/dividerHorizontal"
+          android:layout_height="1dp"
+          android:layout_width="match_parent" />
+
+    <LinearLayout style="?android:attr/buttonBarStyle"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal">
+
+        <Button android:id="@+id/button_cancel"
+                style="?android:attr/buttonBarButtonStyle"
+                android:background="@drawable/selectable_item_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel" />
+
+    </LinearLayout>
+
+</LinearLayout>

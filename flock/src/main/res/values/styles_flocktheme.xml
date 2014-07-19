@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="AutoCompleteTextViewFlockTheme" parent="android:Widget.Holo.Light.AutoCompleteTextView">
+      <item name="android:dropDownSelector">@drawable/flocktheme_list_selector_holo_light</item>
+	    <item name="android:background">@drawable/flocktheme_edit_text_holo_light</item>
+  </style>
+
+  <style name="ButtonFlockTheme" parent="android:Widget.Holo.Light.Button">
+	  <item name="android:background">@drawable/flocktheme_btn_default_holo_light</item>
+  </style>
+
+  <style name="ImageButtonFlockTheme" parent="android:Widget.Holo.Light.ImageButton">
+	  <item name="android:background">@drawable/flocktheme_btn_default_holo_light</item>
+  </style>
+
+  <style name="SpinnerFlockTheme" parent="android:Widget.Holo.Light.Spinner">
+      <item name="android:background">@drawable/flocktheme_spinner_background_holo_light</item>
+      <item name="android:dropDownSelector">@drawable/flocktheme_list_selector_holo_light</item>
+  </style>
+
+  <style name="ProgressBarFlockTheme" parent="android:Widget.Holo.Light.ProgressBar.Horizontal">
+      <item name="android:progressDrawable">@drawable/flocktheme_progress_horizontal_holo_light</item>
+      <item name="android:indeterminateDrawable">@drawable/flocktheme_progress_indeterminate_horizontal_holo_light</item>
+  </style>
+
+  <style name="SeekBarFlockTheme" parent="android:Widget.Holo.Light.SeekBar">
+      <item name="android:progressDrawable">@drawable/flocktheme_scrubber_progress_horizontal_holo_light</item>
+      <item name="android:indeterminateDrawable">@drawable/flocktheme_scrubber_progress_horizontal_holo_light</item>
+      <item name="android:thumb">@drawable/flocktheme_scrubber_control_selector_holo_light</item>
+  </style>
+
+  <style name="ToggleFlockTheme" parent="android:Widget.Holo.Light.Button.Toggle">
+      <item name="android:background">@drawable/flocktheme_btn_toggle_holo_light</item>
+  </style>
+
+</resources>

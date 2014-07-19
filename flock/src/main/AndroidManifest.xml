@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="org.anhonesteffort.flock"
+          android:versionCode="1"
+          android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="19" />
+
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+    <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/flock_icon"
+        android:label="@string/app_name"
+        android:theme="@style/FlockTheme">
+
+        <activity android:name="org.anhonesteffort.flock.PreferencesActivity"
+                  android:label="@string/app_name"
+                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize">
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.PreferencesActivity"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="org.anhonesteffort.flock.SetupActivity"
+                  android:windowSoftInputMode="adjustPan"/>
+
+        <activity android:name=".MyCalendarsActivity" >
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.CalendarsActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".MyAddressbooksActivity" >
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.AddressbooksActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="org.anhonesteffort.flock.ImportContactsActivity"
+                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize" >
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.ImportContactsActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="org.anhonesteffort.flock.ImportCalendarsActivity"
+                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize" >
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.ImportCalendarsActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="org.anhonesteffort.flock.ChangeEncryptionPasswordActivity"
+                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize">
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.ChangeCipherPassphraseActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="org.anhonesteffort.flock.CorrectPasswordActivity"
+                  android:exported="true"
+                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize">
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.DavLoginActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="org.anhonesteffort.flock.CorrectEncryptionPasswordActivity"
+                  android:exported="true"
+                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize">
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.DavLoginActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".UnregisterAccountActivity"
+                  android:windowSoftInputMode="adjustPan"
+                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize" >
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.RemoveAccountActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="org.anhonesteffort.flock.ManageSubscriptionActivity" >
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.ManageSubscriptionActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="org.anhonesteffort.flock.EditAutoRenewActivity"
+                  android:screenOrientation="portrait"/>
+
+        <activity android:name="org.anhonesteffort.flock.SendBitcoinActivity" />
+
+        <service android:name="org.anhonesteffort.flock.auth.AccountAuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data android:name="android.accounts.AccountAuthenticator"
+                       android:resource="@xml/account_authenticator" />
+        </service>
+
+        <provider android:name="org.anhonesteffort.flock.sync.key.KeyProviderStub"
+                  android:authorities="org.anhonesteffort.flock.sync.key"
+                  android:syncable="true"
+                  android:label="KeySyncService" />
+
+        <service android:name="org.anhonesteffort.flock.sync.key.KeySyncService"
+                 android:exported="true"
+                 android:process=":flock" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                       android:resource="@xml/keys_syncadapter" />
+        </service>
+
+        <service android:name="org.anhonesteffort.flock.sync.addressbook.AddressbookSyncService"
+                 android:exported="true"
+                 android:process=":flock" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                       android:resource="@xml/contacts_syncadapter" />
+            <meta-data android:name="android.provider.CONTACTS_STRUCTURE"
+                       android:resource="@xml/contacts_structure" />
+        </service>
+
+        <service android:name="org.anhonesteffort.flock.sync.calendar.CalendarsSyncService"
+                 android:exported="true"
+                 android:process=":flock" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                       android:resource="@xml/calendars_syncadapter" />
+        </service>
+
+        <service android:name="org.anhonesteffort.flock.RegisterAccountService"
+                 android:exported="false"/>
+
+        <service android:name="org.anhonesteffort.flock.ImportOwsAccountService"
+                 android:exported="false"/>
+
+        <service android:name="org.anhonesteffort.flock.ImportOtherAccountService"
+                 android:exported="false"/>
+
+        <service android:name="org.anhonesteffort.flock.ContactCopyService"
+                 android:exported="false" />
+
+        <service android:name="org.anhonesteffort.flock.CalendarCopyService"
+                 android:exported="false"/>
+
+        <service android:name="org.anhonesteffort.flock.CorrectPasswordService"
+                 android:exported="false"/>
+
+        <service android:name="org.anhonesteffort.flock.ChangeEncryptionPasswordService"
+                 android:exported="false"/>
+
+        <receiver android:name="org.anhonesteffort.flock.sync.SyncBooter">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

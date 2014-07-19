@@ -1,0 +1,6 @@
+<account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
+                       android:accountType="openwhispersystems.org"
+                       android:icon="@drawable/flock_icon"
+                       android:smallIcon="@drawable/flock_icon"
+                       android:label="@string/app_name"
+                       android:accountPreferences="@xml/account_preferences"/>

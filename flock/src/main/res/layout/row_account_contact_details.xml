@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/row_account_details"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="68dp"
+              android:baselineAligned="false" >
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="6" >
+
+        <TextView android:id="@+id/account_name"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:textAppearance="?android:attr/textAppearanceLarge"
+                  android:text="ACCOUNT NAME!!!"
+                  android:gravity="center_vertical|left" android:singleLine="true"/>
+
+        <TextView android:id="@+id/account_contact_count"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:text="1337 contacts"
+                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:gravity="center_vertical|left" />
+
+    </LinearLayout>
+
+    <CheckBox android:id="@+id/import_checkbox"
+              android:layout_width="0dp"
+              android:layout_height="fill_parent"
+              android:layout_weight="1"
+              android:layout_gravity="right"
+              android:focusable="false"
+              android:gravity="center_vertical|right"/>
+
+</LinearLayout>

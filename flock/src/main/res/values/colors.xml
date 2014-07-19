@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="holo_blue_dark">#ff0099cc</color>
+
+    <color name="step_pager_previous_tab_color">#4433b5e5</color>
+    <color name="step_pager_selected_tab_color">#ff0099cc</color>
+    <color name="step_pager_selected_last_tab_color">#ff669900</color>
+    <color name="step_pager_next_tab_color">#10000000</color>
+
+    <color name="disaled_grey">#ff858284</color>
+    <color name="success_green">#ff669900</color>
+    <color name="warning_yellow">#fff6dc25</color>
+    <color name="error_red">#fff24238</color>
+    <color name="bitcoin_orange">#ffec9912</color>
+
+    <color name="text_light">#66000000</color>
+</resources>

@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item android:id="@+id/create_collection_button"
+          android:icon="@drawable/content_new"
+          android:showAsAction="always"
+          android:visible="true" />
+
+</menu>

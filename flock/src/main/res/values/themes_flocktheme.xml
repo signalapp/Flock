@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="FlockTheme" parent="@style/_FlockTheme"/>
+
+    <style name="_FlockTheme" parent="android:Theme.Holo.Light">
+        <item name="circularProgressBarStyle">@style/CircularProgressBar</item>
+
+        <item name="android:actionBarStyle">@style/FlockActionBar</item>
+        <item name="android:editTextBackground">@drawable/flocktheme_edit_text_holo_light</item>
+
+        <item name="android:textColorHighlight">#99ff8800</item>
+        <item name="android:textSelectHandleLeft">@drawable/flocktheme_text_select_handle_left</item>
+        <item name="android:textSelectHandleRight">@drawable/flocktheme_text_select_handle_right</item>
+        <item name="android:textSelectHandle">@drawable/flocktheme_text_select_handle_middle</item>
+
+        <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewFlockTheme</item>
+
+        <item name="android:listChoiceIndicatorMultiple">@drawable/flocktheme_btn_check_holo_light</item>
+
+        <item name="android:listChoiceIndicatorSingle">@drawable/flocktheme_btn_radio_holo_light</item>
+
+        <item name="android:buttonStyle">@style/ButtonFlockTheme</item>
+
+        <item name="android:imageButtonStyle">@style/ImageButtonFlockTheme</item>
+
+        <item name="android:dropDownSpinnerStyle">@style/SpinnerFlockTheme</item>
+
+        <item name="android:progressBarStyleHorizontal">@style/ProgressBarFlockTheme</item>
+
+        <item name="android:seekBarStyle">@style/SeekBarFlockTheme</item>
+
+        <item name="android:buttonStyleToggle">@style/ToggleFlockTheme</item>
+
+        <item name="android:listChoiceBackgroundIndicator">@drawable/flocktheme_list_selector_holo_light</item>
+
+        <item name="android:activatedBackgroundIndicator">@drawable/flocktheme_activated_background_holo_light</item>
+
+        <item name="android:fastScrollThumbDrawable">@drawable/flocktheme_fastscroll_thumb_holo</item>
+
+        <item name="android:textColorSecondary">#ff999999</item>
+
+    </style>
+
+    <style name="TitleTextStyle">
+        <item name="android:textColor">#ffeeeeee</item>
+        <item name="android:textSize">22.6sp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="StatusHeaderTextAppearance">
+        <item name="android:textColor">#ff333333</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="StatusHeaderSyncTimeTextAppearance" parent="StatusHeaderTextAppearance">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <!-- ActionBar styles -->
+    <style name="FlockActionBar"
+           parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">#ffff8702</item>
+        <item name="android:titleTextStyle">@style/TitleTextStyle</item>
+        <item name="android:icon">@drawable/flock_actionbar_icon</item>
+        <item name="android:height">50sp</item>
+    </style>
+</resources>

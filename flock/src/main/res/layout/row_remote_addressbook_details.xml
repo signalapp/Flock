@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="68dp"
+              android:baselineAligned="false" >
+
+    <TextView android:id="@+id/collection_display_name"
+              android:layout_width="0dp"
+              android:layout_height="fill_parent"
+              android:layout_weight="6"
+              android:textAppearance="?android:attr/textAppearanceLarge"
+              android:text="ADDRESSBOOK COLLECTION!!!"
+              android:gravity="center_vertical|left" />
+
+    <RadioButton android:id="@+id/collection_sync_button"
+                 android:layout_width="0dp"
+                 android:layout_height="fill_parent"
+                 android:layout_weight="1"
+                 android:layout_gravity="right"
+                 android:focusable="false"
+                 android:gravity="center_vertical|right"/>
+
+</LinearLayout>

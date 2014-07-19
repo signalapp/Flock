@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Flock</string>
+    <string name="at_flock_sync">\@flock</string>
+
+
+    <string name="period">.</string>
+
+    <string name="previous">Previous</string>
+    <string name="begin">Begin</string>
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="finish">Finish</string>
+
+    <string name="days">days</string>
+    <string name="addressbook">addressbook</string>
+    <string name="failed">failed</string>
+
+    <string name="display_name_missing">Display name missing</string>
+    <string name="display_name_unavailable">Display name unavailable</string>
+
+
+    <!-- Notifications -->
+    <string name="notification_contact_import">Contact import</string>
+    <string name="notification_importing_contacts">Importing contacts.</string>
+    <string name="notification_importing_contacts_from">Importing contacts from</string>
+    <string name="notification_calendar_import">Calendar import</string>
+    <string name="notification_importing_calendars">Importing calendars.</string>
+    <string name="notification_importing_events_from">Importing events from</string>
+    <string name="notification_finalizing_imported_calendars">Finalizing imported calendars.</string>
+    <string name="notification_import_complete_copied">Import complete, copied</string>
+    <string name="notification_import_complete_failed_to_copy_all">Import complete, failed to copy all</string>
+    <string name="notification_flock_login_error">Flock login error</string>
+    <string name="notification_tap_to_correct_password">Tap to correct password.</string>
+    <string name="notification_flock_encryption_error">Flock encryption error</string>
+    <string name="notification_tap_to_correct_encryption_password">Tap to correct encryption password.</string>
+    <string name="notification_flock_subscription_expired">Flock subscription expired</string>
+    <string name="notification_tap_to_update_subscription">Tap to update subscription.</string>
+
+
+    <!-- status header stuff -->
+    <string name="status_header_status_good">Everything\'s working!</string>
+    <string name="status_header_status_account_login_failed">Account login failed</string>
+    <string name="status_header_status_encryption_password_incorrect">Encryption password incorrect</string>
+    <string name="status_header_status_sync_disabled">Android sync disabled!</string>
+    <string name="status_header_status_auto_renew_error">Subscription auto-renew error</string>
+    <string name="status_header_status_our_sync_service_error">Sync temporarily unavailable…</string>
+    <string name="status_header_status_their_sync_service_error">WebDAV server has errors</string>
+    <string name="status_header_status_registration_service_error">Registration service temporarily unavailable…</string>
+
+    <string name="status_header_sync_time">Last synced on %1$s</string>
+    <string name="status_header_sync_in_progress">Sync in progress…</string>
+
+    <!-- SetupActivity, intro -->
+    <string name="welcome_to_flock">Welcome to Flock!</string>
+    <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">
+        Flock syncs your contacts and calendars between multiple devices while protecting your privacy
+        with strong encryption.
+    </string>
+
+
+    <!-- SetupActivity, select service provider -->
+    <string name="title_chose_sync_service">Chose sync service</string>
+    <string name="flock_sync">Flock Sync</string>
+    <string name="flock_sync_is_a_service_run_by_open_whisper_systems_providing">
+        Flock Sync is a service run by Open Whisper Systems, providing durability and security
+        for $%.2f/year. Evaluate at no charge for 30 days, no payment information required.
+    </string>
+    <string name="host_my_own">Host my own</string>
+    <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">
+        You may chose to run and configure your own WebDAV compliant server as a sync service.
+        Before use with Flock the server must pass a series of tests.
+    </string>
+
+
+    <!-- SetupActivity, other server test -->
+    <string name="title_server_tests">Server tests</string>
+    <string name="tests_not_yet_started">Tests not yet started…</string>
+    <string name="tests_interrupted">Tests interrupted…</string>
+    <string name="tests_complete">Tests complete!</string>
+    <string name="start_tests">Start tests</string>
+    <string name="stop_tests">Stop tests</string>
+    <string name="restart_tests">Restart tests</string>
+    <string name="tests_completed_successfully">Tests completed successfully!</string>
+
+    <string name="test_dav_current_user_principal">DAV: current-user-principal</string>
+    <string name="test_error_carddav_current_user_principal">Server does not support CardDAV well-known URI or DAV: current-user-principal.</string>
+    <string name="test_error_caldav_current_user_principal">Server does not support CalDAV well-known URI or DAV: current-user-principal.</string>
+
+    <string name="test_carddav_addressbook_homeset">CardDAV: addressbook-homeset</string>
+    <string name="test_error_carddav_addressbook_homeset">Server does not support CardDAV: addressbook-homeset.</string>
+
+    <string name="test_caldav_calendar_homeset">CalDAV: calendar-homeset</string>
+    <string name="test_error_caldav_calendar_homeset">Server does not support CalDAV: calendar-homeset.</string>
+
+    <string name="test_caldav_create_and_delete_collections">DAV: create and delete collection</string>
+    <string name="test_error_caldav_create_and_delete_collections">Server does not support creating and deleting of calendar collections.</string>
+
+    <string name="test_caldav_create_and_edit_collection_properties">DAV: edit collection properties</string>
+    <string name="test_error_caldav_create_and_edit_collection_properties">Server does not support creating DAV collection properties.</string>
+
+    <string name="test_carddav_create_and_delete_contacts">CardDAV: create and delete contacts</string>
+    <string name="test_error_carddav_create_and_delete_contacts">Server does not support creating and deleting contacts.</string>
+
+    <string name="test_caldav_create_and_delete_events">CalDAV: create and delete events</string>
+    <string name="test_error_caldav_create_and_delete_events">Server does not support creating and deleting calendar events.</string>
+
+
+    <!-- SetupActivity, setup account -->
+    <string name="title_import_account">Import Account</string>
+    <string name="title_register_account">Register Account</string>
+    <string name="title_setup_account">Setup account</string>
+    <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">
+        Choose a username for your account and a strong password to encrypt your data.
+    </string>
+
+    <string name="do_you_have_a_flock_account">Do you have a flock account?</string>
+    <string name="yes_log_me_in">Yes log me in</string>
+    <string name="no_register_me">No register me</string>
+    <string name="text_setup_account_with_other">
+        Enter the URL and credentials for your WebDAV host then chose a separate
+        password for encryption.
+    </string>
+
+    <string name="button_login">Login</string>
+    <string name="hint_username">username</string>
+    <string name="hint_password">password</string>
+    <string name="hint_current_password">current password</string>
+    <string name="hint_repeat_password">repeat password</string>
+    <string name="hint_href_webdav_host">https://example.com</string>
+    <string name="hint_encryption_password">encryption password</string>
+    <string name="hint_repeat_encryption_password">repeat encryption password</string>
+
+    <string name="generating_authentication_secrets">generating authentication secrets …</string>
+    <string name="registering_account">registering account…</string>
+    <string name="account_register_completed_with_errors">Account register completed with errors.</string>
+    <string name="account_register_failed">Account register failed.</string>
+    <string name="generating_encryption_secrets">generating encryption secrets …</string>
+    <string name="creating_default_addressbook">creating default addressbook…</string>
+    <string name="setting_up_calendars">setting up calendars…</string>
+    <string name="registration_interrupted">registration interrupted.</string>
+
+    <string name="logging_in">logging in…</string>
+    <string name="importing_contacts_and_calendars">Importing contacts and calendars…</string>
+    <string name="account_import_completed_with_errors">Account import completed with errors.</string>
+    <string name="account_import_failed">Account import failed.</string>
+    <string name="importing_encryption_secrets">Importing encryption secrets…</string>
+    <string name="importing_addressbook">importing addressbook…</string>
+    <string name="importing_calendars">importing calendars…</string>
+    <string name="account_import_interrupted">account import interrupted.</string>
+
+
+    <!-- SetupActivity, import -->
+    <string name="button_import">Import</string>
+    <string name="import_complete">Import complete!</string>
+
+
+    <!-- SetupActivity, import contacts -->
+    <string name="select_accounts_to_import_contacts_from">
+        Select accounts to import contacts from
+    </string>
+    <string name="contacts">contacts</string>
+    <string name="title_import_contacts">Import contacts</string>
+    <string name="started_background_import_of">Started background import of</string>
+
+
+    <!-- SetupActivity, import calendars-->
+    <string name="select_calendars_to_import">
+        Select calendars to import
+    </string>
+    <string name="calendars">calendars</string>
+    <string name="events">events</string>
+    <string name="title_import_calendars">Import calendars</string>
+
+
+    <!-- SetupActivity, select remote addressbook and calendars-->
+    <string name="select_a_single_remote_addressbook_in_which_to_store">
+        Select a single remote addressbook in which to store Flock contacts.
+    </string>
+    <string name="select_the_calendars_you_would_like_to_sync_with_this_device">
+        Select the calendars you would like to sync with this device.
+    </string>
+    <string name="setup_complete">Setup complete!</string>
+
+
+    <!-- My calendars and my addressbooks... -->
+    <string name="hint_display_name">display name</string>
+    <string name="display_name_cannot_be_empty">Display name cannot be empty.</string>
+
+
+    <!-- My addressbooks -->
+    <string name="title_my_addressbooks">My addressbooks</string>
+    <string name="title_edit_selected_addressbooks">Edit selected addressbooks</string>
+    <string name="title_addressbook_properties">Addressbook properties</string>
+    <string name="title_delete_selected_addressbooks_dialog">Delete selected addressbooks?</string>
+    <string name="addressbook_saved">Addressbook saved!</string>
+    <string name="addressbooks_deleted">Addressbooks deleted.</string>
+    <string name="addressbooks_selected">addressbooks selected</string>
+    <string name="are_you_sure_you_want_to_delete_selected_addressbooks">
+        Are you sure you want to delete selected addressbooks?
+    </string>
+
+
+    <!-- My calendars -->
+    <string name="title_my_calendars">My calendars</string>
+    <string name="title_edit_selected_calendars">Edit selected calendars</string>
+    <string name="title_calendar_properties">Calendar properties</string>
+    <string name="title_delete_selected_calendars_dialog">Delete selected calendars?</string>
+    <string name="calendar_created">Calendar created.</string>
+    <string name="calendar_saved">Calendar saved!</string>
+    <string name="calendars_deleted">Calendars deleted.</string>
+    <string name="calendars_selected">calendars selected</string>
+    <string name="are_you_sure_you_want_to_delete_selected_calendars">
+        Are you sure you want to delete selected calendars?
+    </string>
+
+
+    <!-- PreferencesActivity -->
+    <string name="title_flock_settings">Flock settings</string>
+    <string name="title_settings">Settings</string>
+
+    <string name="preference_group_sync">Sync</string>
+    <string name="preference_title_sync_frequency">Sync frequency</string>
+
+    <string name="preference_title_sync_on_content_change">Sync on change</string>
+    <string name="preference_description_sync_on_content_change">
+        Synchronize contacts and calendars as soon as they change
+    </string>
+
+    <string name="preference_title_sync_now">Sync now</string>
+    <string name="sync_requested_will_begin_when_possible">Sync requested, will begin when possible</string>
+
+    <string name="preference_group_contacts">Contacts</string>
+    <string name="preference_group_calendars">Calendars</string>
+    <string name="preference_title_default_calendar_color">Default calendar color</string>
+    <string name="minutes">minutes</string>
+    <string name="new_calendars_will_be">New calendars will be</string>
+
+    <string name="preference_group_account">Account</string>
+    <string name="preference_title_change_encryption_password">Change encryption password</string>
+    <string name="preference_title_delete_account">Delete account</string>
+
+
+    <!-- ChangeEncryptionPasswordActivity -->
+    <string name="title_change_encryption_password">Change encryption password</string>
+    <string name="button_save_password">Save password</string>
+    <string name="hint_new_password">new password</string>
+    <string name="hint_new_password_repeat">repeat new password</string>
+    <string name="encryption_password_saved">Encryption password saved!</string>
+    <string name="sending_request">sending request…</string>
+    <string name="updating_encryption_secrets">updating encryption secrets…</string>
+    <string name="password_change_failed">password change failed.</string>
+
+
+    <!-- ManageSubscriptionActivity -->
+    <string name="title_manage_subscription">Manage subscription</string>
+    <string name="days_remain">days remain</string>
+    <string name="subscription_history">Subscription history</string>
+    <string name="title_refreshing_subscription_details">Refreshing subscription details</string>
+    <string name="auto_renew_disabled">auto-renew disabled</string>
+    <string name="processing_payment">processing payment</string>
+    <string name="auto_renew_enabled">auto-renew enabled</string>
+    <string name="auto_renew_error">auto-renew error</string>
+    <string name="button_edit_payment_details">Edit payment details</string>
+
+
+    <!-- EditAutoRenewActivity -->
+    <string name="usd_per_year">$%.2f/year</string>
+    <string name="with_auto_renew_flock_automatically_charges_your_card_before">
+        With auto-renew, Flock automatically charges your card seven days before your subscription runs out.
+    </string>
+    <string name="button_save">Save</string>
+    <string name="button_verify_and_save">Verify and save</string>
+    <string name="card_verified_and_saved">Card verified and saved!</string>
+    <string name="autorenew_saved">Auto-renew saved!</string>
+    <string name="enable_autorenew">enable auto-renew</string>
+    <string name="hint_card_cvc">CVC</string>
+    <string name="hint_card_expiration">MM/YY</string>
+    <string name="hint_card_number">5555 5555 5555 5555</string>
+
+
+    <!-- SendBitcoinActivity -->
+    <string name="title_send_bitcoin">Send bitcoin</string>
+    <string name="title_refreshing_bitcoin_details">Refreshing bitcoin details</string>
+    <string name="mBTC_to">mBTC to</string>
+    <string name="address_copied_to_clipboard">Address copied to clipboard.</string>
+    <string name="bitcoin_received">Bitcoin received!</string>
+    <string name="minutes_until_address_expires">minutes until address expires</string>
+
+
+    <!-- DeleteAccountActivity -->
+    <string name="title_unregister_account">Unregister account</string>
+    <string name="if_you_chose_to_unregister_your_account_all_flock">
+        If you chose to unregister your account, all Flock contacts, calendars,
+        and subscription history will be permanently deleted.
+    </string>
+    <string name="are_you_sure_you_want_to_unregister_your_account">
+        Are you sure you want to unregister your account?
+    </string>
+    <string name="account_has_been_unregistered">Account has been unregistered.</string>
+
+
+    <!-- CorrectPasswordActivity -->
+    <string name="title_correct_sync_password">Correct sync password</string>
+    <string name="unable_to_login_to_sync_service_please_correct_your_password">
+        Unable to login to sync service, please correct your password.
+    </string>
+    <string name="login_successful">Login successful!</string>
+
+
+    <!-- CorrectEncryptionPasswordActivity -->
+    <string name="title_correct_encryption_password">Correct encryption password</string>
+    <string name="encryption_password_is_invalid_please_correct_your_encryption_password">
+        Encryption password is invalid, please correct your encryption password.
+    </string>
+    <string name="password_corrected">Password corrected!</string>
+
+
+    <!-- ErrorToaster messages -->
+    <string name="error_login_unauthorized">Login failed, invalid username or password</string>
+
+    <string name="error_registration_api_server_error">Our registration servers are having trouble, sorry.</string>
+    <string name="error_registration_api_client_error">Client registration API error, please send debug logs.</string>
+
+    <string name="error_our_dav_server_error">Our sync servers are having trouble, sorry.</string>
+    <string name="error_their_dav_server_error">Your sync server is not acting as expected, check debug logs.</string>
+    <string name="error_dav_client_error">Local storage error, please send debug logs.</string>
+
+    <string name="error_connection_error">Connection error, please check internet connection.</string>
+    <string name="error_our_certificate_validation">Insecure sync connection, please send debug logs.</string>
+    <string name="error_their_certificate_validation">Certificate validation error, check debug logs.</string>
+    <string name="error_unknown_io_error">Unknown IO error, please send debug logs.</string>
+
+    <string name="error_invalid_encryption_password">Invalid encryption password.</string>
+    <string name="error_invalid_mac_error">Decryption error, please send debug logs.</string>
+    <string name="error_unknown_crypto_error">Unknown cryptography error, please send debug logs.</string>
+
+    <string name="error_url_cannot_be_empty">Url cannot be empty</string>
+    <string name="error_username_empty">Username must not be empty.</string>
+    <string name="error_username_illegal">Username must contain \'@\' and be at least 5 characters in length.</string>
+    <string name="error_passwords_do_not_match">Passwords do not match.</string>
+    <string name="error_password_too_short">Password is too short!</string>
+    <string name="error_username_already_registered">Username already registered, try another.</string>
+
+    <string name="error_card_number_could_not_be_verified">Card number could not be verified</string>
+    <string name="error_card_expiration_could_not_be_verified">Card expiration could not be verified</string>
+    <string name="error_card_security_code_could_not_be_verified">Card security code could not be verified</string>
+    <string name="error_your_card_could_not_be_verified">Your card could not be verified</string>
+    <string name="error_stripe_api_error">Unknown payment processing error, try again or send debug logs.</string>
+
+    <string name="error_android_account_manager_error">Unexpected Android AccountManager error!</string>
+
+
+    <!-- misc errors -->
+    <string name="android_sync_disabled_please_enable">Android sync disabled, please enable!</string>
+    <string name="error_multiple_accounts_not_allowed">Flock users may not have multiple accounts.</string>
+    <string name="error_no_account_is_registered">No account is registered with this device.</string>
+    <string name="error_password_unavailable_please_login">Password unavailable, please login.</string>
+</resources>
