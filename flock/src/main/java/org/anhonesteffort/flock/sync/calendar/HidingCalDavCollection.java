@@ -187,7 +187,7 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
       return originalComponentPair;
 
     String          recoveredComponentText = HidingUtil.decodeAndDecryptIfNecessary(masterCipher, protectedComponent.getValue());
-    StringReader    stringReader           = new StringReader(recoveredComponentText.replace("\n ", ""));
+    StringReader    stringReader           = new StringReader(recoveredComponentText);
     CalendarBuilder calendarBuilder        = new CalendarBuilder();
 
     try {
@@ -219,7 +219,7 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
         recoveredComponentPairs.add(exposedComponentPair);
       else {
         String          recoveredComponentText = HidingUtil.decodeAndDecryptIfNecessary(masterCipher, protectedComponent.getValue());
-        StringReader    stringReader           = new StringReader(recoveredComponentText.replace("\n ", ""));
+        StringReader    stringReader           = new StringReader(recoveredComponentText);
         CalendarBuilder calendarBuilder        = new CalendarBuilder();
 
         try {
