@@ -129,7 +129,7 @@ public class KeyHelper {
     byte[] plaintextCipherKey   = Arrays.copyOfRange(plaintextKeyMaterial, 0, KeyUtil.CIPHER_KEY_LENGTH_BYTES);
     byte[] plaintextMacKey      = Arrays.copyOfRange(plaintextKeyMaterial,
                                                      KeyUtil.CIPHER_KEY_LENGTH_BYTES,
-                                                     plaintextCipherKey.length);
+                                                     KeyUtil.CIPHER_KEY_LENGTH_BYTES + KeyUtil.MAC_KEY_LENGTH_BYTES);
 
     KeyStore.saveEncryptedKeyMaterial(context, saltAndEncryptedKeyMaterial[1]);
     KeyStore.saveKeyMaterialSalt(     context, salt);
