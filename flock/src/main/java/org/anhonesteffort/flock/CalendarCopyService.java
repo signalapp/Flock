@@ -113,7 +113,7 @@ public class CalendarCopyService extends Service implements CalendarCopiedListen
       notificationBuilder
           .setProgress(0, 0, false)
           .setContentText(getString(R.string.notification_import_complete_copied) +
-                          " " + countEventCopiesFailed + " " + getString(R.string.events) +
+                          " " + countEventsCopied + " " + getString(R.string.events) +
                           ", " + countEventCopiesFailed + " " + getString(R.string.failed) +
                           getString(R.string.period));
     }
