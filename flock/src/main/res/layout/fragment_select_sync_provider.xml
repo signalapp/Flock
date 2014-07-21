@@ -72,6 +72,6 @@
               android:layout_marginTop="32dp"
               android:fontFamily="sans-serif-light"
               android:textAppearance="?android:textAppearanceMedium"
-              android:text="@string/flock_sync_is_a_service_run_by_open_whisper_systems_providing"/>
+              android:text="@string/flock_sync_is_a_service_run_by_open_whisper_systems_available"/>
 
 </LinearLayout>

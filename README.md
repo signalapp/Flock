@@ -4,14 +4,13 @@ Flock
 A secure contact and calendar syncing application for Android.
 
 Flock is a replacement for the default contact and calendar synchronization services provided by Google. Flock provides end-to-end encryption
-between multiple Android devices, putting the privacy of your contacts and calendars back under your control. To facilitate syncing between
-multiple devices a "Sync Service" is required, this can be any standards compliant WebDAV server that conforms to the following RFCs:
+between multiple Android devices putting the privacy of your contacts and calendars back under your control. To facilitate syncing between
+multiple devices a "sync service" is required, this can be any standards compliant WebDAV server that conforms to the following RFCs:
 
 1. RFC 2518 - HTTP Extensions for Distributed Authoring -- WEBDAV
 2. RFC 4918 - HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)
 3. RFC 6352 - CardDAV: vCard Extensions to Web Distributed Authoring and Versioning (WebDAV)
 4. RFC 4791 - Calendaring Extensions to WebDAV (CalDAV)
-5. RFC 1337 - TODO: A few more small specs to include...
 
 Building and contributing code
 ==============================
@@ -22,7 +21,7 @@ Bug tracker
 
 Have a bug? Please create an issue here on GitHub!
 
-https://github.com/rhodey/securesync/issues
+https://github.com/WhisperSystems/Flock/issues
 
 Mailing list
 ------------
