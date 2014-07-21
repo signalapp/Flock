@@ -57,7 +57,7 @@
             <intent android:action="org.anhonesteffort.flock.ChangeCipherPassphraseActivity"/>
         </Preference>
 
-        <Preference android:title="Manage Subscription"
+        <Preference android:title="@string/title_manage_subscription"
                     android:key="pref_subscription">
             <intent android:action="org.anhonesteffort.flock.ManageSubscriptionActivity"/>
         </Preference>

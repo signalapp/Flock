@@ -77,7 +77,7 @@
     </string>
     <string name="host_my_own">Host my own</string>
     <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">
-        You may chose to run and configure your own WebDAV compliant server as a sync service.
+        You may chose to run and configure your own WebDAV-compliant server as a sync service.
         Before use with Flock the server must pass a series of tests.
     </string>
 
@@ -123,9 +123,9 @@
         Choose a username for your account and a strong password to encrypt your data.
     </string>
 
-    <string name="do_you_have_a_flock_account">Do you have a flock account?</string>
-    <string name="yes_log_me_in">Yes log me in</string>
-    <string name="no_register_me">No register me</string>
+    <string name="do_you_have_a_flock_account">Do you have a Flock account?</string>
+    <string name="yes_log_me_in">Yes, log me in</string>
+    <string name="no_register_me">No, register me</string>
     <string name="text_setup_account_with_other">
         Enter the URL and credentials for your WebDAV host then chose a separate
         password for encryption.
@@ -326,7 +326,7 @@
 
 
     <!-- ErrorToaster messages -->
-    <string name="error_login_unauthorized">Login failed, invalid username or password</string>
+    <string name="error_login_unauthorized">Login failed. Invalid username or password</string>
 
     <string name="error_registration_api_server_error">Our registration servers are having trouble, sorry.</string>
     <string name="error_registration_api_client_error">Client registration API error, please send debug logs.</string>
