@@ -193,6 +193,12 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
     return Optional.fromNullable(displayName);
   }
 
+  public void setVisible(Boolean isVisible) {
+    pendingOperations.add(ContentProviderOperation.newUpdate(getCollectionUri())
+        .withValue(CalendarContract.Calendars.VISIBLE, isVisible ? 1 : 0)
+        .build());
+  }
+
   @Override
   public void setDisplayName(String displayName) {
     pendingOperations.add(ContentProviderOperation.newUpdate(getCollectionUri())
@@ -689,9 +695,16 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
       }
 
       toStore.setCollectionCopied(toCollection.get().getLocalId(), true);
+
+      setVisible(false);
+      commitPendingOperations();
+
       listener.onCalendarCopied(getAccount(), toAccount, localId);
 
     } catch (RemoteException e) {
+      listener.onCalendarCopyFailed(e, getAccount(), toAccount, localId);
+      return;
+    } catch (OperationApplicationException e) {
       listener.onCalendarCopyFailed(e, getAccount(), toAccount, localId);
       return;
     }
