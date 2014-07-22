@@ -194,6 +194,8 @@
 
     <!-- My calendars and my addressbooks... -->
     <string name="hint_display_name">display name</string>
+    <string name="heading_display_name">Display name</string>
+    <string name="heading_sync">Sync</string>
     <string name="display_name_cannot_be_empty">Display name cannot be empty.</string>
 
 

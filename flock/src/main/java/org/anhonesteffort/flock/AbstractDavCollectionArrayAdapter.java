@@ -47,12 +47,14 @@ public abstract class AbstractDavCollectionArrayAdapter<T extends HidingDavColle
 {
 
   protected LayoutInflater      inflater;
+  protected boolean             hasSyncOption;
   protected int                 rowLayout;
   protected T[]                 remoteCollections;
   protected LocalComponentStore localStore;
   protected List<String>        batchSelections;
 
   public AbstractDavCollectionArrayAdapter(Context             context,
+                                           boolean             hasSyncOption,
                                            int                 rowLayout,
                                            T[]                 remoteCollections,
                                            LocalComponentStore localStore,
@@ -60,6 +62,7 @@ public abstract class AbstractDavCollectionArrayAdapter<T extends HidingDavColle
   {
     super(context, rowLayout, remoteCollections);
 
+    this.hasSyncOption     = hasSyncOption;
     this.rowLayout         = rowLayout;
     this.remoteCollections = remoteCollections;
     this.localStore        = localStore;
@@ -102,7 +105,11 @@ public abstract class AbstractDavCollectionArrayAdapter<T extends HidingDavColle
 
     ViewHolder viewHolder = (ViewHolder) collectionRowView.getTag(R.integer.tag_view_holder);
 
-    viewHolder.syncCheck.setOnCheckedChangeListener(getOnCheckChangedListener(remoteCollections[position]));
+    if (hasSyncOption)
+      viewHolder.syncCheck.setOnCheckedChangeListener(getOnCheckChangedListener(remoteCollections[position]));
+    else
+      viewHolder.syncCheck.setVisibility(View.GONE);
+
     collectionRowView.setTag(R.integer.tag_collection_path, remoteCollections[position].getPath());
 
     if (batchSelections.contains(remoteCollections[position].getPath())) {
@@ -124,10 +131,12 @@ public abstract class AbstractDavCollectionArrayAdapter<T extends HidingDavColle
       else
         viewHolder.displayName.setText(R.string.display_name_missing);
 
-      if (localStore.getCollection(remoteCollections[position].getPath()).isPresent())
-        viewHolder.syncCheck.setChecked(true);
-      else
-        viewHolder.syncCheck.setChecked(false);
+      if (hasSyncOption) {
+        if (localStore.getCollection(remoteCollections[position].getPath()).isPresent())
+          viewHolder.syncCheck.setChecked(true);
+        else
+          viewHolder.syncCheck.setChecked(false);
+      }
 
     } catch (PropertyParseException e) {
       ErrorToaster.handleShowError(getContext(), e);

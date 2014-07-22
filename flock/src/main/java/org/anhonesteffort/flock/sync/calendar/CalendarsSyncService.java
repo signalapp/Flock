@@ -34,6 +34,8 @@ import android.util.Log;
 
 import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.crypto.InvalidMacException;
+import org.anhonesteffort.flock.sync.key.KeySyncUtil;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 
 import org.anhonesteffort.flock.DavAccountHelper;
@@ -153,6 +155,40 @@ public class CalendarsSyncService extends Service {
 
         LocalCalendarStore localStore  = new LocalCalendarStore(provider, davAccountOptional.get().getOsAccount());
         HidingCalDavStore  remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), davAccountOptional.get(), masterCipher.get());
+
+        if (DavAccountHelper.isUsingOurServers(getContext())) {
+          for (HidingCalDavCollection remoteCollection : remoteStore.getCollections()) {
+            try {
+
+              if (!remoteCollection.getPath().contains(KeySyncUtil.PATH_KEY_COLLECTION) &&
+                  !localStore.getCollection(remoteCollection.getPath()).isPresent())
+              {
+                if (remoteCollection.getHiddenDisplayName().isPresent() &&
+                    remoteCollection.getHiddenColor().isPresent())
+                {
+                  localStore.addCollection(remoteCollection.getPath(),
+                                           remoteCollection.getHiddenDisplayName().get(),
+                                           remoteCollection.getHiddenColor().get());
+                }
+                else if (!remoteCollection.getHiddenDisplayName().isPresent())
+                  localStore.addCollection(remoteCollection.getPath(), remoteCollection.getHiddenDisplayName().get());
+                else
+                  localStore.addCollection(remoteCollection.getPath());
+              }
+
+            } catch (IOException e) {
+              handleException(getContext(), e, syncResult);
+            } catch (PropertyParseException e) {
+              handleException(getContext(), e, syncResult);
+            } catch (RemoteException e) {
+              handleException(getContext(), e, syncResult);
+            } catch (InvalidMacException e) {
+              handleException(getContext(), e, syncResult);
+            } catch (GeneralSecurityException e) {
+              handleException(getContext(), e, syncResult);
+            }
+          }
+        }
 
         for (LocalEventCollection localCollection : localStore.getCollections()) {
           Log.d(TAG, "found local collection: " + localCollection.getPath());

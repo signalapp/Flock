@@ -20,7 +20,6 @@
 package org.anhonesteffort.flock;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -35,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -65,6 +65,19 @@ public class MyCalendarsFragment extends AbstractMyCollectionsFragment
 {
 
   private static final String TAG = "org.anhonesteffort.flock.MyCalendarsFragment";
+
+  @Override
+  public View onCreateView(LayoutInflater inflater,
+                           ViewGroup      container,
+                           Bundle         savedInstanceState)
+  {
+    View fragmentView = super.onCreateView(inflater, container, savedInstanceState);
+
+    if (account != null && DavAccountHelper.isUsingOurServers(account))
+      fragmentView.findViewById(R.id.list_heading_sync).setVisibility(View.GONE);
+
+    return fragmentView;
+  }
 
   protected String getStringCollectionsSelected() {
     return getString(R.string.calendars_selected);
@@ -156,6 +169,7 @@ public class MyCalendarsFragment extends AbstractMyCollectionsFragment
     LocalCalendarStore localCalendarStore  = new LocalCalendarStore(activity, account.getOsAccount());
     RemoteCalendarListAdapter calendarListAdapter =
         new RemoteCalendarListAdapter(activity,
+                                      !DavAccountHelper.isUsingOurServers(account),
                                       remoteCalendarArray,
                                       localCalendarStore,
                                       batchSelections,
@@ -179,8 +193,10 @@ public class MyCalendarsFragment extends AbstractMyCollectionsFragment
           AlertDialog.Builder builder     = new AlertDialog.Builder(activity);
           SharedPreferences   settings    = PreferenceManager.getDefaultSharedPreferences(activity);
 
-    colorPicker.setColor(settings.getInt(PreferencesActivity.KEY_PREF_DEFAULT_CALENDAR_COLOR, R.color.flocktheme_color));
+    colorPicker.setColor(settings.getInt(PreferencesActivity.KEY_PREF_DEFAULT_CALENDAR_COLOR,
+                                         getResources().getColor(R.color.flocktheme_color)));
     builder.setView(view).setTitle(R.string.title_calendar_properties);
+
     builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 
       @Override
@@ -196,7 +212,7 @@ public class MyCalendarsFragment extends AbstractMyCollectionsFragment
 
   private int getColorForSelectedCalendar() {
     if (batchSelections.size() == 0)
-      return R.color.flocktheme_color;
+      return getResources().getColor(R.color.flocktheme_color);
 
     for(int i = 0; i < collectionsListView.getChildCount(); i++) {
       View    rowView   = collectionsListView.getChildAt(i);
@@ -207,7 +223,7 @@ public class MyCalendarsFragment extends AbstractMyCollectionsFragment
         return (Integer) colorView.getTag(R.integer.tag_calendar_color);
     }
 
-    return R.color.flocktheme_color;
+    return getResources().getColor(R.color.flocktheme_color);
   }
 
   private void handleEditSelectedCalendar() {
@@ -302,6 +318,9 @@ public class MyCalendarsFragment extends AbstractMyCollectionsFragment
           remoteStore.addCollection(calendarRemotePath, displayName, color);
           remoteStore.releaseConnections();
 
+          LocalCalendarStore localStore = new LocalCalendarStore(activity, account.getOsAccount());
+          localStore.addCollection(calendarRemotePath, displayName, color);
+
           result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
 
         } catch (PropertyParseException e) {
@@ -309,6 +328,8 @@ public class MyCalendarsFragment extends AbstractMyCollectionsFragment
         } catch (DavException e) {
           ErrorToaster.handleBundleError(e, result);
         } catch (SSLException e) {
+          ErrorToaster.handleBundleError(e, result);
+        } catch (RemoteException e) {
           ErrorToaster.handleBundleError(e, result);
         } catch (IOException e) {
           ErrorToaster.handleBundleError(e, result);

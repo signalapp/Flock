@@ -43,12 +43,13 @@ public class RemoteCalendarListAdapter extends AbstractDavCollectionArrayAdapter
   private View.OnClickListener colorClickListener;
 
   public RemoteCalendarListAdapter(Context                  context,
+                                   boolean                  hasSyncOption,
                                    HidingCalDavCollection[] remoteCalendars,
                                    LocalCalendarStore       localStore,
                                    List<String>             selectedCalendars,
                                    View.OnClickListener     colorClickListener)
   {
-    super(context, R.layout.row_remote_calendar_details, remoteCalendars, localStore, selectedCalendars);
+    super(context, hasSyncOption, R.layout.row_remote_calendar_details, remoteCalendars, localStore, selectedCalendars);
     this.colorClickListener = colorClickListener;
   }
 
@@ -85,8 +86,8 @@ public class RemoteCalendarListAdapter extends AbstractDavCollectionArrayAdapter
         calendarViewHolder.colorView.setTag(R.integer.tag_calendar_color,  color.get());
       }
       else {
-        calendarViewHolder.colorView.setBackgroundResource(R.color.flocktheme_color);
-        calendarViewHolder.colorView.setTag(R.integer.tag_calendar_color, R.color.flocktheme_color);
+        calendarViewHolder.colorView.setBackgroundColor(getContext().getResources().getColor(R.color.flocktheme_color));
+        calendarViewHolder.colorView.setTag(R.integer.tag_calendar_color, getContext().getResources().getColor(R.color.flocktheme_color));
       }
 
     } catch (PropertyParseException e) {

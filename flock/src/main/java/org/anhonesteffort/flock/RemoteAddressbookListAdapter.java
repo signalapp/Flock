@@ -36,7 +36,7 @@ public class RemoteAddressbookListAdapter extends AbstractDavCollectionArrayAdap
                                       LocalAddressbookStore     localStore,
                                       List<String>              selectedAddressbooks)
   {
-    super(context, R.layout.row_remote_addressbook_details, remoteAddressbooks, localStore, selectedAddressbooks);
+    super(context, true, R.layout.row_remote_addressbook_details, remoteAddressbooks, localStore, selectedAddressbooks);
   }
 
   @Override
