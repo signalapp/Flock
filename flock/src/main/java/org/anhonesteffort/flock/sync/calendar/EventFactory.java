@@ -25,6 +25,7 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.CalendarContract;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.google.common.base.Optional;
@@ -420,9 +421,18 @@ public class EventFactory {
         values.put(CalendarContract.Events.EXDATE, exDate.getValue());
 
       if (rRule == null && rDate == null) {
-
         DtEnd dtEnd = vEvent.getEndDate();
-        if (dtEnd != null && dtEnd.getDate() != null) {
+
+        if (dtEnd != null && dtEnd.getDate() != null && vEvent.getDuration() == null &&
+           (dtStart.getDate().getTime() + DateUtils.DAY_IN_MILLIS) == dtEnd.getDate().getTime())
+        {
+          if (dtEnd.getTimeZone() != null)
+            values.put(CalendarContract.Events.EVENT_TIMEZONE, dtEnd.getTimeZone().getID());
+
+          values.put(CalendarContract.Events.DTEND, dtEnd.getDate().getTime());
+          values.put(CalendarContract.Events.ALL_DAY, 1);
+        }
+        else if (dtEnd != null && dtEnd.getDate() != null) {
           if (dtEnd.getTimeZone() != null)
             values.put(CalendarContract.Events.EVENT_TIMEZONE, dtEnd.getTimeZone().getID());
 
@@ -433,13 +443,17 @@ public class EventFactory {
           java.util.Date endDate  = duration.getDuration().getTime(dtStart.getDate());
           values.put(CalendarContract.Events.DTEND, endDate.getTime());
         }
-        else
+        else {
+          values.put(CalendarContract.Events.DTEND, dtStart.getDate().getTime() + DateUtils.DAY_IN_MILLIS);
           values.put(CalendarContract.Events.ALL_DAY, 1);
-
-      } else if (vEvent.getDuration() != null)
+        }
+      }
+      else if (vEvent.getDuration() != null && vEvent.getDuration().getValue().equals("P1D")) {
         values.put(CalendarContract.Events.DURATION, vEvent.getDuration().getValue());
-      else
         values.put(CalendarContract.Events.ALL_DAY, 1);
+      }
+      else if (vEvent.getDuration() != null)
+        values.put(CalendarContract.Events.DURATION, vEvent.getDuration().getValue());
 
       PropertyList attendees = vEvent.getProperties(Attendee.ATTENDEE);
       if (attendees != null && attendees.size() > 0)
@@ -614,7 +628,12 @@ public class EventFactory {
                                           CalDavConstants.CALDAV_NAMESPACE, path);
     }
 
-    Long dtEndMilliseconds = eventValues.getAsLong(CalendarContract.Events.DTEND);
+    Boolean allDay            = eventValues.getAsBoolean(CalendarContract.Events.ALL_DAY);
+    Long    dtEndMilliseconds = eventValues.getAsLong(CalendarContract.Events.DTEND);
+
+    if (allDay && eventValues.getAsString(CalendarContract.Events.DURATION) == null)
+      dtEndMilliseconds = dtStartMilliseconds + DateUtils.DAY_IN_MILLIS;
+
     if (dtEndMilliseconds != null && dtEndMilliseconds > 0) {
       DtEnd  dtEnd         = new DtEnd(new Date(dtEndMilliseconds));
       String dtStartTZText = eventValues.getAsString(CalendarContract.Events.EVENT_TIMEZONE);
