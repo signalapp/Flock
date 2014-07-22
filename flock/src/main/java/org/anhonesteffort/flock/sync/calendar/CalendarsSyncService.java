@@ -170,7 +170,7 @@ public class CalendarsSyncService extends Service {
                                            remoteCollection.getHiddenDisplayName().get(),
                                            remoteCollection.getHiddenColor().get());
                 }
-                else if (!remoteCollection.getHiddenDisplayName().isPresent())
+                else if (remoteCollection.getHiddenDisplayName().isPresent())
                   localStore.addCollection(remoteCollection.getPath(), remoteCollection.getHiddenDisplayName().get());
                 else
                   localStore.addCollection(remoteCollection.getPath());
