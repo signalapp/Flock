@@ -14,7 +14,7 @@ multiple devices a "sync service" is required, this can be any standards complia
 
 Building and contributing code
 ==============================
-Instructions on how to build Flock, as well as on how to setup an IDE to modify it can be found in the "BUILDING.md" file.
+Instructions on how to build Flock, as well as on how to setup an IDE to modify it can be found in the [BUILDING.md](BUILDING.md) file.
 
 Bug tracker
 -----------
