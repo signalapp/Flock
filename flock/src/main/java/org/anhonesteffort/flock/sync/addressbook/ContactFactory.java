@@ -1094,15 +1094,22 @@ public class ContactFactory {
 
     if (vCard.getBirthday() != null && vCard.getBirthday().getDate() != null) {
       SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+      String           formatted = formatter.format(vCard.getBirthday().getDate());
       ContentValues    values    = new ContentValues();
+
+       /*
+        aCalendar birthday with "year unknown" option...
+        https://github.com/WhisperSystems/Flock/issues/26
+      */
+      if (formatted.startsWith("0001-"))
+        formatted = "-" + formatted.substring(4);
 
       values.put(ContactsContract.Data.MIMETYPE,
                  ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE);
       values.put(ContactsContract.CommonDataKinds.Event.TYPE,
                  ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY);
-
       values.put(ContactsContract.CommonDataKinds.Event.START_DATE,
-                 formatter.format(vCard.getBirthday().getDate()));
+                 formatted);
 
       valuesList.add(values);
     }
@@ -1163,13 +1170,20 @@ public class ContactFactory {
       try {
 
         if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY) {
+          /*
+            aCalendar birthday with "year unknown" option...
+            https://github.com/WhisperSystems/Flock/issues/26
+          */
+          if (eventStartDate.startsWith("-"))
+            eventStartDate = "0001" + eventStartDate.substring(1);
+
           Birthday birthday = new Birthday(formatter.parse(eventStartDate));
           vCard.setBirthday(birthday);
         }
 
       } catch (ParseException e) {
         throw new InvalidComponentException("caught exception while parsing birthday", false,
-                                            CardDavConstants.CARDDAV_NAMESPACE, path);
+                                            CardDavConstants.CARDDAV_NAMESPACE, path, e);
       }
 
       if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_ANNIVERSARY)
