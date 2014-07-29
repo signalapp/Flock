@@ -53,6 +53,7 @@ import ezvcard.property.Uid;
 import ezvcard.property.Url;
 import ezvcard.util.IOUtils;
 
+import org.anhonesteffort.flock.util.Base64;
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
@@ -937,37 +938,26 @@ public class ContactFactory {
         values.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
                    ContactsContract.CommonDataKinds.StructuredPostal.TYPE_OTHER);
 
-      String formattedAddress = address.getLabel();
-      if (StringUtils.isEmpty(address.getLabel())) {
-        String lineStreet = StringUtils.join(
-            new String[] { address.getStreetAddress(), address.getPoBox(), address.getExtendedAddress() },
-            " ");
+      if (address.getLabel() != null) {
+        try {
 
-        String lineLocality = StringUtils.join(
-            new String[] { address.getPostalCode(), address.getLocality() },
-            " ");
+          String formattedAddress = new String(Base64.decode(address.getLabel()));
 
-        List<String> lines = new LinkedList<String>();
-        if (lineStreet != null)
-          lines.add(lineStreet);
-        if (address.getRegion() != null && !address.getRegion().isEmpty())
-          lines.add(address.getRegion());
-        if (lineLocality != null)
-          lines.add(lineLocality);
+          values.put(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, formattedAddress);
+          values.put(ContactsContract.CommonDataKinds.StructuredPostal.STREET, address.getStreetAddress());
+          values.put(ContactsContract.CommonDataKinds.StructuredPostal.POBOX, address.getPoBox());
+          values.put(ContactsContract.CommonDataKinds.StructuredPostal.NEIGHBORHOOD, address.getExtendedAddress());
+          values.put(ContactsContract.CommonDataKinds.StructuredPostal.CITY, address.getLocality());
+          values.put(ContactsContract.CommonDataKinds.StructuredPostal.REGION, address.getRegion());
+          values.put(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE, address.getPostalCode());
+          values.put(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY, address.getCountry());
 
-        formattedAddress = StringUtils.join(lines, "\n");
+          valuesList.add(values);
+
+        } catch (IOException e) {
+          Log.e(TAG, "formatted address is not base64 encoded, not adding anything for postal addresss.");
+        }
       }
-      values.put(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, formattedAddress);
-
-      values.put(ContactsContract.CommonDataKinds.StructuredPostal.STREET, address.getStreetAddress());
-      values.put(ContactsContract.CommonDataKinds.StructuredPostal.POBOX, address.getPoBox());
-      values.put(ContactsContract.CommonDataKinds.StructuredPostal.NEIGHBORHOOD, address.getExtendedAddress());
-      values.put(ContactsContract.CommonDataKinds.StructuredPostal.CITY, address.getLocality());
-      values.put(ContactsContract.CommonDataKinds.StructuredPostal.REGION, address.getRegion());
-      values.put(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE, address.getPostalCode());
-      values.put(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY, address.getCountry());
-
-      valuesList.add(values);
     }
 
     return valuesList;
@@ -989,7 +979,7 @@ public class ContactFactory {
 
     if (addressType != null && formattedAddress != null) {
       Address address = new Address();
-      address.setLabel(formattedAddress);
+      address.setLabel(Base64.encodeBytes(formattedAddress.getBytes()));
 
       switch (addressType) {
         case ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME:
@@ -1030,8 +1020,8 @@ public class ContactFactory {
       vCard.addAddress(address);
     }
     else {
-      Log.e(TAG, "im address type or formatted address is null, not adding anything");
-      throw new InvalidComponentException("im address type or formatted address is null", false,
+      Log.e(TAG, "address type or formatted address is null, not adding anything");
+      throw new InvalidComponentException("address type or formatted address is null", false,
                                           CardDavConstants.CARDDAV_NAMESPACE, path);
     }
   }
