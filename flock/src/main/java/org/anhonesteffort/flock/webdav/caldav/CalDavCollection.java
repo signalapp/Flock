@@ -312,7 +312,7 @@ public class CalDavCollection extends AbstractDavComponentCollection<Calendar> i
 
       try {
 
-        getStore().getClient().execute(reportMethod);
+        client.execute(reportMethod);
 
         if (reportMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS)
           return getComponentsFromMultiStatus(reportMethod.getResponseBodyAsMultiStatus().getResponses());
@@ -372,7 +372,7 @@ public class CalDavCollection extends AbstractDavComponentCollection<Calendar> i
         calendarOutputter.output(calendar, byteStream);
         putMethod.setRequestEntity(new ByteArrayRequestEntity(byteStream.toByteArray(), CalDavConstants.HEADER_CONTENT_TYPE_CALENDAR));
 
-        getStore().getClient().execute(putMethod);
+        client.execute(putMethod);
         int status = putMethod.getStatusCode();
 
         if (status == DavServletResponse.SC_REQUEST_ENTITY_TOO_LARGE ||

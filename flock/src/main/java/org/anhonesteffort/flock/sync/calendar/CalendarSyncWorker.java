@@ -53,10 +53,13 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
   private static final String TAG = "org.anhonesteffort.flock.sync.calendar.CalendarSyncWorker";
 
   protected CalendarSyncWorker(Context                context,
+                               SyncResult             result,
                                LocalEventCollection   localCollection,
                                HidingCalDavCollection remoteCollection)
   {
-    super(context, localCollection, remoteCollection);
+    super(context, result, localCollection, remoteCollection);
+
+    Thread.currentThread().setContextClassLoader(context.getClassLoader());
   }
 
   private LocalEventCollection getLocalCollection() {

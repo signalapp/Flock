@@ -125,7 +125,7 @@ public class DavAccountHelper {
     return Optional.of(new DavAccount(accountUsername.get(), accountPassword.get(), davHREF.get()));
   }
 
-  private static AndroidDavClient getAndroidDavClient(Context context, DavAccount account)
+  public static AndroidDavClient getAndroidDavClient(Context context, DavAccount account)
     throws MalformedURLException
   {
     URL davHost = new URL(account.getDavHostHREF());

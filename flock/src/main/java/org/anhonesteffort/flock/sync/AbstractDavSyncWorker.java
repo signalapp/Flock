@@ -45,11 +45,12 @@ import java.util.List;
 /**
  * Programmer: rhodey
  */
-public abstract class AbstractDavSyncWorker<T> {
+public abstract class AbstractDavSyncWorker<T> implements Runnable {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.AbstractDavSyncWorker";
 
   protected Context                             context;
+  protected SyncResult                          result;
   protected AbstractLocalComponentCollection<T> localCollection;
   protected HidingDavCollection<T>              remoteCollection;
 
@@ -57,19 +58,36 @@ public abstract class AbstractDavSyncWorker<T> {
   protected Optional<String> remoteCTag = Optional.absent();
 
   public AbstractDavSyncWorker(Context                             context,
+                               SyncResult                          result,
                                AbstractLocalComponentCollection<T> localCollection,
                                HidingDavCollection<T>              remoteCollection)
   {
     this.context          = context;
+    this.result           = result;
     this.localCollection  = localCollection;
     this.remoteCollection = remoteCollection;
   }
 
-  public void run(SyncResult result, boolean force_sync) {
+  protected void handleMakeFlockCollection()
+      throws PropertyParseException, DavException,
+             RemoteException, GeneralSecurityException, IOException
+  {
+    if (!remoteCollection.isFlockCollection()) {
+      if (!localCollection.getDisplayName().isPresent())
+        remoteCollection.makeFlockCollection(" ");
+      else
+        remoteCollection.makeFlockCollection(localCollection.getDisplayName().get());
+    }
+  }
+
+  @Override
+  public void run() {
     Log.d(TAG, "now syncing local: " + localCollection.getPath() +
-               " with remote: " + remoteCollection.getPath());
+               " with remote: "      + remoteCollection.getPath());
 
     try {
+
+      handleMakeFlockCollection();
 
       localCTag  = localCollection.getCTag();
       remoteCTag = remoteCollection.getCTag();
@@ -91,58 +109,58 @@ public abstract class AbstractDavSyncWorker<T> {
       pushLocallyChangedComponents(result);
       pushLocallyCreatedComponents(result);
 
-      boolean pull_remote = force_sync || result.stats.numInserts > 0 ||
-                            result.stats.numUpdates > 0 || result.stats.numDeletes > 0;
+      boolean pull_remote = result.stats.numInserts > 0 ||
+                            result.stats.numUpdates > 0 ||
+                            result.stats.numDeletes > 0 ||
+                            !localCTag.isPresent()      ||
+                            (remoteCTag.isPresent() && !localCTag.get().equals(remoteCTag.get()));
 
-      if (!pull_remote) {
-        if (!localCTag.isPresent())
-          pull_remote = true;
-        else
-          pull_remote = remoteCTag.isPresent() && !localCTag.get().equals(remoteCTag.get());
-      }
+      if (!pull_remote)
+        return;
 
-      if (pull_remote) {
-        remoteCTag = remoteCollection.getCTag();
+      remoteCTag = remoteCollection.getCTag();
 
-        pullRemotelyCreatedProperties(result);
-        pullRemotelyChangedProperties(result);
+      pullRemotelyCreatedProperties(result);
+      pullRemotelyChangedProperties(result);
 
-        pullRemotelyCreatedComponents(result);
-        pullRemotelyChangedComponents(result);
-        purgeRemotelyDeletedComponents(result);
+      pullRemotelyCreatedComponents(result);
+      pullRemotelyChangedComponents(result);
+      purgeRemotelyDeletedComponents(result);
 
-        if (remoteCTag.isPresent()) {
-          Log.d(TAG, "remote ctag post pull remote: " + remoteCTag.get());
+      if (remoteCTag.isPresent()) {
+        Log.d(TAG, "remote ctag post pull remote: " + remoteCTag.get());
 
-          if (result.stats.numAuthExceptions  > 0 ||
-              result.stats.numSkippedEntries  > 0 ||
-              result.stats.numParseExceptions > 0 ||
-              result.stats.numIoExceptions    > 0)
-          {
-            Log.w(TAG, "sync result has errors, will not save remote CTag to local collection");
-            return;
-          }
-
-          localCollection.setCTag(remoteCTag.get());
-          localCollection.commitPendingOperations();
-
-          if (localCollection.getCTag().isPresent())
-            Log.d(TAG, "local ctag post pull remote: "  + localCollection.getCTag().get());
+        if (result.stats.numAuthExceptions  > 0 ||
+            result.stats.numSkippedEntries  > 0 ||
+            result.stats.numParseExceptions > 0 ||
+            result.stats.numIoExceptions    > 0)
+        {
+          Log.w(TAG, "sync result has errors, will not save remote CTag to local collection");
+          return;
         }
-        else
-          throw new PropertyParseException("Remote collection is missing CTag, things could get funny.",
-                                           remoteCollection.getPath(), CalDavConstants.PROPERTY_NAME_CTAG);
-      }
 
-    } catch (RemoteException e) {
-      result.stats.numParseExceptions++;
-      Log.e(TAG, "caught RemoteException while updating ctags! " + e.toString());
-    } catch (OperationApplicationException e) {
-      result.stats.numParseExceptions++;
-      Log.e(TAG, "caught OperationApplicationException while updating ctags! " + e.toString());
+        localCollection.setCTag(remoteCTag.get());
+        localCollection.commitPendingOperations();
+
+        if (localCollection.getCTag().isPresent())
+          Log.d(TAG, "local ctag post pull remote: "  + localCollection.getCTag().get());
+      }
+      else
+        throw new PropertyParseException("Remote collection is missing CTag, things could get funny.",
+                                         remoteCollection.getPath(), CalDavConstants.PROPERTY_NAME_CTAG);
+
     } catch (PropertyParseException e) {
-      result.stats.numParseExceptions++;
-      Log.e(TAG, "caught PropertyParseException while updating ctags! " + e.toString());
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (DavException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (RemoteException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (OperationApplicationException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (GeneralSecurityException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch(IOException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
     }
   }
 
@@ -243,6 +261,18 @@ public abstract class AbstractDavSyncWorker<T> {
        }
      }
 
+     if (deletedIds.size() > 0) {
+       try {
+
+         remoteCollection.fetchProperties();
+
+       }  catch (DavException e) {
+         AbstractDavSyncAdapter.handleException(context, e, result);
+       } catch (IOException e) {
+         AbstractDavSyncAdapter.handleException(context, e, result);
+       }
+     }
+
     } catch (RemoteException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
     }
@@ -306,6 +336,18 @@ public abstract class AbstractDavSyncWorker<T> {
         }
       }
 
+      if (updatedIds.size() > 0) {
+        try {
+
+          remoteCollection.fetchProperties();
+
+        }  catch (DavException e) {
+          AbstractDavSyncAdapter.handleException(context, e, result);
+        } catch (IOException e) {
+          AbstractDavSyncAdapter.handleException(context, e, result);
+        }
+      }
+
     } catch (RemoteException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
     }
@@ -330,7 +372,7 @@ public abstract class AbstractDavSyncWorker<T> {
           Optional<T> component = localCollection.getComponent(componentId);
 
           if (component.isPresent()) {
-            Log.d(TAG, "creating remote component " + componentId);
+            Log.d(TAG, "creating remote component " + componentId + " with uid " + uid);
 
             prePushLocallyCreatedComponent(component.get());
             remoteCollection.addHiddenComponent(component.get());
@@ -356,6 +398,18 @@ public abstract class AbstractDavSyncWorker<T> {
         } catch (RemoteException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
         } catch (OperationApplicationException e) {
+          AbstractDavSyncAdapter.handleException(context, e, result);
+        }
+      }
+
+      if (newIds.size() > 0) {
+        try {
+
+          remoteCollection.fetchProperties();
+
+        }  catch (DavException e) {
+          AbstractDavSyncAdapter.handleException(context, e, result);
+        } catch (IOException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
         }
       }

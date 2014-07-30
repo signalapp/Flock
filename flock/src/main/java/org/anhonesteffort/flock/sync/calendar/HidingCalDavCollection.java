@@ -326,7 +326,6 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
       throws InvalidComponentException, DavException, GeneralSecurityException, IOException
   {
     putHiddenComponentToServer(component, Optional.<String>absent());
-    fetchProperties();
   }
 
   @Override
@@ -334,6 +333,10 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
       throws InvalidComponentException, DavException, GeneralSecurityException, IOException
   {
     putHiddenComponentToServer(component.getComponent(), component.getETag());
-    fetchProperties();
+  }
+
+  @Override
+  public void closeHttpConnection() {
+    getStore().closeHttpConnection();
   }
 }

@@ -19,7 +19,6 @@
 
 package org.anhonesteffort.flock.sync.key;
 
-import android.accounts.Account;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -27,21 +26,26 @@ import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
-import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.common.base.Optional;
-
 import org.anhonesteffort.flock.CorrectEncryptionPasswordActivity;
-import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.R;
 import org.anhonesteffort.flock.auth.DavAccount;
+import org.anhonesteffort.flock.crypto.InvalidMacException;
+import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
-import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
+import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
+import org.anhonesteffort.flock.webdav.PropertyParseException;
+import org.apache.jackrabbit.webdav.DavException;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Programmer: rhodey
@@ -73,30 +77,45 @@ public class KeySyncService extends Service {
       super(context);
     }
 
+    @Override
     protected String getAuthority() {
       return KeySyncScheduler.CONTENT_AUTHORITY;
     }
 
     @Override
-    public void onPerformSync(Account               account,
-                              Bundle                extras,
-                              String                authority,
-                              ContentProviderClient provider,
-                              SyncResult            syncResult)
-    {
-      Log.d(TAG, "performing sync for authority >> " + authority);
-
-      Optional<DavAccount> davAccount = DavAccountHelper.getAccount(getContext());
-      if (!davAccount.isPresent()) {
-        syncResult.stats.numAuthExceptions++;
-        showNotifications(syncResult);
-        return;
-      }
-
-      new KeySyncWorker(getContext(), davAccount.get()).run(syncResult);
-
-      showNotifications(syncResult);
+    protected void setTimeLastSync() {
       new KeySyncScheduler(getContext()).setTimeLastSync(new Date().getTime());
+    }
+
+    @Override
+    protected void handlePreSyncOperations(DavAccount            account,
+                                           MasterCipher          masterCipher,
+                                           ContentProviderClient provider)
+        throws PropertyParseException, InvalidMacException, DavException,
+               RemoteException, GeneralSecurityException, IOException
+    {
+
+    }
+
+    @Override
+    protected List<AbstractDavSyncWorker> getSyncWorkers(DavAccount            account,
+                                                         MasterCipher          masterCipher,
+                                                         ContentProviderClient client,
+                                                         SyncResult            syncResult)
+        throws DavException, RemoteException, IOException
+    {
+      new KeySyncWorker(getContext(), account).run(syncResult); // hack...
+      return new LinkedList<AbstractDavSyncWorker>();
+    }
+
+    @Override
+    protected void handlePostSyncOperations(DavAccount            account,
+                                            MasterCipher          masterCipher,
+                                            ContentProviderClient provider)
+        throws PropertyParseException, InvalidMacException, DavException,
+               RemoteException, GeneralSecurityException, IOException
+    {
+
     }
   }
 
@@ -125,6 +144,5 @@ public class KeySyncService extends Service {
 
     notificationManager.cancel(ID_NOTIFICATION_CIPHER_PASSPHRASE);
   }
-
 
 }

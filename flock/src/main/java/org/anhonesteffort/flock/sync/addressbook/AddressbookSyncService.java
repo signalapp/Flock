@@ -19,29 +19,30 @@
 
 package org.anhonesteffort.flock.sync.addressbook;
 
-import android.accounts.Account;
 import android.app.Service;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
-import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.google.common.base.Optional;
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.auth.DavAccount;
-import org.anhonesteffort.flock.crypto.KeyHelper;
+import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
-import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
+import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Programmer: rhodey
@@ -72,74 +73,72 @@ public class AddressbookSyncService extends Service {
       super(context);
     }
 
+    @Override
     protected String getAuthority() {
       return AddressbookSyncScheduler.CONTENT_AUTHORITY;
     }
 
     @Override
-    public void onPerformSync(Account               account,
-                              Bundle                extras,
-                              String                authority,
-                              ContentProviderClient provider,
-                              SyncResult            syncResult)
-    {
-      Log.d(TAG, "performing sync for authority: " + authority + ", account: " + account.name);
+    protected void setTimeLastSync() {
+      new AddressbookSyncScheduler(getContext()).setTimeLastSync(new Date().getTime());
+    }
 
-      Optional<DavAccount> davAccount = DavAccountHelper.getAccount(getContext());
-      if (!davAccount.isPresent()) {
-        Log.d(TAG, "dav account is missing");
-        syncResult.stats.numAuthExceptions++;
-        showNotifications(syncResult);
-        return;
-      }
+    @Override
+    protected void handlePreSyncOperations(DavAccount            account,
+                                           MasterCipher          masterCipher,
+                                           ContentProviderClient provider)
+        throws PropertyParseException, InvalidMacException, DavException,
+               RemoteException, GeneralSecurityException, IOException
+    {
+      Log.d(TAG, "handlePreSyncOperations()");
+    }
+
+    @Override
+    protected List<AbstractDavSyncWorker> getSyncWorkers(DavAccount            account,
+                                                         MasterCipher          masterCipher,
+                                                         ContentProviderClient provider,
+                                                         SyncResult            syncResult)
+        throws DavException, RemoteException, IOException
+    {
+      List<AbstractDavSyncWorker> workers     = new LinkedList<AbstractDavSyncWorker>();
+      LocalAddressbookStore       localStore  = new LocalAddressbookStore(getContext(), provider, account);
+      HidingCardDavStore          remoteStore = DavAccountHelper.getHidingCardDavStore(getContext(), account, masterCipher);
 
       try {
 
-        Optional<MasterCipher> masterCipher = KeyHelper.getMasterCipher(getContext());
-        if (!masterCipher.isPresent()) {
-          Log.d(TAG, "master cipher is missing");
-          syncResult.stats.numAuthExceptions++;
-          return ;
-        }
-
-        LocalAddressbookStore localStore  = new LocalAddressbookStore(getContext(), provider, davAccount.get());
-        HidingCardDavStore    remoteStore = DavAccountHelper.getHidingCardDavStore(getContext(), davAccount.get(), masterCipher.get());
-
         for (LocalContactCollection localCollection : localStore.getCollections()) {
           Log.d(TAG, "found local collection: " + localCollection.getPath());
+
           Optional<HidingCardDavCollection> remoteCollection = remoteStore.getCollection(localCollection.getPath());
-
           if (remoteCollection.isPresent()) {
-            if (!remoteCollection.get().isFlockCollection()) {
-              if (!localCollection.getDisplayName().isPresent())
-                remoteCollection.get().makeFlockCollection(" ");
-              else
-                remoteCollection.get().makeFlockCollection(localCollection.getDisplayName().get());
-            }
+            remoteCollection.get().setClient(
+                DavAccountHelper.getAndroidDavClient(getContext(), account)
+            );
 
-            new AddressbookSyncWorker(getContext(), localCollection, remoteCollection.get()).run(syncResult, false);
-          }
-          else {
+            workers.add(
+                new AddressbookSyncWorker(getContext(), syncResult, localCollection, remoteCollection.get())
+            );
+          } else {
             Log.d(TAG, "local collection missing remotely, deleting locally");
             localStore.removeCollection(localCollection.getPath());
           }
         }
 
+      } finally {
         remoteStore.releaseConnections();
-
-      } catch (PropertyParseException e) {
-        handleException(getContext(), e, syncResult);
-      } catch (IOException e) {
-        handleException(getContext(), e, syncResult);
-      } catch (DavException e) {
-        handleException(getContext(), e, syncResult);
-      } catch (GeneralSecurityException e) {
-        handleException(getContext(), e, syncResult);
       }
 
-      showNotifications(syncResult);
-      new AddressbookSyncScheduler(getContext()).setTimeLastSync(new Date().getTime());
+      return workers;
+    }
+
+    @Override
+    protected void handlePostSyncOperations(DavAccount            account,
+                                            MasterCipher          masterCipher,
+                                            ContentProviderClient provider)
+        throws PropertyParseException, InvalidMacException, DavException,
+               RemoteException, GeneralSecurityException, IOException
+    {
+      Log.d(TAG, "handlePostSyncOperations()");
     }
   }
-
 }

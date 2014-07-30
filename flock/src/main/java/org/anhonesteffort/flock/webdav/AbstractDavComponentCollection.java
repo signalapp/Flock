@@ -61,20 +61,24 @@ import javax.xml.parsers.ParserConfigurationException;
 public abstract class AbstractDavComponentCollection<T> implements DavComponentCollection<T> {
 
   private final AbstractDavComponentStore<?> store;
+  protected     DavClient                    client;
   private       String                       path;
   protected     DavPropertySet               properties;
 
-  protected AbstractDavComponentCollection(AbstractDavComponentStore<?> store, String path) {
-    this.store = store;
-    this.path  = path;
-    properties = new DavPropertySet();
+  protected AbstractDavComponentCollection(AbstractDavComponentStore<?> store,
+                                           String                       path) {
+    this.store   = store;
+    this.client  = store.davClient;
+    this.path    = path;
+    properties   = new DavPropertySet();
   }
 
   protected AbstractDavComponentCollection(AbstractDavComponentStore<?> store,
                                            String                       path,
-                                           DavPropertySet properties)
+                                           DavPropertySet               properties)
   {
     this.store      = store;
+    this.client     = store.davClient;
     this.path       = path;
     this.properties = properties;
   }
@@ -83,13 +87,18 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
                                            String                       path,
                                            String                       displayName)
   {
-    this.store = store;
-    this.path  = path;
+    this.store  = store;
+    this.client = store.davClient;
+    this.path   = path;
 
     properties = new DavPropertySet();
     properties.add(new DefaultDavProperty<String>(DavPropertyName.DISPLAYNAME, displayName));
   }
 
+  public void setClient(DavClient client) {
+    this.client = client;
+  }
+  
   public AbstractDavComponentStore<?> getStore() {
     return store;
   }
@@ -268,7 +277,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
 
     try {
 
-      getStore().getClient().execute(propFindMethod);
+      client.execute(propFindMethod);
 
       if (propFindMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS) {
         MultiStatus           multiStatus = propFindMethod.getResponseBodyAsMultiStatus();
@@ -291,7 +300,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
 
     try {
 
-      getStore().getClient().execute(propFindMethod);
+      client.execute(propFindMethod);
 
       if (propFindMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS) {
         MultiStatus           multiStatus = propFindMethod.getResponseBodyAsMultiStatus();
@@ -319,7 +328,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
     try {
 
       propPatchMethod.getRequestEntity().writeRequest(stream);
-      getStore().getClient().execute(propPatchMethod);
+      client.execute(propPatchMethod);
 
       if (propPatchMethod.getStatusCode() != DavServletResponse.SC_MULTI_STATUS)
         throw new DavException(propPatchMethod.getStatusCode(), propPatchMethod.getStatusText());
@@ -342,7 +351,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
 
     try {
 
-      getStore().getClient().execute(propFindMethod);
+      client.execute(propFindMethod);
 
       if (propFindMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS) {
         MultiStatus           multiStatus = propFindMethod.getResponseBodyAsMultiStatus();
@@ -389,7 +398,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
 
       try {
 
-        getStore().getClient().execute(reportMethod);
+        client.execute(reportMethod);
         if (reportMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS) {
           try {
 
@@ -429,7 +438,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
 
     try {
 
-      getStore().getClient().execute(reportMethod);
+      client.execute(reportMethod);
 
       if (reportMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS)
         return getComponentsFromMultiStatus(reportMethod.getResponseBodyAsMultiStatus().getResponses());
@@ -466,15 +475,12 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
 
     try {
 
-      getStore().getClient().execute(deleteMethod);
+      client.execute(deleteMethod);
       if (!deleteMethod.succeeded())
         throw new DavException(deleteMethod.getStatusCode(), deleteMethod.getStatusText());
 
     } finally {
       deleteMethod.releaseConnection();
     }
-
-    fetchProperties();
   }
-
 }
