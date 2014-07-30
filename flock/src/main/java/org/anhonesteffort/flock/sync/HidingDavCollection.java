@@ -40,15 +40,17 @@ public interface HidingDavCollection<T> {
 
   public Optional<String> getCTag() throws PropertyParseException;
 
+  public boolean isFlockCollection() throws PropertyParseException;
+
+  public void makeFlockCollection(String displayName) throws DavException, IOException, GeneralSecurityException;
+
+  public void fetchProperties() throws DavException, IOException;
+
   public Optional<String> getHiddenDisplayName()
       throws PropertyParseException, InvalidMacException, GeneralSecurityException, IOException;
 
   public void setHiddenDisplayName(String displayName)
-      throws DavException, IOException, InvalidMacException, GeneralSecurityException;
-
-  public Optional<String> getEncryptedKeyMaterial() throws PropertyParseException;
-
-  public void setEncryptedKeyMaterial(String encryptedKeyMaterial) throws DavException, IOException;
+      throws DavException, IOException, GeneralSecurityException;
 
   public HashMap<String, String> getComponentETags() throws DavException, IOException;
 

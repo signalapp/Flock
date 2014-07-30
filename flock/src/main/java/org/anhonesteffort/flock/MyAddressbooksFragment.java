@@ -125,6 +125,14 @@ public class MyAddressbooksFragment extends AbstractMyCollectionsFragment {
   private void handleEditSelectedAddressbook() {
     Log.d(TAG, "handleEditSelectedAddressbook()");
 
+    if (!getIsFlockCollectionForSelectedCollection()) {
+      Toast.makeText(getActivity(),
+                     R.string.you_cannot_edit_addressbooks_that_have_not_been_synced,
+                     Toast.LENGTH_SHORT).show();
+      initializeList();
+      return;
+    }
+
           LayoutInflater      inflater        = getActivity().getLayoutInflater();
           View                dialogView      = inflater.inflate(R.layout.dialog_addressbook_edit, null);
     final EditText            displayNameEdit = (EditText) dialogView.findViewById(R.id.dialog_display_name);
@@ -219,8 +227,6 @@ public class MyAddressbooksFragment extends AbstractMyCollectionsFragment {
         } catch (SSLException e) {
           ErrorToaster.handleBundleError(e, result);
         } catch (IOException e) {
-          ErrorToaster.handleBundleError(e, result);
-        } catch (InvalidMacException e) {
           ErrorToaster.handleBundleError(e, result);
         } catch (GeneralSecurityException e) {
           ErrorToaster.handleBundleError(e, result);

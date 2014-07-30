@@ -41,12 +41,11 @@ import android.widget.Toast;
 
 import com.chiralcode.colorpicker.ColorPicker;
 import com.google.common.base.Optional;
-import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.HidingCalDavCollection;
 import org.anhonesteffort.flock.sync.calendar.HidingCalDavStore;
 import org.anhonesteffort.flock.sync.calendar.LocalCalendarStore;
-import org.anhonesteffort.flock.sync.key.KeySyncUtil;
+import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -229,6 +228,14 @@ public class MyCalendarsFragment extends AbstractMyCollectionsFragment
   private void handleEditSelectedCalendar() {
     Log.d(TAG, "handleEditSelectedCalendar()");
 
+    if (!getIsFlockCollectionForSelectedCollection()) {
+      Toast.makeText(getActivity(),
+                     R.string.you_cannot_edit_calendars_that_have_not_been_synced,
+                     Toast.LENGTH_SHORT).show();
+      initializeList();
+      return;
+    }
+
           LayoutInflater      inflater        = activity.getLayoutInflater();
           View                view            = inflater.inflate(R.layout.dialog_calendar_edit, null);
     final EditText            displayNameEdit = (EditText   ) view.findViewById(R.id.dialog_display_name);
@@ -396,8 +403,6 @@ public class MyCalendarsFragment extends AbstractMyCollectionsFragment
           ErrorToaster.handleBundleError(e, result);
         } catch (IOException e) {
           ErrorToaster.handleBundleError(e, result);
-        } catch (InvalidMacException e) {
-          ErrorToaster.handleBundleError(e, result);
         } catch (GeneralSecurityException e) {
           ErrorToaster.handleBundleError(e, result);
         }
@@ -500,7 +505,7 @@ public class MyCalendarsFragment extends AbstractMyCollectionsFragment
       private List<HidingCalDavCollection> handleRemoveKeyCollection(List<HidingCalDavCollection> collections) {
         Optional<HidingCalDavCollection> keyCollection = Optional.absent();
         for (HidingCalDavCollection collection : collections) {
-          if (collection.getPath().contains(KeySyncUtil.PATH_KEY_COLLECTION))
+          if (collection.getPath().contains(DavKeyStore.PATH_KEY_COLLECTION))
             keyCollection = Optional.of(collection);
         }
         if (keyCollection.isPresent())

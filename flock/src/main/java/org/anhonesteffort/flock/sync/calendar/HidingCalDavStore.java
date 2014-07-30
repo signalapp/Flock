@@ -21,6 +21,7 @@ package org.anhonesteffort.flock.sync.calendar;
 
 import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.sync.HidingDavCollectionMixin;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 
 import org.anhonesteffort.flock.crypto.MasterCipher;
@@ -156,7 +157,10 @@ public class HidingCalDavStore implements HidingDavStore<HidingCalDavCollection>
   public void addCollection(String path)
       throws DavException, IOException, GeneralSecurityException
   {
-    calDavStore.addCollection(path);
+    DavPropertySet properties = new DavPropertySet();
+
+    properties.add(new DefaultDavProperty<Object>(HidingDavCollectionMixin.PROPERTY_FLOCK_COLLECTION, "true"));
+    calDavStore.addCollection(path, properties);
   }
 
   public void addCollection(String  path,
@@ -168,6 +172,7 @@ public class HidingCalDavStore implements HidingDavStore<HidingCalDavCollection>
     String         hiddenDisplayName = HidingUtil.encryptEncodeAndPrefix(masterCipher, displayName);
     String         hiddenColor       = HidingUtil.encryptEncodeAndPrefix(masterCipher, color.toString());
 
+    properties.add(new DefaultDavProperty<Object>(HidingDavCollectionMixin.PROPERTY_FLOCK_COLLECTION, "true"));
     properties.add(new DefaultDavProperty<String>(DavPropertyName.DISPLAYNAME,                  hiddenDisplayName));
     properties.add(new DefaultDavProperty<String>(HidingCalDavCollection.PROPERTY_HIDDEN_COLOR, hiddenColor));
 

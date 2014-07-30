@@ -24,8 +24,8 @@ import org.anhonesteffort.flock.crypto.KeyUtil;
 import org.anhonesteffort.flock.registration.RegistrationApi;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
-import org.anhonesteffort.flock.sync.calendar.HidingCalDavCollection;
-import org.anhonesteffort.flock.sync.key.KeySyncUtil;
+import org.anhonesteffort.flock.sync.key.DavKeyCollection;
+import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -171,17 +171,23 @@ public class ChangeEncryptionPasswordService extends Service {
 
     try {
 
-      HidingCalDavCollection keyCollection = KeySyncUtil.getOrCreateKeyCollection(getBaseContext(), account);
-      keyCollection.setEncryptedKeyMaterial(encryptedKeyMaterial);
-      keyCollection.getStore().closeHttpConnection();
+      DavKeyStore                davKeyStore   = DavAccountHelper.getDavKeyStore(getBaseContext(), account);
+      Optional<DavKeyCollection> keyCollection = davKeyStore.getCollection();
+
+      if (!keyCollection.isPresent()) {
+        Log.e(TAG, "key collection is missing!");
+        result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_CRYPTO_ERROR);
+        return;
+      }
+
+      keyCollection.get().setEncryptedKeyMaterial(encryptedKeyMaterial);
+      davKeyStore.closeHttpConnection();
 
       result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
 
     } catch (PropertyParseException e) {
       ErrorToaster.handleBundleError(e, result);
     } catch (DavException e) {
-      ErrorToaster.handleBundleError(e, result);
-    } catch (GeneralSecurityException e) {
       ErrorToaster.handleBundleError(e, result);
     } catch (IOException e) {
       ErrorToaster.handleBundleError(e, result);

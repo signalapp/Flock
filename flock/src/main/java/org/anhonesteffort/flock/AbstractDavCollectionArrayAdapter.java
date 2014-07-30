@@ -45,7 +45,6 @@ import java.util.List;
 public abstract class AbstractDavCollectionArrayAdapter<T extends HidingDavCollection>
     extends ArrayAdapter<T>
 {
-
   protected LayoutInflater      inflater;
   protected boolean             hasSyncOption;
   protected int                 rowLayout;
@@ -125,6 +124,11 @@ public abstract class AbstractDavCollectionArrayAdapter<T extends HidingDavColle
 
     try {
 
+      if (remoteCollections[position].isFlockCollection())
+        collectionRowView.setTag(R.integer.tag_is_flock_collection, Boolean.TRUE);
+      else
+        collectionRowView.setTag(R.integer.tag_is_flock_collection, Boolean.FALSE);
+
       Optional<String> displayName = remoteCollections[position].getHiddenDisplayName();
       if (displayName.isPresent())
         viewHolder.displayName.setText(displayName.get());
@@ -201,5 +205,4 @@ public abstract class AbstractDavCollectionArrayAdapter<T extends HidingDavColle
       }
     }
   }
-
 }

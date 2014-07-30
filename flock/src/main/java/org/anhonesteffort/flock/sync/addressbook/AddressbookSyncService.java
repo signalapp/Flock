@@ -36,9 +36,11 @@ import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
+import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Date;
 
 /**
@@ -107,8 +109,16 @@ public class AddressbookSyncService extends Service {
           Log.d(TAG, "found local collection: " + localCollection.getPath());
           Optional<HidingCardDavCollection> remoteCollection = remoteStore.getCollection(localCollection.getPath());
 
-          if (remoteCollection.isPresent())
+          if (remoteCollection.isPresent()) {
+            if (!remoteCollection.get().isFlockCollection()) {
+              if (!localCollection.getDisplayName().isPresent())
+                remoteCollection.get().makeFlockCollection(" ");
+              else
+                remoteCollection.get().makeFlockCollection(localCollection.getDisplayName().get());
+            }
+
             new AddressbookSyncWorker(getContext(), localCollection, remoteCollection.get()).run(syncResult, false);
+          }
           else {
             Log.d(TAG, "local collection missing remotely, deleting locally");
             localStore.removeCollection(localCollection.getPath());
@@ -117,9 +127,13 @@ public class AddressbookSyncService extends Service {
 
         remoteStore.releaseConnections();
 
+      } catch (PropertyParseException e) {
+        handleException(getContext(), e, syncResult);
       } catch (IOException e) {
         handleException(getContext(), e, syncResult);
       } catch (DavException e) {
+        handleException(getContext(), e, syncResult);
+      } catch (GeneralSecurityException e) {
         handleException(getContext(), e, syncResult);
       }
 

@@ -38,15 +38,9 @@ import java.security.GeneralSecurityException;
  */
 public class HidingDavCollectionMixin {
 
-  protected static final String          PROPERTY_NAME_KEY_MATERIAL_SALT      = "X-KEY-MATERIAL-SALT";
-  protected static final String          PROPERTY_NAME_ENCRYPTED_KEY_MATERIAL = "X-ENCRYPTED-KEY-MATERIAL";
-
-  protected static final DavPropertyName PROPERTY_KEY_MATERIAL_SALT      = DavPropertyName.create(
-      PROPERTY_NAME_KEY_MATERIAL_SALT,
-      OwsWebDav.NAMESPACE
-  );
-  protected static final DavPropertyName PROPERTY_ENCRYPTED_KEY_MATERIAL = DavPropertyName.create(
-      PROPERTY_NAME_ENCRYPTED_KEY_MATERIAL,
+  protected static final String          PROPERTY_NAME_FLOCK_COLLECTION = "X-FLOCK-COLLECTION";
+  public    static final DavPropertyName PROPERTY_FLOCK_COLLECTION      = DavPropertyName.create(
+      PROPERTY_NAME_FLOCK_COLLECTION,
       OwsWebDav.NAMESPACE
   );
 
@@ -62,55 +56,40 @@ public class HidingDavCollectionMixin {
 
   public DavPropertyNameSet getPropertyNamesForFetch() {
     DavPropertyNameSet hidingCollectionProps = new DavPropertyNameSet();
-    hidingCollectionProps.add(PROPERTY_KEY_MATERIAL_SALT);
-    hidingCollectionProps.add(PROPERTY_ENCRYPTED_KEY_MATERIAL);
+
+    hidingCollectionProps.add(PROPERTY_FLOCK_COLLECTION);
 
     return hidingCollectionProps;
   }
 
-  public Optional<String> getKeyMaterialSalt() throws PropertyParseException {
-    return collection.getProperty(PROPERTY_KEY_MATERIAL_SALT, String.class);
+  public boolean isFlockCollection() throws PropertyParseException {
+    return collection.getProperty(PROPERTY_FLOCK_COLLECTION, String.class).isPresent();
   }
 
-  public void setKeyMaterialSalt(String keyMaterialSalt)
-      throws DavException, IOException
+  public void makeFlockCollection(String hiddenDisplayName, DavPropertyNameSet removeProperties)
+      throws DavException, IOException, GeneralSecurityException
   {
-    DavPropertySet updateProperties = new DavPropertySet();
-    updateProperties.add(new DefaultDavProperty<String>(PROPERTY_KEY_MATERIAL_SALT,
-                                                        keyMaterialSalt));
+    DavPropertySet addProperties = new DavPropertySet();
 
-    collection.patchProperties(updateProperties, new DavPropertyNameSet());
-  }
+    addProperties.add(new DefaultDavProperty<String>(PROPERTY_FLOCK_COLLECTION,   "true"));
+    addProperties.add(new DefaultDavProperty<String>(DavPropertyName.DISPLAYNAME, HidingUtil.encryptEncodeAndPrefix(masterCipher, hiddenDisplayName)));
 
-  public Optional<String> getEncryptedKeyMaterial() throws PropertyParseException {
-    return collection.getProperty(PROPERTY_ENCRYPTED_KEY_MATERIAL, String.class);
-  }
-
-  public void setEncryptedKeyMaterial(String encryptedKeyMaterial)
-      throws DavException, IOException
-  {
-    DavPropertySet updateProperties = new DavPropertySet();
-    updateProperties.add(new DefaultDavProperty<String>(PROPERTY_ENCRYPTED_KEY_MATERIAL,
-                                                        encryptedKeyMaterial));
-
-    collection.patchProperties(updateProperties, new DavPropertyNameSet());
+    collection.patchProperties(addProperties, removeProperties);
   }
 
   public Optional<String> getHiddenDisplayName()
-      throws PropertyParseException, InvalidMacException,
-      GeneralSecurityException, IOException
+      throws PropertyParseException, InvalidMacException, GeneralSecurityException, IOException
   {
     Optional<String> displayName = collection.getDisplayName();
 
     if (displayName.isPresent())
       return Optional.of(HidingUtil.decodeAndDecryptIfNecessary(masterCipher, displayName.get()));
-
-    return Optional.absent();
+    else
+      return Optional.absent();
   }
 
   public void setHiddenDisplayName(String displayName)
-      throws DavException, IOException,
-      InvalidMacException, GeneralSecurityException
+      throws DavException, IOException, GeneralSecurityException
   {
     collection.setDisplayName(HidingUtil.encryptEncodeAndPrefix(masterCipher, displayName));
   }

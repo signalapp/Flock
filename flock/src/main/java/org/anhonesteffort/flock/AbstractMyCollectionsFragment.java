@@ -21,7 +21,6 @@ package org.anhonesteffort.flock;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -76,7 +75,7 @@ public abstract class AbstractMyCollectionsFragment extends AccountAndKeyRequire
                            ViewGroup      container,
                            Bundle         savedInstanceState)
   {
-          activity    = getActivity();
+         activity     = getActivity();
     View fragmentView = inflater.inflate(R.layout.fragment_list_sync_collections, container, false);
 
     if (accountAndKeyAvailable())
@@ -257,6 +256,21 @@ public abstract class AbstractMyCollectionsFragment extends AccountAndKeyRequire
     }
 
     return Optional.absent();
+  }
+
+  protected boolean getIsFlockCollectionForSelectedCollection() {
+    if (batchSelections.size() == 0)
+      return false;
+
+    for(int i = 0; i < collectionsListView.getChildCount(); i++) {
+      View    rowView  = collectionsListView.getChildAt(i);
+      Boolean selected = (Boolean ) rowView.getTag(R.integer.tag_collection_selected);
+
+      if (selected)
+        return (Boolean) collectionsListView.getChildAt(i).getTag(R.integer.tag_is_flock_collection);
+    }
+
+    return false;
   }
 
   protected abstract void retrieveRemoteCollectionsAsync();

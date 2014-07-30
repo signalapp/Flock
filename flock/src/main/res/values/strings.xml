@@ -210,6 +210,9 @@
     <string name="are_you_sure_you_want_to_delete_selected_addressbooks">
         Are you sure you want to delete selected addressbooks?
     </string>
+    <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">
+        You cannot edit addressbooks that have not been synced.
+    </string>
 
 
     <!-- My calendars -->
@@ -223,6 +226,9 @@
     <string name="calendars_selected">calendars selected</string>
     <string name="are_you_sure_you_want_to_delete_selected_calendars">
         Are you sure you want to delete selected calendars?
+    </string>
+     <string name="you_cannot_edit_calendars_that_have_not_been_synced">
+        You cannot edit calendars that have not been synced.
     </string>
 
 

@@ -30,6 +30,7 @@ import org.anhonesteffort.flock.sync.AndroidDavClient;
 import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.sync.addressbook.HidingCardDavStore;
 import org.anhonesteffort.flock.sync.calendar.HidingCalDavStore;
+import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.anhonesteffort.flock.webdav.caldav.CalDavStore;
 import org.anhonesteffort.flock.webdav.carddav.CardDavStore;
@@ -148,7 +149,7 @@ public class DavAccountHelper {
   }
 
   public static CardDavStore getCardDavStore(Context context, DavAccount account)
-      throws DavException, IOException
+      throws IOException
   {
     if (isUsingOurServers(account))
       return new CardDavStore(getAndroidDavClient(context, account),
@@ -161,7 +162,7 @@ public class DavAccountHelper {
   }
 
   public static CalDavStore getCalDavStore(Context context, DavAccount account)
-      throws DavException, IOException
+      throws IOException
   {
     if (isUsingOurServers(account))
       return new CalDavStore(getAndroidDavClient(context, account),
@@ -173,10 +174,23 @@ public class DavAccountHelper {
                            Optional.<String>absent());
   }
 
+  public static DavKeyStore getDavKeyStore(Context context, DavAccount account)
+      throws IOException
+  {
+    if (isUsingOurServers(account))
+      return new DavKeyStore(getAndroidDavClient(context, account),
+                             Optional.of(getOwsCurrentUserPrincipal(account)),
+                             Optional.of(getOwsCalendarHomeSet(account)));
+
+    return new DavKeyStore(getAndroidDavClient(context, account),
+                           Optional.<String>absent(),
+                           Optional.<String>absent());
+  }
+
   public static HidingCardDavStore getHidingCardDavStore(Context      context,
                                                          DavAccount   account,
                                                          MasterCipher masterCipher)
-    throws DavException, IOException
+    throws IOException
   {
     if (isUsingOurServers(account))
       return new HidingCardDavStore(masterCipher,
@@ -193,7 +207,7 @@ public class DavAccountHelper {
   public static HidingCalDavStore getHidingCalDavStore(Context      context,
                                                        DavAccount   account,
                                                        MasterCipher masterCipher)
-      throws DavException, IOException
+      throws IOException
   {
     if (isUsingOurServers(account))
       return new HidingCalDavStore(masterCipher,

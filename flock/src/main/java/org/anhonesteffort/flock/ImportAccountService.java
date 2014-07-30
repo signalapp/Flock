@@ -12,8 +12,9 @@ import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.KeyStore;
+import org.anhonesteffort.flock.sync.key.DavKeyCollection;
+import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
-import org.anhonesteffort.flock.sync.key.KeySyncUtil;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -38,7 +39,30 @@ public abstract class ImportAccountService extends Service {
 
     try {
 
-      saltAndEncryptedKeyMaterial = KeySyncUtil.getSaltAndEncryptedKeyMaterial(getBaseContext(), account);
+      DavKeyStore                davKeyStore   = DavAccountHelper.getDavKeyStore(getBaseContext(), account);
+      Optional<DavKeyCollection> keyCollection = davKeyStore.getCollection();
+
+      if (keyCollection.isPresent()) {
+        if (keyCollection.get().getKeyMaterialSalt().isPresent()   &&
+            keyCollection.get().getEncryptedKeyMaterial().isPresent())
+        {
+          saltAndEncryptedKeyMaterial = Optional.of(
+              new String[] {
+                  keyCollection.get().getKeyMaterialSalt().get(),
+                  keyCollection.get().getEncryptedKeyMaterial().get()
+              }
+          );
+        }
+      }
+      else {
+        DavKeyStore.createCollection(getBaseContext(), account);
+        keyCollection = davKeyStore.getCollection();
+
+        if (!keyCollection.isPresent()) {
+          result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_DAV_SERVER_ERROR);
+          return;
+        }
+      }
 
     } catch (PropertyParseException e) {
       ErrorToaster.handleBundleError(e, result);

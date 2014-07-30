@@ -69,10 +69,10 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
 
   private static final String TAG = "org.anhonesteffort.flock.sync.calendar.HidingCalDavCollection";
 
-  private static final String PROPERTY_NAME_FLOCK_HIDDEN_CALENDAR = "X-FLOCK-HIDDEN-CALENDAR";
+  protected static final String PROPERTY_NAME_FLOCK_HIDDEN_CALENDAR = "X-FLOCK-HIDDEN-CALENDAR";
+  protected static final String PROPERTY_NAME_HIDDEN_COLOR          = "X-FLOCK-HIDDEN-CALENDAR-COLOR";
 
-  protected static final String          PROPERTY_NAME_HIDDEN_COLOR = "X-FLOCK-HIDDEN-CALENDAR-COLOR";
-  protected static final DavPropertyName PROPERTY_HIDDEN_COLOR      = DavPropertyName.create(
+  protected static final DavPropertyName PROPERTY_HIDDEN_COLOR = DavPropertyName.create(
       PROPERTY_NAME_HIDDEN_COLOR,
       OwsWebDav.NAMESPACE
   );
@@ -108,6 +108,21 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
   }
 
   @Override
+  public boolean isFlockCollection() throws PropertyParseException {
+    return delegate.isFlockCollection();
+  }
+
+  @Override
+  public void makeFlockCollection(String displayName)
+      throws DavException, IOException, GeneralSecurityException
+  {
+    DavPropertyNameSet removeNameSet = new DavPropertyNameSet();
+    removeNameSet.add(CalDavConstants.PROPERTY_NAME_CALENDAR_COLOR);
+
+    delegate.makeFlockCollection(displayName, removeNameSet);
+  }
+
+  @Override
   public Optional<String> getHiddenDisplayName()
       throws PropertyParseException, InvalidMacException,
       GeneralSecurityException, IOException
@@ -117,8 +132,7 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
 
   @Override
   public void setHiddenDisplayName(String displayName)
-      throws DavException, IOException,
-      InvalidMacException, GeneralSecurityException
+      throws DavException, IOException, GeneralSecurityException
   {
     delegate.setHiddenDisplayName(displayName);
   }
@@ -138,8 +152,7 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
   }
 
   public void setHiddenColor(Integer color)
-      throws DavException, IOException,
-      InvalidMacException, GeneralSecurityException
+      throws DavException, IOException, GeneralSecurityException
   {
     String hiddenColorString = HidingUtil.encryptEncodeAndPrefix(masterCipher, color.toString());
 
@@ -147,28 +160,6 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
     updateProperties.add(new DefaultDavProperty<String>(PROPERTY_HIDDEN_COLOR, hiddenColorString));
 
     patchProperties(updateProperties, new DavPropertyNameSet());
-  }
-
-  public Optional<String> getKeyMaterialSalt() throws PropertyParseException {
-    return delegate.getKeyMaterialSalt();
-  }
-
-  public void setKeyMaterialSalt(String keyMaterialSalt)
-      throws DavException, IOException
-  {
-    delegate.setKeyMaterialSalt(keyMaterialSalt);
-  }
-
-  @Override
-  public Optional<String> getEncryptedKeyMaterial() throws PropertyParseException {
-    return delegate.getEncryptedKeyMaterial();
-  }
-
-  @Override
-  public void setEncryptedKeyMaterial(String encryptedKeyMaterial)
-      throws DavException, IOException
-  {
-    delegate.setEncryptedKeyMaterial(encryptedKeyMaterial);
   }
 
   @Override
@@ -266,10 +257,10 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
       calendar.setTime(new java.util.Date(startDate.getTime()));
 
       calendar.set(java.util.Calendar.DAY_OF_MONTH, 1);
-      calendar.set(java.util.Calendar.HOUR, 1);
-      calendar.set(java.util.Calendar.MINUTE, 1);
-      calendar.set(java.util.Calendar.SECOND, 1);
-      calendar.set(java.util.Calendar.MILLISECOND, 1);
+      calendar.set(java.util.Calendar.HOUR,         1);
+      calendar.set(java.util.Calendar.MINUTE,       1);
+      calendar.set(java.util.Calendar.SECOND,       1);
+      calendar.set(java.util.Calendar.MILLISECOND,  1);
 
       Date  approximateEndDate = new Date(calendar.getActualMaximum(java.util.Calendar.DAY_OF_MONTH));
       DtEnd approximateDtEnd   = new DtEnd(approximateEndDate);

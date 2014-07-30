@@ -23,6 +23,7 @@ import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.LocalAddressbookStore;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
+import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.anhonesteffort.flock.webdav.caldav.CalDavCollection;
 import org.anhonesteffort.flock.webdav.caldav.CalDavStore;
@@ -146,8 +147,10 @@ public class RegisterAccountService extends ImportAccountService {
 
       CalDavStore store = DavAccountHelper.getCalDavStore(getBaseContext(), registerAcount);
       for (CalDavCollection collection : store.getCollections()) {
-        Log.d(TAG, "deleting default calendar " + collection.getPath());
-        store.removeCollection(collection.getPath());
+        if (!collection.getPath().contains(DavKeyStore.PATH_KEY_COLLECTION)) {
+          Log.d(TAG, "deleting default calendar " + collection.getPath());
+          store.removeCollection(collection.getPath());
+        }
       }
 
       store.closeHttpConnection();

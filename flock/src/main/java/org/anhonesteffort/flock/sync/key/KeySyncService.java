@@ -20,6 +20,8 @@
 package org.anhonesteffort.flock.sync.key;
 
 import android.accounts.Account;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentProviderClient;
 import android.content.Context;
@@ -27,10 +29,14 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.common.base.Optional;
+
+import org.anhonesteffort.flock.CorrectEncryptionPasswordActivity;
 import org.anhonesteffort.flock.DavAccountHelper;
+import org.anhonesteffort.flock.R;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
@@ -42,6 +48,7 @@ import java.util.Date;
  */
 public class KeySyncService extends Service {
 
+  private static final int    ID_NOTIFICATION_CIPHER_PASSPHRASE = 1022;
   private static final String TAG = "org.anhonesteffort.flock.sync.key.KeySyncService";
 
   private static       KeySyncAdapter sSyncAdapter     = null;
@@ -92,5 +99,32 @@ public class KeySyncService extends Service {
       new KeySyncScheduler(getContext()).setTimeLastSync(new Date().getTime());
     }
   }
+
+  public static void showCipherPassphraseInvalidNotification(Context context) {
+    Log.w(TAG, "showCipherPassphraseInvalidNotification()");
+    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
+
+    notificationBuilder.setContentTitle(context.getString(R.string.notification_flock_encryption_error));
+    notificationBuilder.setContentText(context.getString(R.string.notification_tap_to_correct_encryption_password));
+    notificationBuilder.setSmallIcon(R.drawable.alert_warning_light);
+    notificationBuilder.setAutoCancel(true);
+
+    Intent        clickIntent   = new Intent(context, CorrectEncryptionPasswordActivity.class);
+    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    notificationBuilder.setContentIntent(pendingIntent);
+
+    NotificationManager notificationManager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+    notificationManager.notify(ID_NOTIFICATION_CIPHER_PASSPHRASE, notificationBuilder.build());
+  }
+
+  public static void cancelCipherPassphraseNotification(Context context) {
+    NotificationManager notificationManager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+    notificationManager.cancel(ID_NOTIFICATION_CIPHER_PASSPHRASE);
+  }
+
 
 }

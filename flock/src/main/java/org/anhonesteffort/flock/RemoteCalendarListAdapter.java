@@ -132,8 +132,11 @@ public class RemoteCalendarListAdapter extends AbstractDavCollectionArrayAdapter
                                              displayName.get(),
                                              color.get());
           }
-          else if (displayName.isPresent())
-            localStore.addCollection(remoteCollection.getPath(), displayName.get());
+          else if (displayName.isPresent()) {
+            localCalendarStore.addCollection(remoteCollection.getPath(),
+                                             displayName.get(),
+                                             getContext().getResources().getColor(R.color.flocktheme_color));
+          }
           else {
             localStore.addCollection(remoteCollection.getPath(),
                                      getContext().getString(R.string.display_name_missing));

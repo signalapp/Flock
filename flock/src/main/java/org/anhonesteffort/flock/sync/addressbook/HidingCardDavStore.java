@@ -21,6 +21,7 @@ package org.anhonesteffort.flock.sync.addressbook;
 
 import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.sync.HidingDavCollectionMixin;
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 
 import org.anhonesteffort.flock.crypto.MasterCipher;
@@ -154,14 +155,12 @@ public class HidingCardDavStore implements HidingDavStore<HidingCardDavCollectio
 
   @Override
   public void addCollection(String path)
-    throws DavException, IOException, GeneralSecurityException
+      throws DavException, IOException, GeneralSecurityException
   {
-    cardDavStore.addCollection(path);
-  }
+    DavPropertySet properties = new DavPropertySet();
 
-  @Override
-  public void removeCollection(String path) throws DavException, IOException {
-    cardDavStore.removeCollection(path);
+    properties.add(new DefaultDavProperty<Object>(HidingDavCollectionMixin.PROPERTY_FLOCK_COLLECTION, "true"));
+    cardDavStore.addCollection(path, properties);
   }
 
   public void addCollection(String path,
@@ -171,9 +170,15 @@ public class HidingCardDavStore implements HidingDavStore<HidingCardDavCollectio
     DavPropertySet properties        = new DavPropertySet();
     String         hiddenDisplayName = HidingUtil.encryptEncodeAndPrefix(masterCipher, displayName);
 
+    properties.add(new DefaultDavProperty<Object>(HidingDavCollectionMixin.PROPERTY_FLOCK_COLLECTION, "true"));
     properties.add(new DefaultDavProperty<String>(DavPropertyName.DISPLAYNAME, hiddenDisplayName));
 
     cardDavStore.addCollection(path, properties);
+  }
+
+  @Override
+  public void removeCollection(String path) throws DavException, IOException {
+    cardDavStore.removeCollection(path);
   }
 
   @Override

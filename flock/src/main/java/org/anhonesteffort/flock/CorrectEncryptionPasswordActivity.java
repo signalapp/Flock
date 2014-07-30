@@ -33,7 +33,7 @@ import android.widget.Toast;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.KeyStore;
 import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
-import org.anhonesteffort.flock.sync.key.KeySyncUtil;
+import org.anhonesteffort.flock.sync.key.KeySyncService;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -110,7 +110,7 @@ public class CorrectEncryptionPasswordActivity extends Activity {
 
           if (KeyHelper.masterPassphraseIsValid(getBaseContext())) {
             result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
-            KeySyncUtil.cancelCipherPassphraseNotification(getBaseContext());
+            KeySyncService.cancelCipherPassphraseNotification(getBaseContext());
           }
           else
             result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_INVALID_CIPHER_PASSPHRASE);

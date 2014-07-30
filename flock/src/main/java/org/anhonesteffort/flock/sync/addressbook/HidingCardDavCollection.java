@@ -92,6 +92,18 @@ public class HidingCardDavCollection extends CardDavCollection implements Hiding
   }
 
   @Override
+  public boolean isFlockCollection() throws PropertyParseException {
+    return delegate.isFlockCollection();
+  }
+
+  @Override
+  public void makeFlockCollection(String displayName)
+      throws DavException, IOException, GeneralSecurityException
+  {
+    delegate.makeFlockCollection(displayName, new DavPropertyNameSet());
+  }
+
+  @Override
   public Optional<String> getHiddenDisplayName()
       throws PropertyParseException, InvalidMacException,
       GeneralSecurityException, IOException
@@ -101,22 +113,9 @@ public class HidingCardDavCollection extends CardDavCollection implements Hiding
 
   @Override
   public void setHiddenDisplayName(String displayName)
-      throws DavException, IOException,
-      InvalidMacException, GeneralSecurityException
+      throws DavException, IOException, GeneralSecurityException
   {
     delegate.setHiddenDisplayName(displayName);
-  }
-
-  @Override
-  public Optional<String> getEncryptedKeyMaterial() throws PropertyParseException {
-    return delegate.getEncryptedKeyMaterial();
-  }
-
-  @Override
-  public void setEncryptedKeyMaterial(String encryptedKeyMaterial)
-      throws DavException, IOException
-  {
-    delegate.setEncryptedKeyMaterial(encryptedKeyMaterial);
   }
 
   @Override

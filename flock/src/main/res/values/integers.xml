@@ -12,5 +12,6 @@
     <integer name="tag_account_type">500</integer>
     <integer name="tag_account_contact_count">600</integer>
     <integer name="tag_calendar_local_id">700</integer>
+    <integer name="tag_is_flock_collection">800</integer>
 
 </resources>

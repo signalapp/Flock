@@ -28,7 +28,7 @@ import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.HidingCalDavCollection;
 import org.anhonesteffort.flock.sync.calendar.HidingCalDavStore;
 import org.anhonesteffort.flock.sync.calendar.LocalCalendarStore;
-import org.anhonesteffort.flock.sync.key.KeySyncUtil;
+import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -158,7 +158,7 @@ public class ImportOwsAccountService extends ImportAccountService {
   private List<HidingCalDavCollection> handleRemoveKeyCollection(List<HidingCalDavCollection> collections) {
     Optional<HidingCalDavCollection> keyCollection = Optional.absent();
     for (HidingCalDavCollection collection : collections) {
-      if (collection.getPath().contains(KeySyncUtil.PATH_KEY_COLLECTION))
+      if (collection.getPath().contains(DavKeyStore.PATH_KEY_COLLECTION))
         keyCollection = Optional.of(collection);
     }
     if (keyCollection.isPresent())

@@ -26,10 +26,12 @@ import android.util.Log;
 import com.google.common.base.Optional;
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.auth.DavAccount;
+import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.KeyStore;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.calendar.HidingCalDavCollection;
+import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -53,51 +55,79 @@ public class KeySyncWorker {
 
   public void run(SyncResult result) {
     Log.d(TAG, "now syncing");
-
-    Optional<String> localKeyMaterialSalt      = Optional.absent();
-    Optional<String> localEncryptedKeyMaterial = Optional.absent();
-
     try {
 
-      localKeyMaterialSalt      = KeyHelper.buildEncodedSalt(context);
-      localEncryptedKeyMaterial = KeyStore.getEncryptedKeyMaterial(context);
-
-      if (!localKeyMaterialSalt.isPresent() || !localEncryptedKeyMaterial.isPresent()) {
-        Log.w(TAG, "missing local key material salt or local encrypted key material.");
-        return;
-      }
-
-    } catch (IOException e) {
-      Log.e(TAG, "caught exception while retrieving salt and encrypted key material", e);
-      AbstractDavSyncAdapter.handleException(context, e, result);
-      return;
-    }
-
-    try {
-
-      if (!KeyHelper.masterPassphraseIsValid(context) &&
-          !DavAccountHelper.isUsingOurServers(context))
-      {
-        KeySyncUtil.showCipherPassphraseInvalidNotification(context);
-        return;
-      }
-
-    } catch (GeneralSecurityException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
-    } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
-    }
-
-    try {
-
-      HidingCalDavCollection keyCollection = KeySyncUtil.getOrCreateKeyCollection(context, account);
+      DavKeyStore davKeyStore = DavAccountHelper.getDavKeyStore(context, account);
 
       try {
 
-        Optional<String> remoteKeyMaterialSalt = keyCollection.getKeyMaterialSalt();
-        if (!remoteKeyMaterialSalt.isPresent()) {
-          Log.e(TAG, "remote key material salt is missing, will put local");
-          keyCollection.setKeyMaterialSalt(localKeyMaterialSalt.get());
+        Optional<String> localKeyMaterialSalt      = KeyHelper.buildEncodedSalt(context);
+        Optional<String> localEncryptedKeyMaterial = KeyStore.getEncryptedKeyMaterial(context);
+
+        if (!localKeyMaterialSalt.isPresent() || !localEncryptedKeyMaterial.isPresent()) {
+          Log.e(TAG, "missing local key material salt or local encrypted key material.");
+          return;
+        }
+
+        Optional<DavKeyCollection> keyCollection = davKeyStore.getCollection();
+
+        if (!keyCollection.isPresent()) {
+          Log.w(TAG, "key collection is missing");
+          return;
+        }
+
+        try {
+
+          if (!KeyHelper.masterPassphraseIsValid(context) &&
+              !DavAccountHelper.isUsingOurServers(context))
+          {
+            KeySyncService.showCipherPassphraseInvalidNotification(context);
+            return;
+          }
+
+        } catch (GeneralSecurityException e) {
+          AbstractDavSyncAdapter.handleException(context, e, result);
+        } catch (IOException e) {
+          AbstractDavSyncAdapter.handleException(context, e, result);
+        }
+
+        try {
+
+          Optional<String> remoteKeyMaterialSalt      = keyCollection.get().getKeyMaterialSalt();
+          Optional<String> remoteEncryptedKeyMaterial = keyCollection.get().getEncryptedKeyMaterial();
+
+          if (!remoteKeyMaterialSalt.isPresent())
+            keyCollection.get().setKeyMaterialSalt(localKeyMaterialSalt.get());
+
+          if (!remoteEncryptedKeyMaterial.isPresent())
+            keyCollection.get().setEncryptedKeyMaterial(localEncryptedKeyMaterial.get());
+
+          else if (remoteKeyMaterialSalt.isPresent() &&
+                   !remoteEncryptedKeyMaterial.get().equals(localEncryptedKeyMaterial.get()))
+          {
+            try {
+
+              KeyHelper.importSaltAndEncryptedKeyMaterial(context, new String[]{
+                  remoteKeyMaterialSalt.get(),
+                  remoteEncryptedKeyMaterial.get()
+              });
+
+            } catch (InvalidMacException e) {
+              Log.d(TAG, "caught invalid mac exception while importing remote key material, " +
+                          "assuming password change for non-flock sync user.");
+              KeyStore.saveEncryptedKeyMaterial(context, remoteEncryptedKeyMaterial.get());
+              KeySyncService.showCipherPassphraseInvalidNotification(context);
+            }
+          }
+
+        } catch (PropertyParseException e) {
+          AbstractDavSyncAdapter.handleException(context, e, result);
+        } catch (DavException e) {
+          AbstractDavSyncAdapter.handleException(context, e, result);
+        } catch (IOException e) {
+          AbstractDavSyncAdapter.handleException(context, e, result);
+        } catch (GeneralSecurityException e) {
+          AbstractDavSyncAdapter.handleException(context, e, result);
         }
 
       } catch (PropertyParseException e) {
@@ -106,30 +136,10 @@ public class KeySyncWorker {
         AbstractDavSyncAdapter.handleException(context, e, result);
       } catch (IOException e) {
         AbstractDavSyncAdapter.handleException(context, e, result);
+      } finally {
+        davKeyStore.closeHttpConnection();
       }
 
-      Optional<String> remoteKeyMaterial = keyCollection.getEncryptedKeyMaterial();
-      if (!remoteKeyMaterial.isPresent()) {
-        Log.e(TAG, "remote encrypted key material is missing, will put local");
-        keyCollection.setEncryptedKeyMaterial(localEncryptedKeyMaterial.get());
-      }
-
-      else if (!DavAccountHelper.isUsingOurServers(account) &&
-               !localEncryptedKeyMaterial.get().equals(remoteKeyMaterial.get()))
-      {
-        Log.e(TAG, "remote encrypted key material is different, will import locally");
-        KeyStore.saveEncryptedKeyMaterial(context, remoteKeyMaterial.get());
-        KeySyncUtil.showCipherPassphraseInvalidNotification(context);
-      }
-
-      keyCollection.getStore().closeHttpConnection();
-
-    } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
-    } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
-    } catch (GeneralSecurityException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
     } catch (IOException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
     }
