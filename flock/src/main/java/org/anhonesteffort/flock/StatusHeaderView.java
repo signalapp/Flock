@@ -128,9 +128,16 @@ public class StatusHeaderView extends LinearLayout {
     final int    syncStatusDrawable;
 
     if (timeLastSync == -1) {
+      if (!ContentResolver.getMasterSyncAutomatically()) {
+        syncStatusView.setText(getContext().getString(R.string.status_header_status_sync_disabled));
+        syncStatusView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.sad_cloud, 0, 0);
+      }
+      else {
+        syncStatusView.setText(getContext().getString(R.string.status_header_sync_in_progress));
+        syncStatusView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.sync_in_progress, 0, 0);
+      }
+
       timeLastSyncView.setVisibility(GONE);
-      syncStatusView.setText(getContext().getString(R.string.status_header_sync_in_progress));
-      syncStatusView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.sync_in_progress, 0, 0);
       invalidate();
       return;
     }
