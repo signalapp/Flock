@@ -35,6 +35,7 @@ import android.util.Log;
 
 import com.google.common.base.Optional;
 import ezvcard.VCard;
+import ezvcard.property.Photo;
 
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 import org.anhonesteffort.flock.sync.AbstractLocalComponentCollection;
@@ -90,15 +91,6 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
   private Uri getUriForData() {
     return getSyncAdapterUri(ContactsContract.Data.CONTENT_URI);
-  }
-
-  private Uri getUriForPicture(Long rawContactId) {
-    Uri rawContactUri = ContentUris.withAppendedId(
-        ContactsContract.RawContacts.CONTENT_URI,
-        rawContactId
-    );
-    return Uri.withAppendedPath(rawContactUri,
-                                ContactsContract.RawContacts.DisplayPhoto.CONTENT_DIRECTORY);
   }
 
   @Override
@@ -217,7 +209,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForEmailAddress(),
@@ -232,10 +224,41 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     cursor.close();
   }
 
-  private void addPictures(Long rawContactId, VCard vCard)
+  private Optional<Photo> getThumbnailPhoto(Long rawContactId)
       throws InvalidComponentException, RemoteException
   {
-    ContactFactory.addPicture(getPath(), client, getUriForPicture(rawContactId), vCard);
+    String   SELECTION      = getColumnNameComponentDataLocalId()     + "=? " +
+                              "AND " + ContactsContract.Data.MIMETYPE + "=?";
+    String[] SELECTION_ARGS = new String[]{
+        rawContactId.toString(),
+        ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE
+    };
+
+    Optional<Photo> thumbnailPhoto = Optional.absent();
+    Cursor          cursor         = client.query(getUriForData(),
+                                                  ContactFactory.getProjectionForThumbnailPhoto(),
+                                                  SELECTION,
+                                                  SELECTION_ARGS,
+                                                  null);
+
+    if (cursor.moveToNext()) {
+      ContentValues photoValues    = ContactFactory.getValuesForThumbnailPhoto(cursor);
+                    thumbnailPhoto = ContactFactory.getPhotoForThumbnailValues(photoValues);
+    }
+
+    cursor.close();
+    return thumbnailPhoto;
+  }
+
+  private void addPhotos(Long rawContactId, VCard vCard)
+      throws InvalidComponentException, RemoteException
+  {
+    Optional<Photo> photo = ContactFactory.getDisplayPhoto(getPath(), client, rawContactId);
+    if (!photo.isPresent())
+      photo = getThumbnailPhoto(rawContactId);
+
+    if (photo.isPresent())
+      vCard.addPhoto(photo.get());
   }
 
   private void addOrganizations(Long rawContactId, VCard vCard)
@@ -428,7 +451,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     addStructuredNames( rawContactId, vCard);
     addPhoneNumbers(    rawContactId, vCard);
     addEmailAddresses(  rawContactId, vCard);
-    addPictures(        rawContactId, vCard);
+    addPhotos(rawContactId, vCard);
     addOrganizations(   rawContactId, vCard);
     addInstantMessaging(rawContactId, vCard);
     addNickNames(       rawContactId, vCard);
@@ -558,7 +581,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
           .build());
     }
 
-    Optional<ContentValues> picture = ContactFactory.getValuesForPicture(vCard.getComponent());
+    Optional<ContentValues> picture = ContactFactory.getValuesForPhoto(vCard.getComponent());
     if (picture.isPresent()) {
       pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
           .withValues(picture.get())

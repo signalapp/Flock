@@ -20,6 +20,7 @@
 package org.anhonesteffort.flock.sync.addressbook;
 
 import android.content.ContentProviderClient;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
@@ -60,7 +61,6 @@ import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -535,68 +535,74 @@ public class ContactFactory {
     }
   }
 
-  protected static String[] getProjectionForPicture() {
-    return new String[] {
-        ContactsContract.CommonDataKinds.Photo.RAW_CONTACT_ID, // 00
-        ContactsContract.CommonDataKinds.Photo.SYNC1           // 01 (image type)
-    };
+  private static Uri getUriForDisplayPhoto(Long rawContactId) {
+    Uri rawContactUri = ContentUris.withAppendedId(
+        ContactsContract.RawContacts.CONTENT_URI,
+        rawContactId
+    );
+
+    return Uri.withAppendedPath(rawContactUri, ContactsContract.RawContacts.DisplayPhoto.CONTENT_DIRECTORY);
   }
 
-  protected static ContentValues getValuesForPicture(Cursor cursor) {
-    ContentValues values = new ContentValues(2);
-
-    values.put(ContactsContract.CommonDataKinds.Photo.RAW_CONTACT_ID, cursor.getLong(0));
-    values.put(ContactsContract.CommonDataKinds.Photo.SYNC1,          cursor.getString(1));
-
-    return values;
-  }
-
-  protected static Optional<ContentValues> getValuesForPicture(VCard vCard) {
-    if (vCard.getPhotos().size() > 0) {
-      try {
-
-        ContentValues values = new ContentValues();
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        out.write(vCard.getPhotos().get(0).getData());
-
-        values.put(ContactsContract.Data.MIMETYPE,
-                   ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
-        values.put(ContactsContract.CommonDataKinds.Photo.PHOTO,
-                   vCard.getPhotos().get(0).getData());
-
-        return Optional.of(values);
-
-      } catch (IOException e) {
-        Log.e(TAG, "caught exception while shoving photo into content values", e);
-      }
-    }
-    else
-      Log.w(TAG, "no photos found in vcard, returning absent");
-
-    return Optional.absent();
-  }
-
-  protected static void addPicture(String                path,
-                                   ContentProviderClient client,
-                                   Uri                   pictureUri,
-                                   VCard                 vCard)
+  protected static Optional<Photo> getDisplayPhoto(String                path,
+                                                   ContentProviderClient client,
+                                                   Long                  rawContactId)
       throws InvalidComponentException, RemoteException
   {
     try {
 
-      AssetFileDescriptor fileDescriptor = client.openAssetFile(pictureUri, "r");
+      AssetFileDescriptor fileDescriptor = client.openAssetFile(getUriForDisplayPhoto(rawContactId), "r");
       InputStream         inputStream    = fileDescriptor.createInputStream();
 
-      Photo photo = new Photo(IOUtils.toByteArray(inputStream), ImageType.JPEG);
-      vCard.addPhoto(photo);
+      return Optional.of(
+          new Photo(IOUtils.toByteArray(inputStream), ImageType.JPEG)
+      );
 
     } catch (FileNotFoundException e) {
-      // nothing to do...
+      return Optional.absent();
     } catch (IOException e) {
       throw new InvalidComponentException("caught exception while adding picture", false,
                                           CardDavConstants.CARDDAV_NAMESPACE, path);
     }
+  }
+
+  protected static String[] getProjectionForThumbnailPhoto() {
+    return new String[] {
+        ContactsContract.CommonDataKinds.Photo.PHOTO // 00 raw bytes of image
+    };
+  }
+
+  protected static ContentValues getValuesForThumbnailPhoto(Cursor cursor) {
+    ContentValues values = new ContentValues(1);
+
+    values.put(ContactsContract.CommonDataKinds.Photo.PHOTO, cursor.getBlob(0));
+
+    return values;
+  }
+
+  protected static Optional<Photo> getPhotoForThumbnailValues(ContentValues values) {
+    if (values.getAsByteArray(ContactsContract.CommonDataKinds.Photo.PHOTO) == null)
+      return Optional.absent();
+
+    return Optional.of(
+        new Photo(values.getAsByteArray(ContactsContract.CommonDataKinds.Photo.PHOTO), ImageType.JPEG)
+    );
+  }
+
+  protected static Optional<ContentValues> getValuesForPhoto(VCard vCard) {
+    if (vCard.getPhotos().size() > 0) {
+      ContentValues values = new ContentValues();
+
+      values.put(ContactsContract.Data.MIMETYPE,
+                 ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
+      values.put(ContactsContract.CommonDataKinds.Photo.PHOTO,
+                 vCard.getPhotos().get(0).getData());
+
+      return Optional.of(values);
+    }
+
+    Log.d(TAG, "no photos found in vcard, returning absent");
+    return Optional.absent();
   }
 
   protected static String[] getProjectionForOrganization() {
