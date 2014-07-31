@@ -95,6 +95,7 @@ public class EventFactory {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.calendar.EventFactory";
 
+  private   static final String PROPERTY_NAME_FLOCK_ALL_DAY                = "X-FLOCK-ALL-DAY";
   private   static final String PROPERTY_NAME_FLOCK_ORIGINAL_SYNC_ID       = "X-FLOCK-ORIGINAL-SYNC-ID";
   private   static final String PROPERTY_NAME_FLOCK_ORIGINAL_INSTANCE_TIME = "X-FLOCK-ORIGINAL-INSTANCE-TIME";
   protected static final String PROPERTY_NAME_FLOCK_COPY_EVENT_ID          = "X-FLOCK-COPY-EVENT-ID";
@@ -420,19 +421,12 @@ public class EventFactory {
       if (exDate != null)
         values.put(CalendarContract.Events.EXDATE, exDate.getValue());
 
+      if (vEvent.getProperty(PROPERTY_NAME_FLOCK_ALL_DAY) != null)
+        values.put(CalendarContract.Events.ALL_DAY, 1);
+
       if (rRule == null && rDate == null) {
         DtEnd dtEnd = vEvent.getEndDate();
-
-        if (dtEnd != null && dtEnd.getDate() != null && vEvent.getDuration() == null &&
-           (dtStart.getDate().getTime() + DateUtils.DAY_IN_MILLIS) == dtEnd.getDate().getTime())
-        {
-          if (dtEnd.getTimeZone() != null)
-            values.put(CalendarContract.Events.EVENT_TIMEZONE, dtEnd.getTimeZone().getID());
-
-          values.put(CalendarContract.Events.DTEND, dtEnd.getDate().getTime());
-          values.put(CalendarContract.Events.ALL_DAY, 1);
-        }
-        else if (dtEnd != null && dtEnd.getDate() != null) {
+        if (dtEnd != null && dtEnd.getDate() != null) {
           if (dtEnd.getTimeZone() != null)
             values.put(CalendarContract.Events.EVENT_TIMEZONE, dtEnd.getTimeZone().getID());
 
@@ -444,13 +438,10 @@ public class EventFactory {
           values.put(CalendarContract.Events.DTEND, endDate.getTime());
         }
         else {
+          Log.w(TAG, "event is missing date end and duration, assuming all day event.");
           values.put(CalendarContract.Events.DTEND, dtStart.getDate().getTime() + DateUtils.DAY_IN_MILLIS);
           values.put(CalendarContract.Events.ALL_DAY, 1);
         }
-      }
-      else if (vEvent.getDuration() != null && vEvent.getDuration().getValue().equals("P1D")) {
-        values.put(CalendarContract.Events.DURATION, vEvent.getDuration().getValue());
-        values.put(CalendarContract.Events.ALL_DAY, 1);
       }
       else if (vEvent.getDuration() != null)
         values.put(CalendarContract.Events.DURATION, vEvent.getDuration().getValue());
@@ -609,8 +600,8 @@ public class EventFactory {
       dtStartMilliseconds = eventValues.getAsLong(CalendarContract.Events.ORIGINAL_INSTANCE_TIME);
 
     if (dtStartMilliseconds != null) {
-      DtStart dtStart      = new DtStart(new Date(dtStartMilliseconds));
-      String dtStartTZText = eventValues.getAsString(CalendarContract.Events.EVENT_TIMEZONE);
+      DtStart dtStart       = new DtStart(new Date(dtStartMilliseconds));
+      String  dtStartTZText = eventValues.getAsString(CalendarContract.Events.EVENT_TIMEZONE);
 
       if (dtStartTZText != null) {
         DateTime startDate     = new DateTime(dtStartMilliseconds);
@@ -631,8 +622,8 @@ public class EventFactory {
     Boolean allDay            = eventValues.getAsBoolean(CalendarContract.Events.ALL_DAY);
     Long    dtEndMilliseconds = eventValues.getAsLong(CalendarContract.Events.DTEND);
 
-    if (allDay && eventValues.getAsString(CalendarContract.Events.DURATION) == null)
-      dtEndMilliseconds = dtStartMilliseconds + DateUtils.DAY_IN_MILLIS;
+    if (allDay)
+      vEvent.getProperties().add(new XProperty(PROPERTY_NAME_FLOCK_ALL_DAY, "true"));
 
     if (dtEndMilliseconds != null && dtEndMilliseconds > 0) {
       DtEnd  dtEnd         = new DtEnd(new Date(dtEndMilliseconds));
