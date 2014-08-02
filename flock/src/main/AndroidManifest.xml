@@ -117,6 +117,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".DeleteAllContactsActivity"
+                  android:windowSoftInputMode="adjustPan"
+                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize">
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.DeleteAllContactsActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity android:name="org.anhonesteffort.flock.EditAutoRenewActivity"
                   android:screenOrientation="portrait"/>
 

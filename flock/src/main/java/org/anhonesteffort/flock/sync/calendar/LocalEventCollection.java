@@ -90,6 +90,14 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
     return getSyncAdapterUri(base, account);
   }
 
+  @Override
+  protected Uri handleAddAccountQueryParams(Uri uri) {
+    return CalendarContract.Events.CONTENT_URI.buildUpon()
+        .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, account.name)
+        .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, account.type)
+        .build();
+  }
+
   protected static Uri getCollectionsUri(Account account) {
     return getSyncAdapterUri(CalendarContract.Calendars.CONTENT_URI, account);
   }
@@ -109,10 +117,6 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
   private Uri getUriForReminders() {
     return getSyncAdapterUri(CalendarContract.Reminders.CONTENT_URI);
-  }
-
-  protected String getColumnNameCollectionRemotePath() {
-    return CalendarContract.Calendars.NAME;
   }
 
   @Override
