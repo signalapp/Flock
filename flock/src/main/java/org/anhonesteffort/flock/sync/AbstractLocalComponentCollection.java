@@ -27,6 +27,7 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteException;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.util.Pair;
 
@@ -81,6 +82,7 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
   }
 
   protected abstract Uri getSyncAdapterUri(Uri base);
+  protected abstract Uri handleAddAccountQueryParams(Uri uri);
   protected abstract Uri getUriForComponents();
 
   protected abstract String getColumnNameCollectionLocalId();
@@ -241,15 +243,26 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
 
   @Override
   public void removeComponent(String remoteUId) throws RemoteException {
-    final String   SELECTION      = getColumnNameComponentUid() + "=? AND " +
+    final String   SELECTION      = getColumnNameComponentUid()      + "=? AND " +
                                     getColumnNameCollectionLocalId() + "=" + localId;
     final String[] SELECTION_ARGS = new String[]{remoteUId};
-
-    Log.d(TAG, "removeComponent() remoteUid" + remoteUId);
 
     pendingOperations.add(ContentProviderOperation
         .newDelete(getUriForComponents())
         .withSelection(SELECTION, SELECTION_ARGS)
+        .withYieldAllowed(true)
+        .build());
+  }
+
+  @Override
+  public void removeAllComponents() throws RemoteException {
+    final String SELECTION     = getColumnNameCollectionLocalId() + "=" + localId;
+    final Uri    COMPONENT_URI = getUriForComponents().buildUpon().clearQuery().build();
+    final Uri    CONTENT_URI   = handleAddAccountQueryParams(COMPONENT_URI);
+
+    pendingOperations.add(ContentProviderOperation
+        .newDelete(CONTENT_URI)
+        .withSelection(SELECTION, null)
         .withYieldAllowed(true)
         .build());
   }

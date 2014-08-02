@@ -317,6 +317,17 @@
     <string name="account_has_been_unregistered">Account has been unregistered.</string>
 
 
+    <!-- DeleteAllContactsActivity -->
+    <string name="title_delete_all_contacts">Delete all contacts</string>
+    <string name="all_contacts_have_been_deleted">All contacts have been deleted.</string>
+     <string name="if_you_chose_to_delete_your_flock_contacts">
+        If you chose to delete your Flock contacts they will be removed from all
+         devices using this Flock account.
+    </string>
+    <string name="are_you_sure_you_want_to_delete_all_flock_contacts">
+        Are you sure you want to delete all Flock contacts?
+    </string>
+
     <!-- CorrectPasswordActivity -->
     <string name="title_correct_sync_password">Correct sync password</string>
     <string name="unable_to_login_to_sync_service_please_correct_your_password">

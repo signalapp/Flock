@@ -85,6 +85,14 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   @Override
+  protected Uri handleAddAccountQueryParams(Uri uri) {
+    return uri.buildUpon()
+        .appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_NAME, account.name)
+        .appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_TYPE, account.type)
+        .build();
+  }
+
+  @Override
   protected Uri getUriForComponents() {
     return getSyncAdapterUri(ContactsContract.RawContacts.CONTENT_URI);
   }

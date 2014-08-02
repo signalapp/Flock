@@ -27,6 +27,9 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.chiralcode.colorpicker.ColorPickerPreference;
@@ -76,6 +79,24 @@ public class PreferencesActivity extends PreferenceActivity
 
     initContentObservers();
     initSyncNowButton();
+  }
+
+  public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.hidden_menu, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.button_delete_all_contacts:
+        Intent nextIntent = new Intent(getBaseContext(), DeleteAllContactsActivity.class);
+        startActivity(nextIntent);
+        break;
+    }
+
+    return false;
   }
 
   @Override

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/button_delete_all_contacts"
+          android:title="@string/title_delete_all_contacts"
+          android:showAsAction="never"
+          android:visible="true"/>
+
+</menu>

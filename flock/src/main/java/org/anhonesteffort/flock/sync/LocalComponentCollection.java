@@ -55,4 +55,6 @@ public interface LocalComponentCollection<T> {
 
   public void removeComponent(String path) throws RemoteException;
 
+  public void removeAllComponents() throws RemoteException;
+
 }
