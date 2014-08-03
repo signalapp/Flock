@@ -19,14 +19,12 @@
 
 package org.anhonesteffort.flock.sync.calendar;
 
-import android.accounts.Account;
 import android.app.Service;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncResult;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -35,13 +33,13 @@ import android.util.Log;
 import com.google.common.base.Optional;
 
 import org.anhonesteffort.flock.crypto.InvalidMacException;
+import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
 import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.PreferencesActivity;
 import org.anhonesteffort.flock.auth.DavAccount;
-import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
@@ -50,6 +48,7 @@ import org.apache.jackrabbit.webdav.DavException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -82,56 +81,33 @@ public class CalendarsSyncService extends Service {
       super(context);
     }
 
+    @Override
     protected String getAuthority() {
       return CalendarsSyncScheduler.CONTENT_AUTHORITY;
     }
 
-    private void finalizeCopiedCalendars(LocalCalendarStore localStore,
-                                         HidingCalDavStore  remoteStore)
-        throws RemoteException, IOException,
-               GeneralSecurityException, DavException, PropertyParseException
-    {
-      Log.d(TAG, "finalizeCopiedCalendars()");
-
-      Optional<String> calendarHome = remoteStore.getCalendarHomeSet();
-      if (!calendarHome.isPresent())
-        throw new PropertyParseException("No calendar-home-set property found for user.",
-                                         remoteStore.getHostHREF(), CalDavConstants.PROPERTY_NAME_CALENDAR_HOME_SET);
-
-      List<LocalEventCollection> copiedCalendars = localStore.getCopiedCollections();
-      for (LocalEventCollection copiedCalendar : copiedCalendars) {
-        String            remotePath  = calendarHome.get().concat(UUID.randomUUID().toString() + "/");
-        Optional<String>  displayName = copiedCalendar.getDisplayName();
-        Optional<Integer> color       = copiedCalendar.getColor();
-        SharedPreferences settings    = PreferenceManager.getDefaultSharedPreferences(getContext());
-
-        Log.d(TAG, "found copied calendar >> " + copiedCalendar.getLocalId());
-        Log.d(TAG, "will put to           >> " + remotePath);
-
-        if (displayName.isPresent()) {
-          if (color.isPresent())
-            remoteStore.addCollection(remotePath, displayName.get(), color.get());
-          else {
-            int defaultColor = settings.getInt(PreferencesActivity.KEY_PREF_DEFAULT_CALENDAR_COLOR, 0xFFFFFFFF);
-            remoteStore.addCollection(remotePath, displayName.get(), defaultColor);
-          }
-        }
-        else
-          remoteStore.addCollection(remotePath);
-
-        localStore.setCollectionPath(copiedCalendar.getLocalId(), remotePath);
-        localStore.setCollectionCopied(copiedCalendar.getLocalId(), false);
-      }
+    @Override
+    protected void setTimeLastSync() {
+      new CalendarsSyncScheduler(getContext()).setTimeLastSync(new Date().getTime());
     }
 
-    private void handleImportNewFlockSyncCalendars(LocalCalendarStore localStore,
-                                                   HidingCalDavStore  remoteStore,
-                                                   SyncResult         syncResult)
-        throws PropertyParseException, DavException, IOException
+    @Override
+    protected void handlePreSyncOperations(DavAccount            account,
+                                           MasterCipher          masterCipher,
+                                           ContentProviderClient provider)
+        throws PropertyParseException, InvalidMacException, DavException,
+               RemoteException, GeneralSecurityException, IOException
     {
-      for (HidingCalDavCollection remoteCollection : remoteStore.getCollections()) {
-        try {
+      Log.d(TAG, "handlePreSyncOperations() -- importing new flock sync collections...");
+      if (!DavAccountHelper.isUsingOurServers(account))
+        return;
 
+      LocalCalendarStore localStore  = new LocalCalendarStore(provider, account.getOsAccount());
+      HidingCalDavStore  remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), account, masterCipher);
+
+      try {
+
+        for (HidingCalDavCollection remoteCollection : remoteStore.getCollections()) {
           if (!remoteCollection.getPath().contains(DavKeyStore.PATH_KEY_COLLECTION) &&
               !localStore.getCollection(remoteCollection.getPath()).isPresent())
           {
@@ -147,95 +123,98 @@ public class CalendarsSyncService extends Service {
             else
               localStore.addCollection(remoteCollection.getPath());
           }
-
-        } catch (IOException e) {
-          handleException(getContext(), e, syncResult);
-        } catch (PropertyParseException e) {
-          handleException(getContext(), e, syncResult);
-        } catch (RemoteException e) {
-          handleException(getContext(), e, syncResult);
-        } catch (InvalidMacException e) {
-          handleException(getContext(), e, syncResult);
-        } catch (GeneralSecurityException e) {
-          handleException(getContext(), e, syncResult);
         }
+
+      } finally {
+        remoteStore.releaseConnections();
       }
     }
 
     @Override
-    public void onPerformSync(Account               account,
-                              Bundle                extras,
-                              String                authority,
-                              ContentProviderClient provider,
-                              SyncResult            syncResult)
+    public List<AbstractDavSyncWorker> getSyncWorkers(DavAccount            account,
+                                                      MasterCipher          masterCipher,
+                                                      ContentProviderClient provider,
+                                                      SyncResult            syncResult)
+        throws DavException, RemoteException, IOException
     {
-      Log.d(TAG, "performing sync for authority >> " + authority);
-
-      // ical4j TimeZoneRegistry kills everything without this...
-      Thread.currentThread().setContextClassLoader(getContext().getClassLoader());
-
-      Optional<DavAccount> davAccountOptional = DavAccountHelper.getAccount(getContext());
-      if (!davAccountOptional.isPresent()) {
-        Log.d(TAG, "dav account is missing");
-        syncResult.stats.numAuthExceptions++;
-        showNotifications(syncResult);
-        return ;
-      }
+      List<AbstractDavSyncWorker> workers     = new LinkedList<AbstractDavSyncWorker>();
+      LocalCalendarStore          localStore  = new LocalCalendarStore(provider, account.getOsAccount());
+      HidingCalDavStore           remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), account, masterCipher);
 
       try {
-
-        Optional<MasterCipher> masterCipher = KeyHelper.getMasterCipher(getContext());
-        if (!masterCipher.isPresent()) {
-          Log.d(TAG, "master cipher is missing");
-          syncResult.stats.numAuthExceptions++;
-          return ;
-        }
-
-        LocalCalendarStore localStore  = new LocalCalendarStore(provider, davAccountOptional.get().getOsAccount());
-        HidingCalDavStore  remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), davAccountOptional.get(), masterCipher.get());
-
-        if (DavAccountHelper.isUsingOurServers(getContext()))
-          handleImportNewFlockSyncCalendars(localStore, remoteStore, syncResult);
 
         for (LocalEventCollection localCollection : localStore.getCollections()) {
           Log.d(TAG, "found local collection: " + localCollection.getPath());
           Optional<HidingCalDavCollection> remoteCollection = remoteStore.getCollection(localCollection.getPath());
 
           if (remoteCollection.isPresent()) {
-            if (!remoteCollection.get().isFlockCollection()) {
-              if (!localCollection.getDisplayName().isPresent())
-                remoteCollection.get().makeFlockCollection(" ");
-              else {
-                Log.d(TAG, "MAKING FLOCK COLLECTION WITH DISPLAY NAME >> " + localCollection.getDisplayName().get());
-                remoteCollection.get().makeFlockCollection(localCollection.getDisplayName().get());
-              }
-            }
+            remoteCollection.get().setClient(
+                DavAccountHelper.getAndroidDavClient(getContext(), account)
+            );
 
-            new CalendarSyncWorker(getContext(), localCollection, remoteCollection.get()).run(syncResult, false);
-          }
-          else {
+            workers.add(
+                new CalendarSyncWorker(getContext(), syncResult, localCollection, remoteCollection.get())
+            );
+          } else {
             Log.d(TAG, "local collection missing remotely, deleting locally");
             localStore.removeCollection(localCollection.getPath());
           }
         }
 
-        finalizeCopiedCalendars(localStore, remoteStore);
+      } finally {
         remoteStore.releaseConnections();
-
-      } catch (IOException e) {
-        handleException(getContext(), e, syncResult);
-      } catch (DavException e) {
-        handleException(getContext(), e, syncResult);
-      } catch (PropertyParseException e) {
-        handleException(getContext(), e, syncResult);
-      } catch (RemoteException e) {
-        handleException(getContext(), e, syncResult);
-      } catch (GeneralSecurityException e) {
-        handleException(getContext(), e, syncResult);
       }
 
-      showNotifications(syncResult);
-      new CalendarsSyncScheduler(getContext()).setTimeLastSync(new Date().getTime());
+      return workers;
+    }
+
+    @Override
+    protected void handlePostSyncOperations(DavAccount            account,
+                                            MasterCipher          masterCipher,
+                                            ContentProviderClient provider)
+        throws RemoteException, IOException,
+               GeneralSecurityException, DavException, PropertyParseException
+    {
+      Log.d(TAG, "handlePostSyncOperations() -- finalizing imported calendars...");
+
+      LocalCalendarStore localStore  = new LocalCalendarStore(provider, account.getOsAccount());
+      HidingCalDavStore  remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), account, masterCipher);
+
+      try {
+
+        Optional<String> calendarHome = remoteStore.getCalendarHomeSet();
+        if (!calendarHome.isPresent())
+          throw new PropertyParseException("No calendar-home-set property found for user.",
+                                           remoteStore.getHostHREF(), CalDavConstants.PROPERTY_NAME_CALENDAR_HOME_SET);
+
+        for (LocalEventCollection copiedCalendar : localStore.getCopiedCollections()) {
+          String            remotePath  = calendarHome.get().concat(UUID.randomUUID().toString() + "/");
+          Optional<String>  displayName = copiedCalendar.getDisplayName();
+          Optional<Integer> color       = copiedCalendar.getColor();
+          SharedPreferences settings    = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+          Log.d(TAG, "found copied calendar >> " + copiedCalendar.getLocalId());
+          Log.d(TAG, "will put to           >> " + remotePath);
+
+          if (displayName.isPresent()) {
+            if (color.isPresent())
+              remoteStore.addCollection(remotePath, displayName.get(), color.get());
+            else {
+              int defaultColor = settings.getInt(PreferencesActivity.KEY_PREF_DEFAULT_CALENDAR_COLOR, 0xFFFFFFFF);
+              remoteStore.addCollection(remotePath, displayName.get(), defaultColor);
+            }
+          }
+          else
+            remoteStore.addCollection(remotePath);
+
+          localStore.setCollectionPath(copiedCalendar.getLocalId(), remotePath);
+          localStore.setCollectionCopied(copiedCalendar.getLocalId(), false);
+        }
+
+      }
+      finally {
+        remoteStore.releaseConnections();
+      }
     }
   }
 }

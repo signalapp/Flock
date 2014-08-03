@@ -19,8 +19,6 @@
 
 package org.anhonesteffort.flock.webdav.carddav;
 
-import android.util.Log;
-
 import com.google.common.base.Optional;
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
@@ -55,15 +53,6 @@ public class CardDavCollection extends AbstractDavComponentCollection<VCard> imp
 
   protected CardDavCollection(CardDavStore cardDavStore, String path) {
     super(cardDavStore, path);
-  }
-
-  protected CardDavCollection(CardDavStore cardDavStore,
-                              String       path,
-                              String       displayName,
-                              String       description)
-  {
-    super(cardDavStore, path, displayName);
-    properties.add(new DefaultDavProperty<String>(CardDavConstants.PROPERTY_NAME_ADDRESSBOOK_DESCRIPTION, description));
   }
 
   protected CardDavCollection(CardDavStore cardDavStore, String path, DavPropertySet properties) {
@@ -184,7 +173,7 @@ public class CardDavCollection extends AbstractDavComponentCollection<VCard> imp
 
     try {
 
-      getStore().getClient().execute(putMethod);
+      client.execute(putMethod);
       int status = putMethod.getStatusCode();
 
       if (status == DavServletResponse.SC_REQUEST_ENTITY_TOO_LARGE ||

@@ -70,4 +70,6 @@ public interface HidingDavCollection<T> {
 
   public void removeComponent(String path) throws DavException, IOException;
 
+  public void closeHttpConnection();
+
 }

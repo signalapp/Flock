@@ -23,11 +23,13 @@ import android.accounts.Account;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
 import android.content.SyncResult;
+import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -40,6 +42,8 @@ import org.anhonesteffort.flock.ManageSubscriptionActivity;
 import org.anhonesteffort.flock.R;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
+import org.anhonesteffort.flock.crypto.KeyHelper;
+import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
 import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
@@ -50,11 +54,15 @@ import org.apache.jackrabbit.webdav.DavServletResponse;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import javax.net.ssl.SSLException;
 
 /**
  * Programmer: rhodey
- * Date: 3/9/14
  */
 public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -65,12 +73,6 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
 
   private static final String PREFERENCES_NAME            = "AbstractDavSyncAdapter.PREFERENCES_NAME";
   private static final String KEY_VOID_AUTH_NOTIFICATIONS = "KEY_VOID_AUTH_NOTIFICATIONS";
-
-  public AbstractDavSyncAdapter(Context context) {
-    super(context, true);
-  }
-
-  protected abstract String getAuthority();
 
   public static void handleException(Context context, Exception e, SyncResult result) {
     if (e instanceof DavException) {
@@ -129,6 +131,102 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
     else {
       result.stats.numParseExceptions++;
       Log.e(TAG, "DID NOT CATCH THIS EXCEPTION CORRECTLY!!! >> " + e.toString());
+    }
+  }
+
+  public AbstractDavSyncAdapter(Context context) {
+    super(context, true);
+  }
+
+  protected abstract String getAuthority();
+
+  protected abstract void setTimeLastSync();
+
+  protected abstract void handlePreSyncOperations(DavAccount            account,
+                                                  MasterCipher          masterCipher,
+                                                  ContentProviderClient provider)
+      throws PropertyParseException, InvalidMacException, DavException,
+             RemoteException, GeneralSecurityException, IOException;
+
+  protected abstract List<AbstractDavSyncWorker> getSyncWorkers(DavAccount            account,
+                                                                MasterCipher          masterCipher,
+                                                                ContentProviderClient client,
+                                                                SyncResult            syncResult)
+      throws DavException, RemoteException, IOException;
+
+  protected abstract void handlePostSyncOperations(DavAccount            account,
+                                                   MasterCipher          masterCipher,
+                                                   ContentProviderClient provider)
+      throws PropertyParseException, InvalidMacException, DavException,
+      RemoteException, GeneralSecurityException, IOException;
+
+  @Override
+  public void onPerformSync(Account               account,
+                            Bundle                extras,
+                            String                authority,
+                            ContentProviderClient provider,
+                            SyncResult            syncResult)
+  {
+    Log.d(TAG, "performing sync for authority >> " + authority);
+
+    Optional<DavAccount> davAccount = DavAccountHelper.getAccount(getContext());
+    if (!davAccount.isPresent()) {
+      Log.d(TAG, "dav account is missing");
+      syncResult.stats.numAuthExceptions++;
+      showNotifications(syncResult);
+
+      Log.d(TAG, "completed sync for authority >> " + authority);
+      return ;
+    }
+
+    try {
+
+      Optional<MasterCipher> masterCipher = KeyHelper.getMasterCipher(getContext());
+      if (!masterCipher.isPresent()) {
+        Log.d(TAG, "master cipher is missing");
+        syncResult.stats.numAuthExceptions++;
+
+        Log.d(TAG, "completed sync for authority >> " + authority);
+        return ;
+      }
+
+      handlePreSyncOperations(davAccount.get(), masterCipher.get(), provider);
+
+      List<AbstractDavSyncWorker> workers = getSyncWorkers(davAccount.get(), masterCipher.get(), provider, syncResult);
+
+      if (workers.size() > 0) {
+        Log.d(TAG, "starting new thread executor service for " + workers.size() + " sync workers.");
+        ExecutorService executor = Executors.newFixedThreadPool(workers.size());
+
+        for (AbstractDavSyncWorker worker : workers)
+          executor.execute(worker);
+
+        executor.shutdown();
+        executor.awaitTermination(60, TimeUnit.MINUTES);
+
+        for (AbstractDavSyncWorker worker : workers)
+          worker.remoteCollection.closeHttpConnection();
+      }
+
+      handlePostSyncOperations(davAccount.get(), masterCipher.get(), provider);
+      setTimeLastSync();
+
+      Log.d(TAG, "completed sync for authority >> " + authority);
+
+    } catch (PropertyParseException e) {
+      handleException(getContext(), e, syncResult);
+    } catch (DavException e) {
+      handleException(getContext(), e, syncResult);
+    } catch (RemoteException e) {
+      handleException(getContext(), e, syncResult);
+    } catch (InvalidMacException e) {
+      handleException(getContext(), e, syncResult);
+    } catch (GeneralSecurityException e) {
+      handleException(getContext(), e, syncResult);
+    } catch (IOException e) {
+      handleException(getContext(), e, syncResult);
+    } catch (InterruptedException e) {
+      handleException(getContext(), e, syncResult);
     }
   }
 
@@ -228,7 +326,7 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
     notificationManager.cancel(ID_NOTIFICATION_SUBSCRIPTION);
   }
 
-  protected void showNotifications(SyncResult result) {
+  private void showNotifications(SyncResult result) {
     if (result.stats.numAuthExceptions > 0 && !isAuthNotificationDisabled())
       showAuthNotificationAndInvalidatePassword(getContext());
     if (result.stats.numSkippedEntries > 0)

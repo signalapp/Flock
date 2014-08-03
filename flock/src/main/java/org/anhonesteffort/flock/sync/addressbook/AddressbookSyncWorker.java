@@ -20,11 +20,7 @@
 package org.anhonesteffort.flock.sync.addressbook;
 
 import android.content.Context;
-import android.util.Log;
-
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.component.VEvent;
+import android.content.SyncResult;
 
 import ezvcard.VCard;
 
@@ -40,10 +36,11 @@ public class AddressbookSyncWorker extends AbstractDavSyncWorker<VCard> {
   private static final String TAG = "org.anhonesteffort.flock.sync.addressbook.AddressbookSyncWorker";
 
   protected AddressbookSyncWorker(Context                 context,
+                                  SyncResult              result,
                                   LocalContactCollection  localCollection,
                                   HidingCardDavCollection remoteCollection)
   {
-    super(context, localCollection, remoteCollection);
+    super(context, result, localCollection, remoteCollection);
   }
 
   @Override

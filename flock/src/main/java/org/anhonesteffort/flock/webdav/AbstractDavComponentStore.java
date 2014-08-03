@@ -50,8 +50,8 @@ public abstract class AbstractDavComponentStore <C extends DavComponentCollectio
   protected final String           password;
   protected       Optional<String> currentUserPrincipal = Optional.absent();
 
-  private DavClient              davClient;
-  private Optional<List<String>> davOptions = Optional.absent();
+  protected DavClient              davClient;
+  private   Optional<List<String>> davOptions = Optional.absent();
 
   public AbstractDavComponentStore(String           hostHREF,
                                    String           username,
@@ -117,7 +117,7 @@ public abstract class AbstractDavComponentStore <C extends DavComponentCollectio
 
     try {
 
-      getClient().execute(propFindMethod);
+      davClient.execute(propFindMethod);
 
       MultiStatus           multiStatus = propFindMethod.getResponseBodyAsMultiStatus();
       MultiStatusResponse[] msResponses = multiStatus.getResponses();
@@ -162,7 +162,7 @@ public abstract class AbstractDavComponentStore <C extends DavComponentCollectio
 
   @Override
   public void closeHttpConnection() {
-    getClient().closeHttpConnection();
+    davClient.closeHttpConnection();
   }
 
 }
