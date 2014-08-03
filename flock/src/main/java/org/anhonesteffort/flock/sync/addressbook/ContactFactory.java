@@ -865,14 +865,20 @@ public class ContactFactory {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
     for (Note note : vCard.getNotes()) {
-      ContentValues values = new ContentValues();
+      try {
 
-      values.put(ContactsContract.Data.MIMETYPE,
-                 ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE);
-      values.put(ContactsContract.CommonDataKinds.Note.NOTE,
-                 note.getValue());
+        ContentValues values = new ContentValues();
 
-      valuesList.add(values);
+        values.put(ContactsContract.Data.MIMETYPE,
+                   ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE);
+        values.put(ContactsContract.CommonDataKinds.Note.NOTE,
+                   new String(Base64.decode(note.getValue())));
+
+        valuesList.add(values);
+
+      } catch (IOException e) {
+        Log.e(TAG, "error base64 decoding note, not putting in content provider", e);
+      }
     }
 
     return valuesList;
@@ -882,7 +888,7 @@ public class ContactFactory {
     String noteText = noteValues.getAsString(ContactsContract.CommonDataKinds.Note.NOTE);
 
     if (noteText != null) {
-      Note note = new Note(noteText);
+      Note note = new Note(Base64.encodeBytes(noteText.getBytes()));
       vCard.addNote(note);
     }
   }
