@@ -26,7 +26,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -160,6 +159,12 @@ public class RegisterAccountFragment extends Fragment {
 
     if (StringUtils.isEmpty(username)) {
       result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_EMPTY_ACCOUNT_ID);
+      ErrorToaster.handleDisplayToastBundledError(getActivity(), result);
+      return;
+    }
+
+    if (username.contains(" ")) {
+      result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SPACES_IN_USERNAME);
       ErrorToaster.handleDisplayToastBundledError(getActivity(), result);
       return;
     }

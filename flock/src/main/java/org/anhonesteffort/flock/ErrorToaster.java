@@ -33,7 +33,6 @@ import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.registration.AuthorizationException;
 import org.anhonesteffort.flock.registration.RegistrationApiClientException;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
-import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
@@ -75,21 +74,22 @@ public class ErrorToaster {
 
   protected static final int CODE_EMPTY_DAV_URL          = 12;
   protected static final int CODE_EMPTY_ACCOUNT_ID       = 13;
-  protected static final int CODE_ILLEGAL_ACCOUNT_ID     = 14;
-  protected static final int CODE_ACCOUNT_ID_TAKEN       = 15;
-  protected static final int CODE_SHORT_PASSWORD         = 16;
-  protected static final int CODE_PASSWORDS_DO_NOT_MATCH = 17;
+  protected static final int CODE_SPACES_IN_USERNAME     = 14;
+  protected static final int CODE_ILLEGAL_ACCOUNT_ID     = 15;
+  protected static final int CODE_ACCOUNT_ID_TAKEN       = 16;
+  protected static final int CODE_SHORT_PASSWORD         = 17;
+  protected static final int CODE_PASSWORDS_DO_NOT_MATCH = 18;
 
-  protected static final int CODE_CARD_NUMBER_INVALID     = 18;
-  protected static final int CODE_CARD_EXPIRATION_INVALID = 19;
-  protected static final int CODE_CARD_CVC_INVALID        = 20;
-  protected static final int CODE_STRIPE_REJECTED_CARD    = 21;
-  protected static final int CODE_STRIPE_CONNECTION_ERROR = 22;
-  protected static final int CODE_STRIPE_API_ERROR        = 23;
+  protected static final int CODE_CARD_NUMBER_INVALID     = 19;
+  protected static final int CODE_CARD_EXPIRATION_INVALID = 20;
+  protected static final int CODE_CARD_CVC_INVALID        = 21;
+  protected static final int CODE_STRIPE_REJECTED_CARD    = 22;
+  protected static final int CODE_STRIPE_CONNECTION_ERROR = 23;
+  protected static final int CODE_STRIPE_API_ERROR        = 24;
 
-  protected static final int CODE_SUBSCRIPTION_EXPIRED = 24;
+  protected static final int CODE_SUBSCRIPTION_EXPIRED = 25;
 
-  protected static final int CODE_ACCOUNT_MANAGER_ERROR = 25;
+  protected static final int CODE_ACCOUNT_MANAGER_ERROR = 26;
 
   protected static void handleBundleError(Exception e, Bundle bundle) {
     Log.e(TAG, "handleBundleError() - ", e);
@@ -222,6 +222,9 @@ public class ErrorToaster {
       case CODE_EMPTY_ACCOUNT_ID:
         handleShowAccountIdEmpty(context);
         break;
+      case CODE_SPACES_IN_USERNAME:
+        handleShowSpacesInAccountId(context);
+        break;
       case CODE_ILLEGAL_ACCOUNT_ID:
         handleShowIllegalAccountId(context);
         break;
@@ -330,6 +333,9 @@ public class ErrorToaster {
   }
   private static void handleShowAccountIdEmpty(Context context) {
     handleShowErrorQuick(context, R.string.error_username_empty);
+  }
+  private static void handleShowSpacesInAccountId(Context context) {
+    handleShowErrorQuick(context, R.string.error_spaces_in_username);
   }
   private static void handleShowIllegalAccountId(Context context) {
     handleShowErrorQuick(context, R.string.error_username_illegal);

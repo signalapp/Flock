@@ -365,6 +365,7 @@
 
     <string name="error_url_cannot_be_empty">Url cannot be empty</string>
     <string name="error_username_empty">Username must not be empty.</string>
+    <string name="error_spaces_in_username">Username must not contain spaces.</string>
     <string name="error_username_illegal">Username must contain \'@\' and be at least 5 characters in length.</string>
     <string name="error_passwords_do_not_match">Passwords do not match.</string>
     <string name="error_password_too_short">Password is too short!</string>
