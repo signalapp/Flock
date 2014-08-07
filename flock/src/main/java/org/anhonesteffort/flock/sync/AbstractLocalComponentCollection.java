@@ -304,6 +304,15 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
         .withValue(getColumnNameDirty(), 1).build());
   }
 
+  public void setUidToNull(Long localId) {
+    Log.d(TAG, "setUidToNull() localId " + localId);
+
+    pendingOperations.add(ContentProviderOperation
+        .newUpdate(ContentUris.withAppendedId(getUriForComponents(), localId))
+        .withValue(getColumnNameComponentUid(), null)
+        .build());
+  }
+
   public void commitPendingOperations() throws OperationApplicationException, RemoteException {
     Log.d(TAG, "commitPendingOperations()");
 

@@ -279,8 +279,8 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
 
   }
 
-  protected void handlePushLocalComponentFailed(SyncResult result, Long localId) {
-    Log.e(TAG, "handlePushLocalComponentFailed() >> " + localId);
+  protected void handleServerRejectedLocalComponent(SyncResult result, Long localId) {
+    Log.e(TAG, "handleServerRejectedLocalComponent() >> " + localId);
 
     try {
 
@@ -321,7 +321,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
         } catch (InvalidComponentException e) {
 
           AbstractDavSyncAdapter.handleException(context, e, result);
-          handlePushLocalComponentFailed(result, componentId.first);
+          handleServerRejectedLocalComponent(result, componentId.first);
 
         } catch (GeneralSecurityException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
@@ -353,6 +353,20 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
     }
   }
 
+  protected void handleServerErrorOnPushNewLocalComponent(SyncResult result, Long localId) {
+    Log.e(TAG, "handleServerErrorOnPushNewLocalComponent() >> " + localId);
+
+    try {
+
+      localCollection.setUidToNull(localId);
+      localCollection.commitPendingOperations();
+
+    } catch (RemoteException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (OperationApplicationException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    }
+  }
 
   protected abstract void prePushLocallyCreatedComponent(T component);
 
@@ -387,13 +401,19 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
         } catch (InvalidComponentException e) {
 
           AbstractDavSyncAdapter.handleException(context, e, result);
-          handlePushLocalComponentFailed(result, componentId);
+          handleServerRejectedLocalComponent(result, componentId);
+
+        } catch (DavException e) {
+
+          AbstractDavSyncAdapter.handleException(context, e, result);
+          handleServerErrorOnPushNewLocalComponent(result, componentId);
+
+        } catch (IOException e) {
+
+          AbstractDavSyncAdapter.handleException(context, e, result);
+          handleServerErrorOnPushNewLocalComponent(result, componentId);
 
         } catch (GeneralSecurityException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (DavException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (IOException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
         } catch (RemoteException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
