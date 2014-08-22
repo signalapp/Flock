@@ -24,6 +24,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,12 +32,17 @@ import android.widget.TextView;
 import com.google.common.base.Optional;
 
 import org.anhonesteffort.flock.auth.DavAccount;
+import org.anhonesteffort.flock.crypto.InvalidCipherVersionException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.registration.RegistrationApi;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
+import org.anhonesteffort.flock.sync.key.DavKeyCollection;
+import org.anhonesteffort.flock.sync.key.DavKeyStore;
+import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
+import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -61,6 +67,7 @@ public class StatusHeaderView extends LinearLayout {
   private AsyncTask            asyncTaskSubscription;
   private AsyncTask            asyncTaskCard;
   private AsyncTask            asyncTaskMasterPassphrase;
+  private AsyncTask            asyncTaskMigration;
 
   private long    timeLastSync                  = -1;
   private boolean syncInProgress                = false;
@@ -127,17 +134,20 @@ public class StatusHeaderView extends LinearLayout {
     final String syncStatusText;
     final int    syncStatusDrawable;
 
-    if (timeLastSync == -1) {
-      if (!ContentResolver.getMasterSyncAutomatically()) {
-        syncStatusView.setText(getContext().getString(R.string.status_header_status_sync_disabled));
-        syncStatusView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.sad_cloud, 0, 0);
-      }
-      else {
-        syncStatusView.setText(getContext().getString(R.string.status_header_sync_in_progress));
-        syncStatusView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.sync_in_progress, 0, 0);
-      }
-
+    if (!ContentResolver.getMasterSyncAutomatically()) {
+      syncStatusView.setText(getContext().getString(R.string.status_header_status_sync_disabled));
       timeLastSyncView.setVisibility(GONE);
+      syncStatusView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.sad_cloud, 0, 0);
+
+      invalidate();
+      return;
+    }
+
+    if (timeLastSync == -1) {
+      syncStatusView.setText(getContext().getString(R.string.status_header_sync_in_progress));
+      syncStatusView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.sync_in_progress, 0, 0);
+      timeLastSyncView.setVisibility(GONE);
+
       invalidate();
       return;
     }
@@ -168,10 +178,6 @@ public class StatusHeaderView extends LinearLayout {
         authNotificationShown = true;
       }
     }
-    else if (!cipherPassphraseIsValid) {
-      syncStatusText     = getContext().getString(R.string.status_header_status_encryption_password_incorrect);
-      syncStatusDrawable = R.drawable.sad_cloud;
-    }
     else if (!subscriptionIsValid) {
       syncStatusText     = getContext().getString(R.string.notification_flock_subscription_expired);
       syncStatusDrawable = R.drawable.sad_cloud;
@@ -184,8 +190,17 @@ public class StatusHeaderView extends LinearLayout {
       syncStatusText     = getContext().getString(R.string.status_header_status_auto_renew_error);
       syncStatusDrawable = R.drawable.sad_cloud;
     }
-    else if (!ContentResolver.getMasterSyncAutomatically()) {
-      syncStatusText     = getContext().getString(R.string.status_header_status_sync_disabled);
+    else if (MigrationHelperBroadcastReceiver.getUiDisabledForMigration(getContext())) {
+      syncStatusText     = getContext().getString(R.string.status_header_status_migration_in_progress);
+      syncStatusDrawable = R.drawable.migration_in_progress;
+
+      timeLastSyncView.setText(R.string.please_wait_this_will_take_a_few_minutes);
+      timeLastSyncView.setVisibility(VISIBLE);
+
+      new KeySyncScheduler(getContext()).requestSync();
+    }
+    else if (!cipherPassphraseIsValid) {
+      syncStatusText     = getContext().getString(R.string.status_header_status_encryption_password_incorrect);
       syncStatusDrawable = R.drawable.sad_cloud;
     }
     else if (syncInProgress) {
@@ -316,6 +331,8 @@ public class StatusHeaderView extends LinearLayout {
 
         } catch (IOException e) {
           ErrorToaster.handleBundleError(e, result);
+        } catch (InvalidCipherVersionException e) {
+          Log.d(TAG, "caught invalid cipher version exception, likely due to migration.", e);
         } catch (GeneralSecurityException e) {
           ErrorToaster.handleBundleError(e, result);
         }
@@ -327,6 +344,58 @@ public class StatusHeaderView extends LinearLayout {
       protected void onPostExecute(Bundle result) {
         asyncTaskMasterPassphrase = null;
         cipherPassphraseIsValid   = passphraseIsValid;
+
+        if (result.getInt(ErrorToaster.KEY_STATUS_CODE) != ErrorToaster.CODE_SUCCESS)
+          ErrorToaster.handleDisplayToastBundledError(getContext(), result);
+      }
+
+    }.execute();
+  }
+
+  private void handleUpdateMigrationInProgress() {
+    if ((asyncTaskMigration != null && !asyncTaskMigration.isCancelled())         ||
+        !MigrationHelperBroadcastReceiver.getUiDisabledForMigration(getContext()) ||
+        !DavKeyCollection.weStartedMigration(getContext()))
+      return;
+
+    Log.d(TAG, "handleUpdateMigrationInProgress()");
+
+    asyncTaskMigration = new AsyncTask<String, Void, Bundle>() {
+
+      @Override
+      protected Bundle doInBackground(String... params) {
+        boolean migrationInProgress = true;
+        Bundle  result              = new Bundle();
+
+        try {
+
+          DavKeyStore                davKeyStore   = DavAccountHelper.getDavKeyStore(getContext(), account.get());
+          Optional<DavKeyCollection> keyCollection = davKeyStore.getCollection();
+
+          if (keyCollection.isPresent())
+            migrationInProgress = !keyCollection.get().isMigrationComplete();
+
+          if (DavKeyCollection.weStartedMigration(getContext()))
+            MigrationHelperBroadcastReceiver.setUiDisabledForMigration(getContext(), migrationInProgress);
+
+          result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
+
+        } catch (InvalidComponentException e) {
+          ErrorToaster.handleBundleError(e, result);
+        } catch (PropertyParseException e) {
+          ErrorToaster.handleBundleError(e, result);
+        } catch (DavException e) {
+          ErrorToaster.handleBundleError(e, result);
+        } catch (IOException e) {
+          ErrorToaster.handleBundleError(e, result);
+        }
+
+        return result;
+      }
+
+      @Override
+      protected void onPostExecute(Bundle result) {
+        asyncTaskMigration = null;
 
         if (result.getInt(ErrorToaster.KEY_STATUS_CODE) != ErrorToaster.CODE_SUCCESS)
           ErrorToaster.handleDisplayToastBundledError(getContext(), result);
@@ -360,6 +429,12 @@ public class StatusHeaderView extends LinearLayout {
       handleUpdateCipherPassphraseIsValid();
     }
   };
+  private final Runnable refreshMigrationRunnable = new Runnable() {
+    @Override
+    public void run() {
+      handleUpdateMigrationInProgress();
+    }
+  };
 
   public void handleStartPerpetualRefresh() {
     account       = DavAccountHelper.getAccount(getContext());
@@ -389,6 +464,12 @@ public class StatusHeaderView extends LinearLayout {
         uiHandler.post(refreshCipherPassphraseRunnable);
       }
     };
+    TimerTask migrationTask = new TimerTask() {
+      @Override
+      public void run() {
+        uiHandler.post(refreshMigrationRunnable);
+      }
+    };
 
     intervalTimer.schedule(uiTask, 0, 2000);
 
@@ -399,6 +480,8 @@ public class StatusHeaderView extends LinearLayout {
       }
       else
         intervalTimer.schedule(passphraseTask, 0, 10000);
+
+      intervalTimer.schedule(migrationTask, 0, 10000);
     }
   }
 }

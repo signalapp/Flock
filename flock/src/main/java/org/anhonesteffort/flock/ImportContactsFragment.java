@@ -22,7 +22,6 @@ package org.anhonesteffort.flock;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ContentProviderClient;
 import android.content.Intent;
 import android.database.Cursor;
@@ -76,7 +75,7 @@ public class ImportContactsFragment extends AccountAndKeyRequiredFragment
   {
     View fragmentView = inflater.inflate(R.layout.fragment_simple_list, container, false);
 
-    if (!accountAndKeyAvailable())
+    if (!accountAndKeyAvailableAndMigrationComplete())
       return fragmentView;
 
     initButtons();
@@ -88,7 +87,7 @@ public class ImportContactsFragment extends AccountAndKeyRequiredFragment
   public void onResume() {
     super.onResume();
 
-    if (!accountAndKeyAvailable())
+    if (!accountAndKeyAvailableAndMigrationComplete())
       return ;
 
     initializeList();

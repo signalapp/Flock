@@ -23,6 +23,7 @@ import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SyncInfo;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ import com.google.common.base.Optional;
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.PreferencesActivity;
 import org.anhonesteffort.flock.auth.DavAccount;
+import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
 
 /**
  * Programmer: rhodey
@@ -54,13 +56,35 @@ public abstract class AbstractSyncScheduler extends ContentObserver {
   protected abstract String getAuthority();
   protected abstract Uri    getUri();
 
-  public boolean syncInProgress(Account account) {
-    return ContentResolver.isSyncActive(account, getAuthority());
-  }
-
   public void registerSelfForBroadcasts() {
     context.getContentResolver().unregisterContentObserver(this);
     context.getContentResolver().registerContentObserver(getUri(), false, this);
+  }
+
+  public boolean syncInProgress(Account account) {
+    for (SyncInfo syncInfo : ContentResolver.getCurrentSyncs()) {
+      if (syncInfo.account.type.equals(account.type) && syncInfo.authority.equals(getAuthority()))
+        return true;
+    }
+
+    return ContentResolver.isSyncActive(account, getAuthority());
+  }
+
+  public boolean getIsSyncEnabled(Account account) {
+    return ContentResolver.getIsSyncable(account, getAuthority()) > 0;
+  }
+
+  public void setSyncEnabled(Account account, boolean enabled) {
+    if (!enabled && getAuthority().equals(KeySyncScheduler.CONTENT_AUTHORITY)) {
+      Log.w(getTAG(), "cannot disable key sync service, not changing sync setting.");
+      return;
+    }
+
+    ContentResolver.setIsSyncable(account, getAuthority(), enabled ? 1 : 0);
+  }
+
+  public void cancelPendingSyncs(Account account) {
+    ContentResolver.cancelSync(account, getAuthority());
   }
 
   public void requestSync() {
@@ -93,6 +117,11 @@ public abstract class AbstractSyncScheduler extends ContentObserver {
           new Bundle(),
           SYNC_INTERVAL);
     }
+  }
+
+  public void restoreSyncIntervalFromSharedPreferences() {
+    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+    setSyncInterval(settings.getInt(PreferencesActivity.KEY_PREF_SYNC_INTERVAL_MINUTES, 60));
   }
 
   public void setTimeLastSync(Long timeMilliseconds) {

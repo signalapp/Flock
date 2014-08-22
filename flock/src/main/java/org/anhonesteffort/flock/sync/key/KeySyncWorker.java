@@ -20,17 +20,21 @@
 package org.anhonesteffort.flock.sync.key;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncResult;
 import android.util.Log;
 
 import com.google.common.base.Optional;
 import org.anhonesteffort.flock.DavAccountHelper;
+import org.anhonesteffort.flock.MigrationHelperBroadcastReceiver;
+import org.anhonesteffort.flock.MigrationService;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.KeyStore;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
-import org.anhonesteffort.flock.sync.calendar.HidingCalDavCollection;
+import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
+import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
@@ -45,12 +49,136 @@ public class KeySyncWorker {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.key.KeySyncWorker";
 
+  public static final String ACTION_KEY_MATERIAL_IMPORTED = "org.anhonesteffort.flock.sync.key.ACTION_KEY_MATERIAL_IMPORTED";
+
   private final Context    context;
   private final DavAccount account;
 
   public KeySyncWorker(Context context, DavAccount account) {
     this.context = context;
     this.account = account;
+
+    Thread.currentThread().setContextClassLoader(context.getClassLoader());
+  }
+
+  private void handleDisableCalendarAndContactSync() {
+    Log.w(TAG, "handleDisableCalendarAndContactSync()");
+
+    new CalendarsSyncScheduler(context).setSyncEnabled(account.getOsAccount(), false);
+    new AddressbookSyncScheduler(context).setSyncEnabled(account.getOsAccount(), false);
+
+    new CalendarsSyncScheduler(context).cancelPendingSyncs(account.getOsAccount());
+    new AddressbookSyncScheduler(context).cancelPendingSyncs(account.getOsAccount());
+  }
+
+  private void handleEnableCalendarAndContactSync() {
+    Log.w(TAG, "handleEnableCalendarAndContactSync()");
+
+    new CalendarsSyncScheduler(context).setSyncEnabled(account.getOsAccount(), true);
+    new AddressbookSyncScheduler(context).setSyncEnabled(account.getOsAccount(), true);
+  }
+
+  private void handleMigrationComplete(SyncResult       result,
+                                       String           localKeyMaterialSalt,
+                                       String           localEncryptedKeyMaterial,
+                                       DavKeyCollection keyCollection)
+  {
+    Log.w(TAG, "handleMigrationComplete()");
+
+    new KeySyncScheduler(context).restoreSyncIntervalFromSharedPreferences();
+
+    try {
+
+      if (!KeyHelper.masterPassphraseIsValid(context) &&
+          !DavAccountHelper.isUsingOurServers(context))
+      {
+        KeySyncService.showCipherPassphraseInvalidNotification(context);
+        return;
+      }
+
+    } catch (GeneralSecurityException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (IOException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    }
+
+    try {
+
+      Optional<String> remoteKeyMaterialSalt      = keyCollection.getKeyMaterialSalt();
+      Optional<String> remoteEncryptedKeyMaterial = keyCollection.getEncryptedKeyMaterial();
+
+      if (!remoteKeyMaterialSalt.isPresent())
+        keyCollection.setKeyMaterialSalt(localKeyMaterialSalt);
+
+      if (!remoteEncryptedKeyMaterial.isPresent())
+        keyCollection.setEncryptedKeyMaterial(localEncryptedKeyMaterial);
+
+      else if (remoteKeyMaterialSalt.isPresent() &&
+               !remoteEncryptedKeyMaterial.get().equals(localEncryptedKeyMaterial))
+      {
+        try {
+
+          KeyHelper.importSaltAndEncryptedKeyMaterial(context, new String[]{
+              remoteKeyMaterialSalt.get(),
+              remoteEncryptedKeyMaterial.get()
+          });
+
+          Intent intent = new Intent();
+          intent.setPackage(MigrationHelperBroadcastReceiver.class.getPackage().getName());
+          intent.setAction(ACTION_KEY_MATERIAL_IMPORTED);
+          context.sendBroadcast(intent);
+
+        } catch (InvalidMacException e) {
+          Log.w(TAG, "caught invalid mac exception while importing remote key material, " +
+                     "assuming password change for non-flock sync user.");
+          KeyStore.saveEncryptedKeyMaterial(context, remoteEncryptedKeyMaterial.get());
+          KeySyncService.showCipherPassphraseInvalidNotification(context);
+        }
+      }
+
+    } catch (PropertyParseException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (DavException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (IOException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (GeneralSecurityException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    }
+
+    handleEnableCalendarAndContactSync();
+  }
+
+  private void handleStartOrResumeMigrationService() {
+    Log.w(TAG, "handleStartOrResumeMigrationService()");
+    context.startService(new Intent(context, MigrationService.class));
+  }
+
+  private void handleMigrationInProgress(SyncResult       result,
+                                         DavKeyCollection keyCollection)
+  {
+    Log.w(TAG, "handleMigrationInProgress()");
+    new KeySyncScheduler(context).setSyncInterval(1);
+
+    try {
+
+      if (!DavKeyCollection.weStartedMigration(context)) {
+        boolean preconditionSucceeded = keyCollection.setMigrationStarted(context);
+        if (!preconditionSucceeded)
+          handleDisableCalendarAndContactSync();
+        else
+          handleStartOrResumeMigrationService();
+      }
+      else
+        handleStartOrResumeMigrationService();
+
+    } catch (InvalidComponentException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (DavException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (IOException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    }
   }
 
   public void run(SyncResult result) {
@@ -76,60 +204,13 @@ public class KeySyncWorker {
           return;
         }
 
-        try {
+        if (keyCollection.get().isMigrationComplete())
+          handleMigrationComplete(result, localKeyMaterialSalt.get(), localEncryptedKeyMaterial.get(), keyCollection.get());
+        else
+          handleMigrationInProgress(result, keyCollection.get());
 
-          if (!KeyHelper.masterPassphraseIsValid(context) &&
-              !DavAccountHelper.isUsingOurServers(context))
-          {
-            KeySyncService.showCipherPassphraseInvalidNotification(context);
-            return;
-          }
-
-        } catch (GeneralSecurityException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (IOException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        }
-
-        try {
-
-          Optional<String> remoteKeyMaterialSalt      = keyCollection.get().getKeyMaterialSalt();
-          Optional<String> remoteEncryptedKeyMaterial = keyCollection.get().getEncryptedKeyMaterial();
-
-          if (!remoteKeyMaterialSalt.isPresent())
-            keyCollection.get().setKeyMaterialSalt(localKeyMaterialSalt.get());
-
-          if (!remoteEncryptedKeyMaterial.isPresent())
-            keyCollection.get().setEncryptedKeyMaterial(localEncryptedKeyMaterial.get());
-
-          else if (remoteKeyMaterialSalt.isPresent() &&
-                   !remoteEncryptedKeyMaterial.get().equals(localEncryptedKeyMaterial.get()))
-          {
-            try {
-
-              KeyHelper.importSaltAndEncryptedKeyMaterial(context, new String[]{
-                  remoteKeyMaterialSalt.get(),
-                  remoteEncryptedKeyMaterial.get()
-              });
-
-            } catch (InvalidMacException e) {
-              Log.d(TAG, "caught invalid mac exception while importing remote key material, " +
-                          "assuming password change for non-flock sync user.");
-              KeyStore.saveEncryptedKeyMaterial(context, remoteEncryptedKeyMaterial.get());
-              KeySyncService.showCipherPassphraseInvalidNotification(context);
-            }
-          }
-
-        } catch (PropertyParseException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (DavException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (IOException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (GeneralSecurityException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        }
-
+      } catch (InvalidComponentException e) {
+        AbstractDavSyncAdapter.handleException(context, e, result);
       } catch (PropertyParseException e) {
         AbstractDavSyncAdapter.handleException(context, e, result);
       } catch (DavException e) {

@@ -19,6 +19,7 @@
 
 package org.anhonesteffort.flock;
 
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -92,8 +93,8 @@ public class DavAccountHelper {
     return Optional.fromNullable(getSharedPreferences(context).getString(KEY_DAV_HOST, null));
   }
 
-  public static void setAccountDavHREF(Context context, String username) {
-    getSharedPreferences(context).edit().putString(KEY_DAV_HOST, username).commit();
+  public static void setAccountDavHREF(Context context, String href) {
+    getSharedPreferences(context).edit().putString(KEY_DAV_HOST, href).commit();
   }
 
   public static void invalidateAccount(Context context) {
@@ -109,6 +110,14 @@ public class DavAccountHelper {
   public static boolean isUsingOurServers(Context context) {
     return getAccountDavHREF(context).isPresent() &&
            getAccountDavHREF(context).get().equals(OwsWebDav.HREF_WEBDAV_HOST);
+  }
+
+  public static Optional<Account> getOsAccount(Context context) {
+    Optional<String> accountUsername = getAccountUsername(context);
+    if (!accountUsername.isPresent())
+      return Optional.absent();
+
+    return Optional.of(new Account(accountUsername.get(), DavAccount.SYNC_ACCOUNT_TYPE));
   }
 
   public static Optional<DavAccount> getAccount(Context context) {

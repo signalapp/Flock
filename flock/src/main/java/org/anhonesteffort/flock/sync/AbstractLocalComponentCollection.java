@@ -27,7 +27,6 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteException;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.util.Pair;
 
@@ -92,11 +91,13 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
 
   protected abstract String getColumnNameDirty();
   protected abstract String getColumnNameDeleted();
+  protected abstract String getColumnNameQueuedForMigration();
 
   public List<Long> getNewComponentIds() throws RemoteException {
     final String[] PROJECTION = new String[]{getColumnNameComponentLocalId(), getColumnNameComponentUid()};
-    final String   SELECTION  = getColumnNameComponentUid() + " IS NULL AND " +
-                                getColumnNameCollectionLocalId() + "=" + localId;
+    final String   SELECTION  = "(" + getColumnNameComponentUid() + " IS NULL OR "  +
+                                      getColumnNameQueuedForMigration() + "=1) AND " +
+                                      getColumnNameCollectionLocalId()  + "=" + localId;
 
     Cursor     cursor = client.query(getUriForComponents(), PROJECTION, SELECTION, null, null);
     List<Long> newIds = new LinkedList<Long>();
@@ -293,7 +294,9 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
 
     pendingOperations.add(ContentProviderOperation
         .newUpdate(ContentUris.withAppendedId(getUriForComponents(), localId))
-        .withValue(getColumnNameDirty(), 0).build());
+        .withValue(getColumnNameDirty(), 0)
+        .withValue(getColumnNameQueuedForMigration(), 0)
+        .build());
   }
 
   public void dirtyComponent(Long localId) {
@@ -311,6 +314,16 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
         .newUpdate(ContentUris.withAppendedId(getUriForComponents(), localId))
         .withValue(getColumnNameComponentUid(), null)
         .build());
+  }
+
+  public void queueForMigration(Long localId)
+      throws RemoteException
+  {
+      pendingOperations.add(ContentProviderOperation
+          .newUpdate(ContentUris.withAppendedId(getUriForComponents(), localId))
+          .withValue(getColumnNameQueuedForMigration(), 1)
+          .withYieldAllowed(false)
+          .build());
   }
 
   public void commitPendingOperations() throws OperationApplicationException, RemoteException {

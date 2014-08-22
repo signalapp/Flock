@@ -20,6 +20,7 @@
 package org.anhonesteffort.flock.sync.addressbook;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncResult;
 
 import ezvcard.VCard;
@@ -34,6 +35,8 @@ import org.apache.jackrabbit.webdav.xml.Namespace;
 public class AddressbookSyncWorker extends AbstractDavSyncWorker<VCard> {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.addressbook.AddressbookSyncWorker";
+
+  public static final String ACTION_PUSH_CREATED_CONTACTS = "org.anhonesteffort.flock.sync.addressbook.AddressbookSyncWorker.ACTION_PUSH_CREATED_CONTACTS";
 
   protected AddressbookSyncWorker(Context                 context,
                                   SyncResult              result,
@@ -58,4 +61,12 @@ public class AddressbookSyncWorker extends AbstractDavSyncWorker<VCard> {
 
   }
 
+  @Override
+  protected void pushLocallyCreatedComponents(SyncResult result) {
+    super.pushLocallyCreatedComponents(result);
+
+    Intent intent = new Intent();
+    intent.setAction(ACTION_PUSH_CREATED_CONTACTS);
+    context.sendBroadcast(intent);
+  }
 }

@@ -48,6 +48,7 @@ public class OwsRegistration {
   protected static final String PRICING_CONTROLLER      = "pricing";
 
   protected static final String PARAM_ACCOUNT_ID        = "id";
+  protected static final String PARAM_ACCOUNT_VERSION   = "version";
   protected static final String PARAM_ACCOUNT_PASSWORD  = "password";
   protected static final String PARAM_STRIPE_CARD_TOKEN = "stripe_card_token";
   protected static final String PARAM_AUTO_RENEW        = "auto_renew";

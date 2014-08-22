@@ -74,13 +74,8 @@ public class AddressbookSyncService extends Service {
     }
 
     @Override
-    protected String getAuthority() {
-      return AddressbookSyncScheduler.CONTENT_AUTHORITY;
-    }
-
-    @Override
-    protected void setTimeLastSync() {
-      new AddressbookSyncScheduler(getContext()).setTimeLastSync(new Date().getTime());
+    protected AddressbookSyncScheduler getSyncScheduler() {
+      return new AddressbookSyncScheduler(getContext());
     }
 
     @Override
