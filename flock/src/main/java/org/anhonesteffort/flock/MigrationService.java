@@ -625,10 +625,10 @@ public class MigrationService extends Service {
   {
     Log.d(TAG, "handleMarkAllComponentsAsNew() >> " + localCollection.getPath());
 
-    for (Long componentId : localCollection.getComponentIds())
+    for (Long componentId : localCollection.getComponentIds()) {
       localCollection.queueForMigration(componentId);
-
-    localCollection.commitPendingOperations();
+      localCollection.commitPendingOperations();
+    }
   }
 
   private void handleMarkAllLocalEventsAndContactsAsNew() {
