@@ -35,12 +35,23 @@ public class KeyStore {
 
   private static final String TAG = "org.anhonesteffort.flock.crypto.KeyStore";
 
-  private static final String PREFERENCES_NAME           = "org.anhonesteffort.flock.crypto.KeyStore";
-  private static final String KEY_MASTER_PASSPHRASE      = "KEY_OLD_MASTER_PASSPHRASE";
-  private static final String KEY_CIPHER_KEY             = "KEY_CIPHER_KEY";
-  private static final String KEY_MAC_KEY                = "KEY_MAC_KEY";
-  private static final String KEY_KEY_MATERIAL_SALT      = "KEY_KEY_MATERIAL_SALT";
-  private static final String KEY_ENCRYPTED_KEY_MATERIAL = "KEY_ENCRYPTED_KEY_MATERIAL";
+  private static final String PREFERENCES_NAME            = "org.anhonesteffort.flock.crypto.KeyStore";
+  private static final String KEY_USE_CIPHER_VERSION_ZERO = "KEY_USE_CIPHER_VERSION_ZERO";
+  private static final String KEY_MASTER_PASSPHRASE       = "KEY_OLD_MASTER_PASSPHRASE";
+  private static final String KEY_CIPHER_KEY              = "KEY_CIPHER_KEY";
+  private static final String KEY_MAC_KEY                 = "KEY_MAC_KEY";
+  private static final String KEY_KEY_MATERIAL_SALT       = "KEY_KEY_MATERIAL_SALT";
+  private static final String KEY_ENCRYPTED_KEY_MATERIAL  = "KEY_ENCRYPTED_KEY_MATERIAL";
+
+  protected static boolean getUseCipherVersionZero(Context context) {
+    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
+    return settings.getBoolean(KEY_USE_CIPHER_VERSION_ZERO, false);
+  }
+
+  public static void setUseCipherVersionZero(Context context, boolean useCipherVersionZero) {
+    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
+    settings.edit().putBoolean(KEY_USE_CIPHER_VERSION_ZERO, useCipherVersionZero).commit();
+  }
 
   protected static void saveCipherKey(Context context, byte[] cipherKey) {
     Log.d(TAG, "SAVING CIPHER KEY MATERIAL...");

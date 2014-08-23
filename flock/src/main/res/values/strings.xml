@@ -51,6 +51,9 @@
     <string name="status_header_status_our_sync_service_error">Sync temporarily unavailable…</string>
     <string name="status_header_status_their_sync_service_error">WebDAV server has errors</string>
     <string name="status_header_status_registration_service_error">Registration service temporarily unavailable…</string>
+    <string name="status_header_status_migration_in_progress">Migration in progress</string>
+    <string name="checking_if_migration_required">Checking if migration required…</string>
+    <string name="please_wait_this_will_take_a_few_minutes">Please wait, this will take a few minutes…</string>
 
     <string name="status_header_sync_time">Last synced on %1$s</string>
     <string name="status_header_sync_in_progress">Sync in progress…</string>
@@ -342,6 +345,33 @@
         Encryption password is invalid, please correct your encryption password.
     </string>
     <string name="password_corrected">Password corrected!</string>
+
+
+    <!-- MigrationReleaseNotesActivity -->
+    <string name="release_notes">Release notes</string>
+    <string name="the_way_that_flock_syncs_data_has_changed_to_make_future_updates_run_more_smoothly">
+        The way that Flock syncs data has changed to make future updates run more
+        smoothly. To help facilitate this update users must temporarily
+        disable sync on all clients older than v0.8.
+    </string>
+    <string name="after_updating_a_device_to_v08_simply_re_enable_sync">
+        After updating a device to v0.8, simply re-enable sync and migration will complete automatically.
+    </string>
+
+
+    <!-- MigrationService -->
+    <string name="migrating_to_new_version">Migrating to new version</string>
+    <string name="preparing_to_upgrade_sync_protocol">Preparing to upgrade sync protocol…</string>
+    <string name="please_enable_sync">Please enable sync</string>
+    <string name="please_enable_anrdoid_sync_to_complete_migration">Please enable Android sync to complete migration.</string>
+    <string name="checking_sync_for_new_contacts_and_calendar">Checking sync for new contacts and calendars…</string>
+    <string name="generating_new_encryption_secrets">Generating new encryption secrets…</string>
+    <string name="replacing_addressbooks_and_calendars">Replacing addressbooks and calendars…</string>
+    <string name="replacing_old_contacts_and_events">Replacing old contacts and events…</string>
+    <string name="finalizing_migration">Finalizing migration…</string>
+    <string name="migration_complete">Migration complete</string>
+    <string name="please_update_flock_on_all_your_devices">Please update Flock on all your devices.</string>
+    <string name="migration_in_progress_please_wait">Migration in progress, please wait…</string>
 
 
     <!-- ErrorToaster messages -->

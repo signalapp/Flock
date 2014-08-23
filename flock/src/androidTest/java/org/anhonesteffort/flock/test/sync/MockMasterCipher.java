@@ -14,7 +14,7 @@ import java.io.IOException;
 public class MockMasterCipher extends MasterCipher {
 
   public MockMasterCipher() {
-    super(null, null);
+    super(false, null, null);
   }
 
   @Override
@@ -28,8 +28,8 @@ public class MockMasterCipher extends MasterCipher {
   }
 
   @Override
-  public byte[] decodeAndDecrypt(byte[] encodedIvCiphertextAndMac) {
-    return Base64.decode(encodedIvCiphertextAndMac);
+  public byte[] decodeAndDecrypt(byte[] encodedVersionIvCiphertextAndMac) {
+    return Base64.decode(encodedVersionIvCiphertextAndMac);
   }
 
   public String decodeAndDecrypt(String data) throws IOException {

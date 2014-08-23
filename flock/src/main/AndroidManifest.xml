@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.anhonesteffort.flock"
-          android:versionCode="7"
-          android:versionName="0.7.7" >
+          android:versionCode="8"
+          android:versionName="0.8" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -131,6 +131,8 @@
 
         <activity android:name="org.anhonesteffort.flock.SendBitcoinActivity" />
 
+        <activity android:name="org.anhonesteffort.flock.MigrationReleaseNotesActivity" />
+
         <service android:name="org.anhonesteffort.flock.auth.AccountAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -197,9 +199,22 @@
         <service android:name="org.anhonesteffort.flock.ChangeEncryptionPasswordService"
                  android:exported="false"/>
 
+        <service android:name="org.anhonesteffort.flock.MigrationService"
+                 android:exported="false"/>
+
         <receiver android:name="org.anhonesteffort.flock.sync.SyncBooter">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="org.anhonesteffort.flock.MigrationHelperBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="org.anhonesteffort.flock.MigrationService.ACTION_MIGRATION_STARTED"/>
+                <action android:name="org.anhonesteffort.flock.MigrationService.ACTION_MIGRATION_COMPLETE"/>
+                <action android:name="org.anhonesteffort.flock.sync.key.ACTION_KEY_MATERIAL_IMPORTED"/>
+                <action android:name="org.anhonesteffort.flock.sync.addressbook.AddressbookSyncWorker.ACTION_PUSH_CREATED_CONTACTS"/>
             </intent-filter>
         </receiver>
 

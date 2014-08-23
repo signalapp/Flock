@@ -23,7 +23,6 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -63,7 +62,7 @@ public class UnregisterAccountActivity extends AccountAndKeyRequiredActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    if (!accountAndKeyAvailable())
+    if (!accountAndKeyAvailableAndMigrationComplete())
       return;
 
     requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);

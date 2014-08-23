@@ -35,7 +35,6 @@ import com.stripe.exception.CardException;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.registration.model.AugmentedFlockAccount;
 import org.anhonesteffort.flock.registration.model.FlockCardInformation;
-import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.util.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -202,6 +201,7 @@ public class RegistrationApi {
 
     List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
     nameValuePairs.add(new BasicNameValuePair(OwsRegistration.PARAM_ACCOUNT_ID,       account.getUserId()));
+    nameValuePairs.add(new BasicNameValuePair(OwsRegistration.PARAM_ACCOUNT_VERSION,  Integer.toString(2)));
     nameValuePairs.add(new BasicNameValuePair(OwsRegistration.PARAM_ACCOUNT_PASSWORD, account.getAuthToken()));
 
     String            HREF       = OwsRegistration.getHrefWithParameters(OwsRegistration.HREF_ACCOUNT_COLLECTION,
@@ -287,6 +287,23 @@ public class RegistrationApi {
     }
 
     return Optional.of(buildFlockCardInformation(response));
+  }
+
+  public void setAccountVersion(DavAccount account, Integer version)
+      throws RegistrationApiException, IOException
+  {
+    Log.d(TAG, "setAccountVersion()");
+
+    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+    nameValuePairs.add(new BasicNameValuePair(OwsRegistration.PARAM_ACCOUNT_VERSION, version.toString()));
+
+    String            HREF       = OwsRegistration.getHrefWithParameters(OwsRegistration.getHrefForAccount(account.getUserId()), nameValuePairs);
+    HttpPut           httpPut    = new HttpPut(HREF);
+    DefaultHttpClient httpClient = getClient(context);
+    authorizeRequest(httpPut, account);
+
+    HttpResponse response = httpClient.execute(httpPut);
+    throwExceptionIfNotOK(response);
   }
 
   public void setAccountPassword(DavAccount account, String newPassword)

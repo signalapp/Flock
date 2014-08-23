@@ -136,6 +136,11 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   @Override
+  protected String getColumnNameQueuedForMigration() {
+    return ContactsContract.RawContacts.SYNC2;
+  }
+
+  @Override
   public Optional<String> getDisplayName() {
     SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_NAME,
         Context.MODE_MULTI_PROCESS);

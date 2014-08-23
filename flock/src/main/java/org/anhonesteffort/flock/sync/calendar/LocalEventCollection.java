@@ -150,11 +150,17 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
   }
 
   @Override
+  protected String getColumnNameQueuedForMigration() {
+    return CalendarContract.Events.SYNC_DATA3;
+  }
+
+  @Override
   public List<Long> getNewComponentIds() throws RemoteException {
     final String[] PROJECTION = new String[]{getColumnNameComponentLocalId()};
     final String   SELECTION  = "(" + getColumnNameComponentUid() + " IS NULL OR " +
-                                CalendarContract.Events.SYNC_DATA2 + " > 0) AND " +
-                                getColumnNameCollectionLocalId() + "=" + localId;
+                                      CalendarContract.Events.SYNC_DATA2 + " > 0 OR " +
+                                      getColumnNameQueuedForMigration()  + "=1) AND " +
+                                      getColumnNameCollectionLocalId()   + "=" + localId;
 
     Cursor     cursor = client.query(getUriForComponents(), PROJECTION, SELECTION, null, null);
     List<Long> newIds = new LinkedList<Long>();

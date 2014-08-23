@@ -48,6 +48,13 @@ public class AndroidDavClient extends DavClient {
     Protocol.registerProtocol("https", appHttps);
   }
 
+  private void handleVersionUsername() {
+    if (DavAccountHelper.isUsingOurServers(context)) {
+      davUsername = davUsername.concat("@V2");
+      initClient();
+    }
+  }
+
   public AndroidDavClient(Context context,
                           URL     davHost,
                           String  username,
@@ -58,5 +65,7 @@ public class AndroidDavClient extends DavClient {
 
     if (davHost.getProtocol().equals("https"))
       fixClientTrust();
+
+    handleVersionUsername();
   }
 }

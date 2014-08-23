@@ -78,7 +78,7 @@ public abstract class AbstractMyCollectionsFragment extends AccountAndKeyRequire
          activity     = getActivity();
     View fragmentView = inflater.inflate(R.layout.fragment_list_sync_collections, container, false);
 
-    if (accountAndKeyAvailable())
+    if (accountAndKeyAvailableAndMigrationComplete())
       initButtons();
 
     return fragmentView;
@@ -104,6 +104,9 @@ public abstract class AbstractMyCollectionsFragment extends AccountAndKeyRequire
   @Override
   public void onResume() {
     super.onResume();
+
+    if (!accountAndKeyAvailableAndMigrationComplete())
+      return;
 
     activity = getActivity();
     initializeList();

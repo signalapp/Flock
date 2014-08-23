@@ -82,13 +82,8 @@ public class CalendarsSyncService extends Service {
     }
 
     @Override
-    protected String getAuthority() {
-      return CalendarsSyncScheduler.CONTENT_AUTHORITY;
-    }
-
-    @Override
-    protected void setTimeLastSync() {
-      new CalendarsSyncScheduler(getContext()).setTimeLastSync(new Date().getTime());
+    protected CalendarsSyncScheduler getSyncScheduler() {
+      return new CalendarsSyncScheduler(getContext());
     }
 
     @Override

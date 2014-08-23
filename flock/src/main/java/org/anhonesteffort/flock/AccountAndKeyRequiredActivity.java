@@ -97,7 +97,16 @@ public class AccountAndKeyRequiredActivity extends Activity {
     masterCipher = handleGetMasterCipherOrFail(this);
   }
 
-  protected boolean accountAndKeyAvailable() {
+  protected boolean accountAndKeyAvailableAndMigrationComplete() {
+    if (MigrationHelperBroadcastReceiver.getUiDisabledForMigration(getBaseContext())) {
+      Toast.makeText(getBaseContext(),
+                     R.string.migration_in_progress_please_wait,
+                     Toast.LENGTH_LONG).show();
+
+      finish();
+      return false;
+    }
+
     return account != null && masterCipher != null;
   }
 

@@ -122,6 +122,8 @@ public class ImportOwsAccountService extends ImportAccountService {
       String authToken     = KeyUtil.getAuthTokenForPassphrase(masterPassphrase);
              importAccount = new DavAccount(accountId, authToken, OwsWebDav.HREF_WEBDAV_HOST);
 
+      DavAccountHelper.setAccountDavHREF(getBaseContext(), importAccount.getDavHostHREF());
+
       if (DavAccountHelper.isAuthenticated(getBaseContext(), importAccount)) {
         if (DavAccountHelper.isExpired(getBaseContext(), importAccount))
           result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUBSCRIPTION_EXPIRED);

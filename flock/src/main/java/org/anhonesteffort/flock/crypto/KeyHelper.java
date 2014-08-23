@@ -57,17 +57,25 @@ public class KeyHelper {
       KeyStore.saveEncryptedKeyMaterial(context, encryptedKeyMaterial.get());
   }
 
-  public static Optional<MasterCipher> getMasterCipher(Context context) throws IOException {
-    Optional<byte[]> cipherKeyBytes = KeyStore.getCipherKey(context);
-    Optional<byte[]> macKeyBytes    = KeyStore.getMacKey(context);
+  public static Optional<MasterCipher> getMasterCipher(Context context)
+      throws IOException
+  {
+    boolean          useCipherVersionZero = KeyStore.getUseCipherVersionZero(context);
+    Optional<byte[]> cipherKeyBytes       = KeyStore.getCipherKey(context);
+    Optional<byte[]> macKeyBytes          = KeyStore.getMacKey(context);
 
     if (!cipherKeyBytes.isPresent() || !macKeyBytes.isPresent())
       return Optional.absent();
 
     SecretKey cipherKey = new SecretKeySpec(cipherKeyBytes.get(), "AES");
-    SecretKey macKey    = new SecretKeySpec(cipherKeyBytes.get(), "SHA256");
+    SecretKey macKey    = null;
 
-    return Optional.of(new MasterCipher(cipherKey, macKey));
+    if (useCipherVersionZero)
+      macKey = new SecretKeySpec(cipherKeyBytes.get(), "SHA256");
+    else
+      macKey = new SecretKeySpec(macKeyBytes.get(), "SHA256");
+
+    return Optional.of(new MasterCipher(useCipherVersionZero, cipherKey, macKey));
   }
 
   public static Optional<String> buildEncodedSalt(Context context) throws IOException {
@@ -94,7 +102,7 @@ public class KeyHelper {
     SecretKey[]  masterKeys      = KeyUtil.getCipherAndMacKeysForPassphrase(salt.get(), masterPassphrase.get());
     SecretKey    masterCipherKey = masterKeys[0];
     SecretKey    masterMacKey    = masterKeys[1];
-    MasterCipher masterCipher    = new MasterCipher(masterCipherKey, masterMacKey);
+    MasterCipher masterCipher    = new MasterCipher(false, masterCipherKey, masterMacKey);
 
     byte[] keyMaterial          = Util.combine(cipherKey.get(), macKey.get());
     byte[] encryptedKeyMaterial = masterCipher.encryptAndEncode(keyMaterial);
@@ -112,11 +120,12 @@ public class KeyHelper {
     if (!masterPassphrase.isPresent())
       throw new InvalidMacException("Passphrase unavailable.");
 
+    boolean      useCipherVersionZero = KeyStore.getUseCipherVersionZero(context);
     byte[]       salt                 = Base64.decode(saltAndEncryptedKeyMaterial[0]);
     SecretKey[]  masterKeys           = KeyUtil.getCipherAndMacKeysForPassphrase(salt, masterPassphrase.get());
     SecretKey    masterCipherKey      = masterKeys[0];
     SecretKey    masterMacKey         = masterKeys[1];
-    MasterCipher masterCipher         = new MasterCipher(masterCipherKey, masterMacKey);
+    MasterCipher masterCipher         = new MasterCipher(useCipherVersionZero, masterCipherKey, masterMacKey);
     byte[]       plaintextKeyMaterial = masterCipher.decodeAndDecrypt(saltAndEncryptedKeyMaterial[1].getBytes());
 
     boolean saltLengthValid        = salt.length                 == KeyUtil.SALT_LENGTH_BYTES;
@@ -155,7 +164,7 @@ public class KeyHelper {
     SecretKey[]  masterKeys      = KeyUtil.getCipherAndMacKeysForPassphrase(salt.get(), masterPassphrase.get());
     SecretKey    masterCipherKey = masterKeys[0];
     SecretKey    masterMacKey    = masterKeys[1];
-    MasterCipher masterCipher    = new MasterCipher(masterCipherKey, masterMacKey);
+    MasterCipher masterCipher    = new MasterCipher(false, masterCipherKey, masterMacKey);
 
     try {
 

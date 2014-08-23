@@ -54,6 +54,7 @@ import org.apache.jackrabbit.webdav.DavServletResponse;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -138,9 +139,7 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
     super(context, true);
   }
 
-  protected abstract String getAuthority();
-
-  protected abstract void setTimeLastSync();
+  protected abstract AbstractSyncScheduler getSyncScheduler();
 
   protected abstract void handlePreSyncOperations(DavAccount            account,
                                                   MasterCipher          masterCipher,
@@ -169,6 +168,11 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
   {
     Log.d(TAG, "performing sync for authority >> " + authority);
 
+    if (!getSyncScheduler().getIsSyncEnabled(account)) {
+      Log.w(TAG, "sync disabled for authority " + authority + ", not gonna sync");
+      return;
+    }
+
     Optional<DavAccount> davAccount = DavAccountHelper.getAccount(getContext());
     if (!davAccount.isPresent()) {
       Log.d(TAG, "dav account is missing");
@@ -185,6 +189,7 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
       if (!masterCipher.isPresent()) {
         Log.d(TAG, "master cipher is missing");
         syncResult.stats.numAuthExceptions++;
+        showNotifications(syncResult);
 
         Log.d(TAG, "completed sync for authority >> " + authority);
         return ;
@@ -209,9 +214,7 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
       }
 
       handlePostSyncOperations(davAccount.get(), masterCipher.get(), provider);
-      setTimeLastSync();
-
-      Log.d(TAG, "completed sync for authority >> " + authority);
+      getSyncScheduler().setTimeLastSync(new Date().getTime());
 
     } catch (PropertyParseException e) {
       handleException(getContext(), e, syncResult);
@@ -228,6 +231,9 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
     } catch (InterruptedException e) {
       handleException(getContext(), e, syncResult);
     }
+
+    Log.d(TAG, "completed sync for authority >> " + authority);
+    showNotifications(syncResult);
   }
 
   public static void disableAuthNotificationsForRunningAdapters(Context context, Account account) {
@@ -255,13 +261,13 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
   private boolean isAuthNotificationDisabled() {
     SharedPreferences settings = getContext().getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
 
-    if (settings.getBoolean(KEY_VOID_AUTH_NOTIFICATIONS + getAuthority(), false)) {
-      settings.edit().putBoolean(KEY_VOID_AUTH_NOTIFICATIONS + getAuthority(), false).commit();
-      Log.e(TAG, "auth notification is disabled for " + getAuthority());
+    if (settings.getBoolean(KEY_VOID_AUTH_NOTIFICATIONS + getSyncScheduler().getAuthority(), false)) {
+      settings.edit().putBoolean(KEY_VOID_AUTH_NOTIFICATIONS + getSyncScheduler().getAuthority(), false).commit();
+      Log.e(TAG, "auth notification is disabled for " + getSyncScheduler().getAuthority());
       return true;
     }
 
-    Log.e(TAG, "auth notification is not disabled for " + getAuthority());
+    Log.e(TAG, "auth notification is not disabled for " + getSyncScheduler().getAuthority());
     return false;
   }
 

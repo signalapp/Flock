@@ -36,15 +36,18 @@ import javax.crypto.spec.IvParameterSpec;
  */
 public class MasterCipher {
 
-  protected static final int MAC_LENGTH_BYTES = 32;
-  protected static final int IV_LENGTH_BYTES  = 16;
+  public    static final byte CURRENT_CIPHER_VERSION = 0x01;
+  protected static final int  MAC_LENGTH_BYTES       = 32;
+  protected static final int  IV_LENGTH_BYTES        = 16;
 
+  private final boolean   useCipherVersionZero;
   private final SecretKey cipherKey;
   private final SecretKey macKey;
 
-  protected MasterCipher(SecretKey cipherKey, SecretKey macKey) {
-    this.cipherKey = cipherKey;
-    this.macKey    = macKey;
+  protected MasterCipher(boolean useCipherVersionZero, SecretKey cipherKey, SecretKey macKey) {
+    this.useCipherVersionZero = useCipherVersionZero;
+    this.cipherKey            = cipherKey;
+    this.macKey               = macKey;
   }
 
   public byte[] encryptAndEncode(byte[] data)
@@ -58,9 +61,15 @@ public class MasterCipher {
 
     byte[] iv         = encryptingCipher.getIV();
     byte[] ciphertext = encryptingCipher.doFinal(data);
-    byte[] mac        = hmac.doFinal(Util.combine(iv, ciphertext));
 
-    return Base64.encodeBytesToBytes(Util.combine(iv, ciphertext, mac));
+    if (useCipherVersionZero) {
+      byte[] mac        = hmac.doFinal(Util.combine(iv, ciphertext));
+      return Base64.encodeBytesToBytes(Util.combine(iv, ciphertext, mac));
+    }
+    else {
+      byte[] mac        = hmac.doFinal(Util.combine(new byte[] {CURRENT_CIPHER_VERSION}, iv, ciphertext));
+      return Base64.encodeBytesToBytes(Util.combine(new byte[] {CURRENT_CIPHER_VERSION}, iv, ciphertext, mac));
+    }
   }
 
   public String encryptAndEncode(String data)
@@ -69,7 +78,7 @@ public class MasterCipher {
     return new String(encryptAndEncode(data.getBytes()));
   }
 
-  public byte[] decodeAndDecrypt(byte[] encodedIvCiphertextAndMac)
+  private byte[] decodeAndDecryptCipherVersionZero(byte[] encodedIvCiphertextAndMac)
       throws InvalidMacException, IOException, GeneralSecurityException
   {
     byte[] ivCiphertextAndMac = Base64.decode(encodedIvCiphertextAndMac);
@@ -86,12 +95,46 @@ public class MasterCipher {
 
     Cipher          decryptingCipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
     IvParameterSpec ivSpec           = new IvParameterSpec(iv);
-    decryptingCipher.init(Cipher.DECRYPT_MODE, cipherKey, ivSpec);
+    Mac             hmac             = Mac.getInstance("HmacSHA256");
 
-    Mac       hmac   = Mac.getInstance("HmacSHA256");
+    decryptingCipher.init(Cipher.DECRYPT_MODE, cipherKey, ivSpec);
     hmac.init(macKey);
 
     verifyMac(hmac, Util.combine(iv, ciphertext), mac);
+
+    return decryptingCipher.doFinal(ciphertext);
+  }
+
+  public byte[] decodeAndDecrypt(byte[] encodedVersionIvCiphertextAndMac)
+      throws InvalidMacException, IOException, GeneralSecurityException
+  {
+    if (useCipherVersionZero)
+      return decodeAndDecryptCipherVersionZero(encodedVersionIvCiphertextAndMac);
+
+    byte[] versionIvCiphertextAndMac = Base64.decode(encodedVersionIvCiphertextAndMac);
+    if (versionIvCiphertextAndMac.length <= (1 + IV_LENGTH_BYTES + MAC_LENGTH_BYTES))
+      throw new GeneralSecurityException("invalid length on decoded cipherVersion, iv, ciphertext and mac");
+
+    byte version = versionIvCiphertextAndMac[0];
+    if (version != CURRENT_CIPHER_VERSION)
+      throw new InvalidCipherVersionException("invalid cipher cipherVersion >> " + version);
+
+    byte[] iv         = Arrays.copyOfRange(versionIvCiphertextAndMac, 1, 1 + IV_LENGTH_BYTES);
+    byte[] ciphertext = Arrays.copyOfRange(versionIvCiphertextAndMac,
+                                           1 + IV_LENGTH_BYTES,
+                                           versionIvCiphertextAndMac.length - MAC_LENGTH_BYTES);
+    byte[] mac        = Arrays.copyOfRange(versionIvCiphertextAndMac,
+                                           versionIvCiphertextAndMac.length - MAC_LENGTH_BYTES,
+                                           versionIvCiphertextAndMac.length);
+
+    Cipher          decryptingCipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+    IvParameterSpec ivSpec           = new IvParameterSpec(iv);
+    Mac             hmac             = Mac.getInstance("HmacSHA256");
+
+    decryptingCipher.init(Cipher.DECRYPT_MODE, cipherKey, ivSpec);
+    hmac.init(macKey);
+
+    verifyMac(hmac, Util.combine(new byte[]{version}, iv, ciphertext), mac);
 
     return decryptingCipher.doFinal(ciphertext);
   }
@@ -110,5 +153,4 @@ public class MasterCipher {
     if (!MessageDigest.isEqual(theirMac, ourMac))
       throw new InvalidMacException("INVALID MAC");
   }
-
 }

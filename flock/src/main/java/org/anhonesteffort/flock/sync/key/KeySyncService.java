@@ -78,13 +78,8 @@ public class KeySyncService extends Service {
     }
 
     @Override
-    protected String getAuthority() {
-      return KeySyncScheduler.CONTENT_AUTHORITY;
-    }
-
-    @Override
-    protected void setTimeLastSync() {
-      new KeySyncScheduler(getContext()).setTimeLastSync(new Date().getTime());
+    protected KeySyncScheduler getSyncScheduler() {
+      return new KeySyncScheduler(getContext());
     }
 
     @Override
