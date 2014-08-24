@@ -498,13 +498,17 @@ public class MigrationService extends Service {
         LocalAddressbookStore localAddressbookStore = new LocalAddressbookStore(getBaseContext(), account);
 
         for (LocalEventCollection localCollection : localCalendarStore.getCollections()) {
-          Log.d(TAG, "deleting remote caldav collection at >> " + localCollection.getPath());
-          remoteCalendarStore.removeCollection(localCollection.getPath());
+          if (remoteCalendarStore.getCollection(localCollection.getPath()).isPresent()) {
+            Log.d(TAG, "deleting remote caldav collection at >> " + localCollection.getPath());
+            remoteCalendarStore.removeCollection(localCollection.getPath());
+          }
         }
 
         for (LocalContactCollection localCollection : localAddressbookStore.getCollections()) {
-          Log.d(TAG, "deleting remote carddav collection at >> " + localCollection.getPath());
-          remoteAddressbookStore.removeCollection(localCollection.getPath());
+          if (remoteAddressbookStore.getCollection(localCollection.getPath()).isPresent()) {
+            Log.d(TAG, "deleting remote carddav collection at >> " + localCollection.getPath());
+            remoteAddressbookStore.removeCollection(localCollection.getPath());
+          }
         }
 
         setState(STATE_DELETED_REMOTE_CALENDARS_AND_ADDRESSBOOKS);

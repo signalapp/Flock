@@ -353,9 +353,8 @@ public class StatusHeaderView extends LinearLayout {
   }
 
   private void handleUpdateMigrationInProgress() {
-    if ((asyncTaskMigration != null && !asyncTaskMigration.isCancelled())         ||
-        !MigrationHelperBroadcastReceiver.getUiDisabledForMigration(getContext()) ||
-        !DavKeyCollection.weStartedMigration(getContext()))
+    if ((asyncTaskMigration != null && !asyncTaskMigration.isCancelled()) ||
+        !MigrationHelperBroadcastReceiver.getUiDisabledForMigration(getContext()))
       return;
 
     Log.d(TAG, "handleUpdateMigrationInProgress()");
@@ -375,8 +374,10 @@ public class StatusHeaderView extends LinearLayout {
           if (keyCollection.isPresent())
             migrationInProgress = !keyCollection.get().isMigrationComplete();
 
-          if (DavKeyCollection.weStartedMigration(getContext()))
-            MigrationHelperBroadcastReceiver.setUiDisabledForMigration(getContext(), migrationInProgress);
+          MigrationHelperBroadcastReceiver.setUiDisabledForMigration(getContext(), migrationInProgress);
+
+          if (!migrationInProgress)
+            MigrationHelperBroadcastReceiver.setMigrationUpdateHandled(getContext());
 
           result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
 

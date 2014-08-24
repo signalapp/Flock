@@ -61,6 +61,10 @@ public abstract class ImportAccountService extends Service {
         {
           KeyStore.setUseCipherVersionZero(getBaseContext(), true);
         }
+        else if (keyCollection.get().isMigrationComplete()) {
+          MigrationHelperBroadcastReceiver.setMigrationUpdateHandled(getBaseContext());
+          MigrationHelperBroadcastReceiver.setUiDisabledForMigration(getBaseContext(), false);
+        }
       }
       else {
         DavKeyStore.createCollection(getBaseContext(), account);

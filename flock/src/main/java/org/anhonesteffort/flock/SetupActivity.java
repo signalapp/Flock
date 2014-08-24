@@ -105,22 +105,9 @@ public class SetupActivity extends FragmentActivity {
     handleButtonPrevious();
   }
 
-  private void limitMultipleAccounts() {
-    if (DavAccountHelper.isAccountRegistered(getBaseContext())) {
-      Toast.makeText(this, R.string.error_multiple_accounts_not_allowed, Toast.LENGTH_SHORT).show();
-      finish();
-    }
-  }
-
   @Override
   protected void onResume() {
     super.onResume();
-
-    if (state == STATE_SELECT_SERVICE_PROVIDER || state == STATE_TEST_SERVICE_PROVIDER ||
-        state == STATE_CONFIGURE_SERVICE_PROVIDER)
-    {
-      limitMultipleAccounts();
-    }
 
     updateFragmentUsingState(state);
   }
@@ -192,6 +179,17 @@ public class SetupActivity extends FragmentActivity {
     startActivity(nextIntent);
 
     finish();
+  }
+
+  private void limitMultipleAccounts() {
+    if (state == STATE_INTRO                 || state == STATE_SELECT_SERVICE_PROVIDER ||
+        state == STATE_TEST_SERVICE_PROVIDER || state == STATE_CONFIGURE_SERVICE_PROVIDER)
+    {
+      if (DavAccountHelper.isAccountRegistered(getBaseContext())) {
+        Toast.makeText(this, R.string.error_multiple_accounts_not_allowed, Toast.LENGTH_SHORT).show();
+        finish();
+      }
+    }
   }
 
   protected void updateFragmentUsingState(int newState) {
@@ -412,6 +410,7 @@ public class SetupActivity extends FragmentActivity {
     }
 
     state = newState;
+    limitMultipleAccounts();
   }
 
   private void handleButtonPrevious() {
