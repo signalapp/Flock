@@ -210,9 +210,10 @@ public class ContactFactory {
         values.put(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
                    structuredName.getFamily());
 
-        if (structuredName.getPrefixes().size() > 0)
+        if (structuredName.getPrefixes().size() > 0) {
           values.put(ContactsContract.CommonDataKinds.StructuredName.PREFIX,
-                     structuredName.getPrefixes().toString());
+                     StringUtils.join(structuredName.getPrefixes(), " "));
+        }
 
         if (structuredName.getAdditional().size() > 0)
           values.put(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME,
@@ -220,7 +221,7 @@ public class ContactFactory {
 
         if (structuredName.getSuffixes().size() > 0)
           values.put(ContactsContract.CommonDataKinds.StructuredName.SUFFIX,
-                     structuredName.getSuffixes().toString());
+                     StringUtils.join(structuredName.getSuffixes(), " "));
       }
 
       RawProperty phoneticGivenName = vCard.getExtendedProperty(PROPERTY_PHONETIC_GIVEN_NAME);
@@ -250,9 +251,9 @@ public class ContactFactory {
     String displayName        = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME);
     String givenName          = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME);
     String familyName         = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME);
-    String prefix             = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.PREFIX);
+    String prefixes           = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.PREFIX);
     String middleName         = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME);
-    String suffix             = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.SUFFIX);
+    String suffixes           = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.SUFFIX);
     String phoneticGivenName  = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_GIVEN_NAME);
     String phoneticMiddleName = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_MIDDLE_NAME);
     String phoneticFamilyName = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_FAMILY_NAME);
@@ -269,14 +270,18 @@ public class ContactFactory {
       if (familyName != null)
         structuredName.setFamily(familyName);
 
-      if (prefix != null)
-        structuredName.addPrefix(prefix);
+      if (prefixes != null) {
+        for (String prefix : StringUtils.split(prefixes))
+          structuredName.addPrefix(prefix);
+      }
 
       if (middleName != null)
         structuredName.addAdditional(middleName);
 
-      if (suffix != null)
-        structuredName.addSuffix(suffix);
+      if (suffixes != null) {
+        for (String suffix : StringUtils.split(suffixes))
+          structuredName.addSuffix(suffix);
+      }
 
       vCard.setStructuredName(structuredName);
 
