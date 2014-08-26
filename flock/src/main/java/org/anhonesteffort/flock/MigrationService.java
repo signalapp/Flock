@@ -455,6 +455,8 @@ public class MigrationService extends Service {
           return;
         }
 
+        keyCollection.get().setMigrationStarted(getBaseContext());
+
         Optional<String> localKeyMaterialSalt      = KeyHelper.buildEncodedSalt(getBaseContext());
         Optional<String> localEncryptedKeyMaterial = KeyStore.getEncryptedKeyMaterial(getBaseContext());
 
@@ -469,6 +471,8 @@ public class MigrationService extends Service {
           setState(STATE_SYNCED_WITH_REMOTE);
         }
 
+      } catch (InvalidComponentException e) {
+        handleException(e);
       } catch (PropertyParseException e) {
         handleException(e);
       } catch (DavException e) {
