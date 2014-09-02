@@ -909,7 +909,7 @@ public class EventFactory {
         if (trigger != null && trigger.getDuration() != null) {
           ContentValues values = new ContentValues();
           values.put(CalendarContract.Reminders.MINUTES, (trigger.getDuration().getMinutes()));
-          values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_DEFAULT);
+          values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
           valueList.add(values);
         }
       }
