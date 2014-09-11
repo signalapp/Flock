@@ -96,6 +96,8 @@ public class ContactFactory {
   private static final String PROPERTY_EVENT_CUSTOM        = "X-EVENT-CUSTOM";
   private static final String PARAMETER_EVENT_CUSTOM_LABEL = "X-EVENT-CUSTOM-LABEL";
 
+  private static final String PROPERTY_INVISIBLE_CONTACT = "X-INVISIBLE-CONTACT";
+
   private static String propertyNameToLabel(String propertyName) {
     return WordUtils.capitalize(propertyName.toLowerCase().replace("x-", "").replace("_", " "));
   }
@@ -1262,6 +1264,25 @@ public class ContactFactory {
 
     if (sipAddress != null)
       vCard.setExtendedProperty(PROPERTY_SIP, sipAddress);
+  }
+
+  protected static String[] getProjectionForGroupMembership() {
+    return new String[] {
+        ContactsContract.Data.DATA1, // 00
+    };
+  }
+
+  protected static Long getIdForGroupMembership(Cursor cursor) {
+    return cursor.getLong(0);
+  }
+
+  protected static void addInvisibleProperty(VCard vCard) {
+    Log.d(TAG, "addInvisibleProperty()");
+    vCard.addExtendedProperty(PROPERTY_INVISIBLE_CONTACT, "true");
+  }
+
+  protected static boolean hasInvisibleProperty(VCard vCard) {
+    return vCard.getExtendedProperty(PROPERTY_INVISIBLE_CONTACT) != null;
   }
 
 }
