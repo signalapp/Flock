@@ -458,21 +458,74 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     cursor.close();
   }
 
+  private List<Long> getGroupIdsForContact(Long rawContactId)
+      throws RemoteException
+  {
+    String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
+                              "AND " + ContactsContract.Data.MIMETYPE + "=?";
+    String[] SELECTION_ARGS = new String[] {
+        rawContactId.toString(),
+        ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE
+    };
+
+    List<Long> groupIds = new LinkedList<Long>();
+    Cursor     cursor   = client.query(getUriForData(),
+        ContactFactory.getProjectionForGroupMembership(),
+        SELECTION,
+        SELECTION_ARGS,
+        null);
+
+    while (cursor.moveToNext())
+      groupIds.add(ContactFactory.getIdForGroupMembership(cursor));
+
+    cursor.close();
+    return groupIds;
+  }
+
+  private boolean isContactWithoutGroupVisible()
+      throws RemoteException
+  {
+    boolean contactWithoutGroupVisible = true;
+    Cursor  cursor                     = client.query(getSyncAdapterUri(ContactsContract.Settings.CONTENT_URI),
+        new String[] {
+            ContactsContract.Settings.UNGROUPED_VISIBLE,
+        },
+        null,
+        null,
+        null);
+
+    if (cursor.moveToNext())
+      contactWithoutGroupVisible = cursor.getInt(0) != 0;
+
+    cursor.close();
+    return contactWithoutGroupVisible;
+  }
+
+  private void addInvisibleProperty(Long rawContactId, VCard vCard)
+      throws RemoteException
+  {
+    boolean isMemberOfGroup = getGroupIdsForContact(rawContactId).size() > 0;
+
+    if (!isMemberOfGroup && !isContactWithoutGroupVisible())
+      ContactFactory.addInvisibleProperty(vCard);
+  }
+
   private void buildContact(Long rawContactId, VCard vCard)
       throws InvalidComponentException, RemoteException
   {
-    addStructuredNames( rawContactId, vCard);
-    addPhoneNumbers(    rawContactId, vCard);
-    addEmailAddresses(  rawContactId, vCard);
-    addPhotos(rawContactId, vCard);
-    addOrganizations(   rawContactId, vCard);
-    addInstantMessaging(rawContactId, vCard);
-    addNickNames(       rawContactId, vCard);
-    addNotes(           rawContactId, vCard);
-    addPostalAddresses( rawContactId, vCard);
-    addWebsites(        rawContactId, vCard);
-    addEvents(          rawContactId, vCard);
-    addSipAddresses(    rawContactId, vCard);
+    addStructuredNames(  rawContactId, vCard);
+    addPhoneNumbers(     rawContactId, vCard);
+    addEmailAddresses(   rawContactId, vCard);
+    addPhotos(           rawContactId, vCard);
+    addOrganizations(    rawContactId, vCard);
+    addInstantMessaging( rawContactId, vCard);
+    addNickNames(        rawContactId, vCard);
+    addNotes(            rawContactId, vCard);
+    addPostalAddresses(  rawContactId, vCard);
+    addWebsites(         rawContactId, vCard);
+    addEvents(           rawContactId, vCard);
+    addSipAddresses(     rawContactId, vCard);
+    addInvisibleProperty(rawContactId, vCard);
   }
 
   @Override
@@ -561,7 +614,9 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   @Override
-  public void addComponent(ComponentETagPair<VCard> vCard) throws InvalidComponentException {
+  public void addComponent(ComponentETagPair<VCard> vCard)
+      throws InvalidComponentException, RemoteException
+  {
     ContentValues rawContactValues = ContactFactory.getValuesForRawContact(vCard);
 
     int raw_contact_op_index = pendingOperations.size();
@@ -694,12 +749,17 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
         Optional<VCard> copyContact = getComponent(contactId);
         if (copyContact.isPresent()) {
-          copyContact.get().setUid(null);
-          ComponentETagPair<VCard> correctedContact =
-              new ComponentETagPair<VCard>(copyContact.get(), Optional.<String>absent());
+          if (!ContactFactory.hasInvisibleProperty(copyContact.get())) {
+            copyContact.get().setUid(null);
+            ComponentETagPair<VCard> correctedContact =
+                new ComponentETagPair<VCard>(copyContact.get(), Optional.<String>absent());
 
-          toCollection.addComponent(correctedContact);
-          toCollection.commitPendingOperations();
+            toCollection.addComponent(correctedContact);
+            toCollection.commitPendingOperations();
+          }
+          else
+            Log.w(TAG, "contact is entirely invisible to the user, skipping.");
+
           listener.onContactCopied(getAccount(), toAccount);
         }
         else
