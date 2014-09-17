@@ -91,7 +91,7 @@ public class ContactCopyService extends Service implements ContactCopiedListener
 
     notificationBuilder
         .setContentText(getString(R.string.notification_importing_contacts_from) +
-                        " " + fromAccount.name)
+                        " " + ((fromAccount != null) ? fromAccount.name : getString(R.string.local_storage)))
         .setProgress(countContactsToCopy, countContactsCopied + countContactCopiesFailed, false);
 
     notifyManager.notify(1023, notificationBuilder.build());
@@ -188,8 +188,12 @@ public class ContactCopyService extends Service implements ContactCopiedListener
         .acquireContentProviderClient(AddressbookSyncScheduler.CONTENT_AUTHORITY);
 
     for (Pair<Account, Account> copyPair : accountsForCopy) {
-      LocalContactCollection fromCollection =
-          new LocalContactCollection(getBaseContext(), client, copyPair.first, "hack");
+      LocalContactCollection fromCollection = null;
+
+      if (!copyPair.first.type.equals(getString(R.string.local_storage)))
+        fromCollection = new LocalContactCollection(getBaseContext(), client, copyPair.first, "hack");
+      else
+        fromCollection = new LocalContactCollection(getBaseContext(), client, null, "hack");
 
       try {
 
@@ -214,7 +218,10 @@ public class ContactCopyService extends Service implements ContactCopiedListener
 
   @Override
   public void onContactCopyFailed(Exception e, Account fromAccount, Account toAccount) {
-    Log.e(TAG, "onContactCopyFailed() from " + fromAccount.name + " to " + toAccount.name, e);
+    Log.e(TAG, "onContactCopyFailed() from " +
+               ((fromAccount != null) ? fromAccount.name : getString(R.string.local_storage)) +
+               " to " +
+               ((toAccount != null) ? toAccount.name : getString(R.string.local_storage)), e);
     handleContactCopyFailed(fromAccount);
   }
 

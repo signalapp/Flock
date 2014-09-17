@@ -27,6 +27,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteException;
@@ -35,13 +36,18 @@ import android.util.Log;
 
 import com.google.common.base.Optional;
 import ezvcard.VCard;
+import ezvcard.parameter.ImageType;
 import ezvcard.property.Photo;
+import ezvcard.util.IOUtils;
 
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 import org.anhonesteffort.flock.sync.AbstractLocalComponentCollection;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -72,10 +78,15 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   public static Uri getSyncAdapterUri(Uri base, Account account) {
+    if (account != null)
+      return base.buildUpon()
+          .appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_NAME, account.name)
+          .appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_TYPE, account.type)
+          .appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER,    "true")
+          .build();
+
     return base.buildUpon()
-        .appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_NAME, account.name)
-        .appendQueryParameter(ContactsContract.RawContacts.ACCOUNT_TYPE, account.type)
-        .appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER,    "true")
+        .appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER, "true")
         .build();
   }
 
@@ -99,6 +110,15 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
   private Uri getUriForData() {
     return getSyncAdapterUri(ContactsContract.Data.CONTENT_URI);
+  }
+
+  private static Uri getUriForDisplayPhoto(Long rawContactId) {
+    Uri rawContactUri = ContentUris.withAppendedId(
+        ContactsContract.RawContacts.CONTENT_URI,
+        rawContactId
+    );
+
+    return Uri.withAppendedPath(rawContactUri, ContactsContract.RawContacts.DisplayPhoto.CONTENT_DIRECTORY);
   }
 
   @Override
@@ -138,6 +158,11 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   @Override
   protected String getColumnNameQueuedForMigration() {
     return ContactsContract.RawContacts.SYNC2;
+  }
+
+  @Override
+  protected String getColumnNameAccountType() {
+    return ContactsContract.RawContacts.ACCOUNT_TYPE;
   }
 
   @Override
@@ -237,6 +262,26 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     cursor.close();
   }
 
+  private Optional<Photo> getDisplayPhoto(Long rawContactId)
+      throws InvalidComponentException, RemoteException
+  {
+    try {
+
+      AssetFileDescriptor fileDescriptor = client.openAssetFile(getUriForDisplayPhoto(rawContactId), "r");
+      InputStream         inputStream    = fileDescriptor.createInputStream();
+
+      return Optional.of(
+          new Photo(IOUtils.toByteArray(inputStream), ImageType.JPEG)
+      );
+
+    } catch (FileNotFoundException e) {
+      return Optional.absent();
+    } catch (IOException e) {
+      throw new InvalidComponentException("caught exception while adding picture", false,
+                                          CardDavConstants.CARDDAV_NAMESPACE, getPath());
+    }
+  }
+
   private Optional<Photo> getThumbnailPhoto(Long rawContactId)
       throws InvalidComponentException, RemoteException
   {
@@ -266,7 +311,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   private void addPhotos(Long rawContactId, VCard vCard)
       throws InvalidComponentException, RemoteException
   {
-    Optional<Photo> photo = ContactFactory.getDisplayPhoto(getPath(), client, rawContactId);
+    Optional<Photo> photo = getDisplayPhoto(rawContactId);
     if (!photo.isPresent())
       photo = getThumbnailPhoto(rawContactId);
 
@@ -740,11 +785,12 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   public void copyToAccount(Account toAccount, ContactCopiedListener listener)
       throws InvalidComponentException, RemoteException
   {
-    Log.d(TAG, "copy my " + getComponentIds().size() + " contacts to " + toAccount.name);
+    LocalContactCollection toCollection = new LocalContactCollection(context, client, toAccount, getPath());
+    List<Long>             componentIds = getComponentIds();
 
-    LocalContactCollection toCollection   = new LocalContactCollection(context, client, toAccount, getPath());
+    Log.d(TAG, "copy my " + componentIds.size() + " contacts to " + toAccount.name);
 
-    for (Long contactId : getComponentIds()) {
+    for (Long contactId : componentIds) {
       try {
 
         Optional<VCard> copyContact = getComponent(contactId);

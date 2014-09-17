@@ -108,7 +108,12 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
   @Override
   protected Uri getUriForComponents() {
-    return getSyncAdapterUri(CalendarContract.Events.CONTENT_URI);
+    if (account != null)
+      return getSyncAdapterUri(CalendarContract.Events.CONTENT_URI);
+
+    return CalendarContract.Events.CONTENT_URI.buildUpon()
+        .appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
+        .build();
   }
 
   private Uri getUriForAttendees() {
@@ -152,6 +157,11 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
   @Override
   protected String getColumnNameQueuedForMigration() {
     return CalendarContract.Events.SYNC_DATA3;
+  }
+
+  @Override
+  protected String getColumnNameAccountType() {
+    return CalendarContract.Events.ACCOUNT_TYPE;
   }
 
   @Override

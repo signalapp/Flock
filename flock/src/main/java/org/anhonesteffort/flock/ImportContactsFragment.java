@@ -117,7 +117,7 @@ public class ImportContactsFragment extends AccountAndKeyRequiredFragment
 
       @Override
       public void onClick(View view) {
-        Intent                       copyService = new Intent(getActivity(), ContactCopyService.class);
+        Intent copyService = new Intent(getActivity(), ContactCopyService.class);
 
         if (selectedAccounts.size() == 0) {
           handleBackgroundImportStarted();
@@ -217,15 +217,26 @@ public class ImportContactsFragment extends AccountAndKeyRequiredFragment
     protected void populateAccountContactCounts(List<AccountContactDetails> accounts)
         throws RemoteException
     {
-      ContentProviderClient client = getActivity().getContentResolver()
+      Uri                   rawContactsUri = null;
+      Cursor                cursor         = null;
+      ContentProviderClient client         = getActivity().getContentResolver()
           .acquireContentProviderClient(AddressbookSyncScheduler.CONTENT_AUTHORITY);
 
       for (AccountContactDetails accountDetails : accounts) {
-        Uri rawContactsUri = LocalContactCollection
-            .getSyncAdapterUri(ContactsContract.RawContacts.CONTENT_URI, accountDetails.account);
+        if (!accountDetails.account.type.equals(getString(R.string.local_storage))) {
+          rawContactsUri = LocalContactCollection
+              .getSyncAdapterUri(ContactsContract.RawContacts.CONTENT_URI, accountDetails.account);
+          cursor                       = client.query(rawContactsUri, null, null, null, null);
+          accountDetails.contact_count = cursor.getCount();
+          Log.d(TAG, "account with type " + accountDetails.account.type + " has " + accountDetails.contact_count + " contacts");
+        }
 
-        Cursor cursor = client.query(rawContactsUri, null, null, null, null);
-        accountDetails.contact_count = cursor.getCount();
+        else {
+          rawContactsUri               = ContactsContract.RawContacts.CONTENT_URI;
+          cursor                       = client.query(rawContactsUri, null, ContactsContract.RawContacts.ACCOUNT_TYPE + " IS NULL", null, null);
+          accountDetails.contact_count = cursor.getCount();
+          Log.d(TAG, "local storage has " +  accountDetails.contact_count + " contacts");
+        }
 
         cursor.close();
       }
@@ -241,6 +252,11 @@ public class ImportContactsFragment extends AccountAndKeyRequiredFragment
           accounts.add(new AccountContactDetails(osAccount, 0));
         }
       }
+      accounts.add(
+          new AccountContactDetails(
+              new Account(getString(R.string.local_storage), getString(R.string.local_storage)),0
+          )
+      );
 
       return accounts;
     }

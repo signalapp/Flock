@@ -92,6 +92,7 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
   protected abstract String getColumnNameDirty();
   protected abstract String getColumnNameDeleted();
   protected abstract String getColumnNameQueuedForMigration();
+  protected abstract String getColumnNameAccountType();
 
   public List<Long> getNewComponentIds() throws RemoteException {
     final String[] PROJECTION = new String[]{getColumnNameComponentLocalId(), getColumnNameComponentUid()};
@@ -152,10 +153,19 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
 
   public List<Long> getComponentIds() throws RemoteException {
     final String[] PROJECTION = new String[]{getColumnNameComponentLocalId(), getColumnNameComponentUid()};
-    final String   SELECTION  = getColumnNameDeleted() + "=0 AND " +
-                                getColumnNameCollectionLocalId() + "=" + localId;
+          String   selection  = null;
 
-    Cursor     cursor = client.query(getUriForComponents(), PROJECTION, SELECTION, null, null);
+    if (account != null) {
+      selection = getColumnNameDeleted() + "=0 AND " +
+                  getColumnNameCollectionLocalId() + "=" + localId;
+    }
+    else {
+      selection = getColumnNameDeleted() + "=0 AND " +
+                  getColumnNameCollectionLocalId() + "=" + localId + " AND " +
+                  getColumnNameAccountType() + " IS NULL";
+    }
+
+    Cursor     cursor = client.query(getUriForComponents(), PROJECTION, selection, null, null);
     List<Long> newIds = new LinkedList<Long>();
 
     if (cursor == null)

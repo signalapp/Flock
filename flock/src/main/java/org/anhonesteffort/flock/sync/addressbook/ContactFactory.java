@@ -19,13 +19,8 @@
 
 package org.anhonesteffort.flock.sync.addressbook;
 
-import android.content.ContentProviderClient;
-import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.util.Log;
 
@@ -52,7 +47,6 @@ import ezvcard.property.StructuredName;
 import ezvcard.property.Telephone;
 import ezvcard.property.Uid;
 import ezvcard.property.Url;
-import ezvcard.util.IOUtils;
 
 import org.anhonesteffort.flock.util.Base64;
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
@@ -61,9 +55,7 @@ import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
@@ -538,37 +530,6 @@ public class ContactFactory {
     else {
       Log.e(TAG, "email type or address is null, not adding anything");
       throw new InvalidComponentException("email type or address is null", false,
-                                          CardDavConstants.CARDDAV_NAMESPACE, path);
-    }
-  }
-
-  private static Uri getUriForDisplayPhoto(Long rawContactId) {
-    Uri rawContactUri = ContentUris.withAppendedId(
-        ContactsContract.RawContacts.CONTENT_URI,
-        rawContactId
-    );
-
-    return Uri.withAppendedPath(rawContactUri, ContactsContract.RawContacts.DisplayPhoto.CONTENT_DIRECTORY);
-  }
-
-  protected static Optional<Photo> getDisplayPhoto(String                path,
-                                                   ContentProviderClient client,
-                                                   Long                  rawContactId)
-      throws InvalidComponentException, RemoteException
-  {
-    try {
-
-      AssetFileDescriptor fileDescriptor = client.openAssetFile(getUriForDisplayPhoto(rawContactId), "r");
-      InputStream         inputStream    = fileDescriptor.createInputStream();
-
-      return Optional.of(
-          new Photo(IOUtils.toByteArray(inputStream), ImageType.JPEG)
-      );
-
-    } catch (FileNotFoundException e) {
-      return Optional.absent();
-    } catch (IOException e) {
-      throw new InvalidComponentException("caught exception while adding picture", false,
                                           CardDavConstants.CARDDAV_NAMESPACE, path);
     }
   }
