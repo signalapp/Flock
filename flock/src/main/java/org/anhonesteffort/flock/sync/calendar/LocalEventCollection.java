@@ -545,6 +545,19 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
     }
   }
 
+  public void handleCorrectEventReminders() throws RemoteException {
+    final ContentValues UPDATE_VALUES  = new ContentValues(1);
+    final String        SELECTION      = CalendarContract.Reminders.METHOD + "=?";
+    final String[]      SELECTION_ARGS = new String[] {
+        Integer.toString(CalendarContract.Reminders.METHOD_DEFAULT)
+    };
+
+    UPDATE_VALUES.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
+    int updateCount = client.update(getUriForReminders(), UPDATE_VALUES, SELECTION, SELECTION_ARGS);
+
+    Log.d(TAG, "corrected " + updateCount + " event reminders.");
+  }
+
   private boolean hasRecurrenceExceptions(Long eventId) throws RemoteException {
     final String[] PROJECTION = new String[]{getColumnNameComponentLocalId(), CalendarContract.Events.ORIGINAL_ID};
     final String   SELECTION  = CalendarContract.Events.ORIGINAL_ID + "=" + eventId;

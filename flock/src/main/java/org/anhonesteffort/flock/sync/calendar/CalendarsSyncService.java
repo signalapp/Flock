@@ -47,7 +47,6 @@ import org.apache.jackrabbit.webdav.DavException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -58,6 +57,8 @@ import java.util.UUID;
 public class CalendarsSyncService extends Service {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.calendar.CalendarsSyncService";
+
+  private static final String KEY_EVENT_REMINDERS_CORRECTED = "CalendarSyncService.KEY_EVENT_REMINDERS_CORRECTED";
 
   private static       CalendarsSyncAdapter sSyncAdapter     = null;
   private static final Object               sSyncAdapterLock = new Object();
@@ -86,17 +87,37 @@ public class CalendarsSyncService extends Service {
       return new CalendarsSyncScheduler(getContext());
     }
 
-    @Override
-    protected void handlePreSyncOperations(DavAccount            account,
-                                           MasterCipher          masterCipher,
-                                           ContentProviderClient provider)
+    private void setEventRemindersCorrected() {
+      Log.d(TAG, "setEventRemindersCorrected()");
+      SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+      preferences.edit().putBoolean(KEY_EVENT_REMINDERS_CORRECTED, true).commit();
+    }
+
+    private boolean getEventRemindersCorrected() {
+      SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+      return preferences.getBoolean(KEY_EVENT_REMINDERS_CORRECTED, false);
+    }
+
+    private void handleCorrectEventReminders(DavAccount            account,
+                                             ContentProviderClient provider)
+        throws RemoteException
+    {
+      Log.d(TAG, "handleCorrectEventReminders()");
+      LocalCalendarStore localStore = new LocalCalendarStore(provider, account.getOsAccount());
+
+      for (LocalEventCollection collection : localStore.getCollections())
+        collection.handleCorrectEventReminders();
+
+      setEventRemindersCorrected();
+    }
+
+    private void handleImportNewCollections(DavAccount            account,
+                                            MasterCipher          masterCipher,
+                                            ContentProviderClient provider)
         throws PropertyParseException, InvalidMacException, DavException,
                RemoteException, GeneralSecurityException, IOException
     {
-      Log.d(TAG, "handlePreSyncOperations() -- importing new flock sync collections...");
-      if (!DavAccountHelper.isUsingOurServers(account))
-        return;
-
+      Log.d(TAG, "handleImportNewCollections()");
       LocalCalendarStore localStore  = new LocalCalendarStore(provider, account.getOsAccount());
       HidingCalDavStore  remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), account, masterCipher);
 
@@ -123,6 +144,22 @@ public class CalendarsSyncService extends Service {
       } finally {
         remoteStore.releaseConnections();
       }
+    }
+
+    @Override
+    protected void handlePreSyncOperations(DavAccount            account,
+                                           MasterCipher          masterCipher,
+                                           ContentProviderClient provider)
+        throws PropertyParseException, InvalidMacException, DavException,
+               RemoteException, GeneralSecurityException, IOException
+    {
+      Log.d(TAG, "handlePreSyncOperations()");
+
+      if (!getEventRemindersCorrected())
+        handleCorrectEventReminders(account, provider);
+
+      if (DavAccountHelper.isUsingOurServers(account))
+        handleImportNewCollections(account, masterCipher, provider);
     }
 
     @Override
