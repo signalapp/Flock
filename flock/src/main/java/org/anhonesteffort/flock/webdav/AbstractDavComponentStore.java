@@ -21,11 +21,13 @@ package org.anhonesteffort.flock.webdav;
 
 import com.google.common.base.Optional;
 
+import org.apache.commons.httpclient.Header;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.Status;
+import org.apache.jackrabbit.webdav.client.methods.DeleteMethod;
 import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
@@ -103,7 +105,42 @@ public abstract class AbstractDavComponentStore <C extends DavComponentCollectio
     return davOptions.get();
   }
 
-  public abstract Optional<String> getCurrentUserPrincipal() throws IOException, DavException;
+  protected abstract String getWellKnownUri();
+
+  protected Optional<String> getCurrentUserPrincipalFromMultiStatus(MultiStatus multiStatus) {
+    for (MultiStatusResponse msResponse : multiStatus.getResponses()) {
+      DavPropertySet foundProperties = msResponse.getProperties(DavServletResponse.SC_OK);
+      DavProperty    homeSetProperty = foundProperties.get(WebDavConstants.PROPERTY_NAME_CURRENT_USER_PRINCIPAL);
+
+      for (Status status : msResponse.getStatus()) {
+        if (status.getStatusCode() == DavServletResponse.SC_OK) {
+
+          if (homeSetProperty != null && homeSetProperty.getValue() instanceof ArrayList) {
+            for (Object child : (ArrayList<?>) homeSetProperty.getValue()) {
+              if (child instanceof Element) {
+                String currentUserPrincipalUri = ((Element) child).getTextContent();
+                if (!(currentUserPrincipalUri.endsWith("/")))
+                  currentUserPrincipalUri = currentUserPrincipalUri.concat("/");
+
+                return Optional.of(currentUserPrincipalUri);
+              }
+            }
+          }
+
+          // Owncloud :(
+          else if (homeSetProperty != null && homeSetProperty.getValue() instanceof Element) {
+            String currentUserPrincipalUri = ((Element) homeSetProperty.getValue()).getTextContent();
+            if (!(currentUserPrincipalUri.endsWith("/")))
+              currentUserPrincipalUri = currentUserPrincipalUri.concat("/");
+
+            return Optional.of(currentUserPrincipalUri);
+          }
+        }
+      }
+    }
+
+    return Optional.absent();
+  }
 
   protected Optional<String> getCurrentUserPrincipal(String propFindUri)
       throws IOException, DavException
@@ -118,46 +155,63 @@ public abstract class AbstractDavComponentStore <C extends DavComponentCollectio
     try {
 
       davClient.execute(propFindMethod);
+      return getCurrentUserPrincipalFromMultiStatus(propFindMethod.getResponseBodyAsMultiStatus());
 
-      MultiStatus           multiStatus = propFindMethod.getResponseBodyAsMultiStatus();
-      MultiStatusResponse[] msResponses = multiStatus.getResponses();
+    } finally {
+      propFindMethod.releaseConnection();
+    }
+  }
 
-      for (MultiStatusResponse msResponse : msResponses) {
-        DavPropertySet foundProperties = msResponse.getProperties(DavServletResponse.SC_OK);
-        DavProperty    homeSetProperty = foundProperties.get(WebDavConstants.PROPERTY_NAME_CURRENT_USER_PRINCIPAL);
+  public Optional<String> getCurrentUserPrincipal() throws DavException, IOException {
+    if (currentUserPrincipal.isPresent())
+      return currentUserPrincipal;
 
-        for (Status status : msResponse.getStatus()) {
-          if (status.getStatusCode() == DavServletResponse.SC_OK) {
+    DavPropertyNameSet props = new DavPropertyNameSet();
+    props.add(WebDavConstants.PROPERTY_NAME_CURRENT_USER_PRINCIPAL);
 
-            if (homeSetProperty != null && homeSetProperty.getValue() instanceof ArrayList) {
-              for (Object child : (ArrayList<?>) homeSetProperty.getValue()) {
-                if (child instanceof Element) {
-                  String currentUserPrincipalUri = ((Element) child).getTextContent();
-                  if (!(currentUserPrincipalUri.endsWith("/")))
-                    currentUserPrincipalUri = currentUserPrincipalUri.concat("/");
+    String         propFindUri    = getHostHREF().concat(getWellKnownUri());
+    PropFindMethod propFindMethod = new PropFindMethod(propFindUri,
+                                                       props,
+                                                       PropFindMethod.DEPTH_0);
 
-                  return Optional.of(currentUserPrincipalUri);
-                }
-              }
-            }
+    try {
 
-            // Owncloud :(
-            else if (homeSetProperty != null && homeSetProperty.getValue() instanceof Element) {
-              String currentUserPrincipalUri = ((Element) homeSetProperty.getValue()).getTextContent();
-              if (!(currentUserPrincipalUri.endsWith("/")))
-                currentUserPrincipalUri = currentUserPrincipalUri.concat("/");
+      getClient().execute(propFindMethod);
+      return getCurrentUserPrincipalFromMultiStatus(propFindMethod.getResponseBodyAsMultiStatus());
 
-              return Optional.of(currentUserPrincipalUri);
-            }
-          }
+    } catch (DavException e) {
+
+      if (e.getErrorCode() == DavServletResponse.SC_MOVED_PERMANENTLY) {
+        Header locationHeader = propFindMethod.getResponseHeader("location"); // TODO: find constant for this...
+        if (locationHeader.getValue() != null) {
+          currentUserPrincipal = getCurrentUserPrincipal(locationHeader.getValue());
+          return currentUserPrincipal;
         }
       }
+      else
+        throw e;
 
     } finally {
       propFindMethod.releaseConnection();
     }
 
     return Optional.absent();
+  }
+
+  @Override
+  public void removeCollection(String path) throws DavException, IOException {
+    DeleteMethod deleteMethod = new DeleteMethod(getHostHREF().concat(path));
+
+    try {
+
+      getClient().execute(deleteMethod);
+
+      if (!deleteMethod.succeeded() && deleteMethod.getStatusCode() != DavServletResponse.SC_OK)
+        throw new DavException(deleteMethod.getStatusCode(), deleteMethod.getStatusText());
+
+    } finally {
+      deleteMethod.releaseConnection();
+    }
   }
 
   @Override

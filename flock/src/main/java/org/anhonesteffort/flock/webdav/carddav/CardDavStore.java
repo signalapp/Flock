@@ -79,40 +79,8 @@ public class CardDavStore extends AbstractDavComponentStore<CardDavCollection>
   }
 
   @Override
-  public Optional<String> getCurrentUserPrincipal() throws DavException, IOException {
-    if (currentUserPrincipal.isPresent())
-      return currentUserPrincipal;
-
-    DavPropertyNameSet props = new DavPropertyNameSet();
-    props.add(WebDavConstants.PROPERTY_NAME_CURRENT_USER_PRINCIPAL);
-
-    String         propFindUri    = getHostHREF().concat("/.well-known/carddav");
-    PropFindMethod propFindMethod = new PropFindMethod(propFindUri,
-                                                       props,
-                                                       PropFindMethod.DEPTH_0);
-
-    try {
-
-      getClient().execute(propFindMethod);
-      propFindMethod.getResponseBodyAsMultiStatus();
-
-    } catch (DavException e) {
-
-      if (e.getErrorCode() == DavServletResponse.SC_MOVED_PERMANENTLY) {
-        Header locationHeader = propFindMethod.getResponseHeader("location"); // TODO: find constant for this...
-        if (locationHeader.getValue() != null) {
-          currentUserPrincipal = super.getCurrentUserPrincipal(locationHeader.getValue());
-          return currentUserPrincipal;
-        }
-      }
-      else
-        throw e;
-
-    } finally {
-      propFindMethod.releaseConnection();
-    }
-
-    return Optional.absent();
+  protected String getWellKnownUri() {
+    return "/.well-known/carddav";
   }
 
   public Optional<String> getAddressbookHomeSet()
@@ -249,7 +217,8 @@ public class CardDavStore extends AbstractDavComponentStore<CardDavCollection>
                 if (child instanceof Element) {
                   String localName = child.getLocalName();
                   if (localName != null)
-                    isAddressbookCollection = localName.equals(CardDavConstants.RESOURCE_TYPE_ADDRESSBOOK);
+                    isAddressbookCollection = isAddressbookCollection ||
+                                              localName.equals(CardDavConstants.RESOURCE_TYPE_ADDRESSBOOK);
                 }
               }
             }
@@ -285,7 +254,7 @@ public class CardDavStore extends AbstractDavComponentStore<CardDavCollection>
       List<CardDavCollection> returnedCollections = getCollectionsFromMultiStatusResponses(this, responses);
 
       if (returnedCollections.size() == 0)
-        Optional.absent();
+        return Optional.absent();
 
       return Optional.of(returnedCollections.get(0));
 
@@ -328,22 +297,6 @@ public class CardDavStore extends AbstractDavComponentStore<CardDavCollection>
 
     } finally {
       method.releaseConnection();
-    }
-  }
-
-  @Override
-  public void removeCollection(String path) throws DavException, IOException {
-    DeleteMethod deleteMethod = new DeleteMethod(getHostHREF().concat(path));
-
-    try {
-
-      getClient().execute(deleteMethod);
-
-      if (!deleteMethod.succeeded())
-        throw new DavException(deleteMethod.getStatusCode(), deleteMethod.getStatusText());
-
-    } finally {
-      deleteMethod.releaseConnection();
     }
   }
 }

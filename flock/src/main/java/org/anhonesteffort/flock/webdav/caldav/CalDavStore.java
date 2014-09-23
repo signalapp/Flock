@@ -35,7 +35,6 @@ import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.Status;
-import org.apache.jackrabbit.webdav.client.methods.DeleteMethod;
 import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
 import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
 import org.apache.jackrabbit.webdav.property.DavProperty;
@@ -79,39 +78,8 @@ public class CalDavStore extends AbstractDavComponentStore<CalDavCollection>
   }
 
   @Override
-  public Optional<String> getCurrentUserPrincipal() throws DavException, IOException {
-    if (currentUserPrincipal.isPresent())
-      return currentUserPrincipal;
-
-    DavPropertyNameSet props = new DavPropertyNameSet();
-    props.add(WebDavConstants.PROPERTY_NAME_CURRENT_USER_PRINCIPAL);
-
-    String         propFindUri    = getHostHREF().concat("/.well-known/caldav");
-    PropFindMethod propFindMethod = new PropFindMethod(propFindUri,
-                                                       props,
-                                                       PropFindMethod.DEPTH_0);
-
-    try {
-
-      getClient().execute(propFindMethod);
-      propFindMethod.getResponseBodyAsMultiStatus();
-
-    } catch (DavException e) {
-
-      if (e.getErrorCode() == DavServletResponse.SC_MOVED_PERMANENTLY) {
-        Header locationHeader = propFindMethod.getResponseHeader("location"); // TODO: find constant for this...
-        if (locationHeader.getValue() != null) {
-          currentUserPrincipal = super.getCurrentUserPrincipal(locationHeader.getValue());
-          return currentUserPrincipal;
-        }
-      }
-      throw e;
-
-    } finally {
-      propFindMethod.releaseConnection();
-    }
-
-    return Optional.absent();
+  protected String getWellKnownUri() {
+    return "/.well-known/caldav";
   }
 
   public Optional<String> getCalendarHomeSet()
@@ -249,7 +217,8 @@ public class CalDavStore extends AbstractDavComponentStore<CalDavCollection>
                 if (child instanceof Element) {
                   String localName = child.getLocalName();
                   if (localName != null) {
-                    isCalendarCollection = localName.equals(CalDavConstants.RESOURCE_TYPE_CALENDAR)            ||
+                    isCalendarCollection = isCalendarCollection                                                ||
+                                           localName.equals(CalDavConstants.RESOURCE_TYPE_CALENDAR)            ||
                                            localName.equals(CalDavConstants.RESOURCE_TYPE_CALENDAR_PROXY_READ) ||
                                            localName.equals(CalDavConstants.RESOURCE_TYPE_CALENDAR_PROXY_WRITE);
                   }
@@ -283,17 +252,17 @@ public class CalDavStore extends AbstractDavComponentStore<CalDavCollection>
 
       getClient().execute(propFindMethod);
 
-      MultiStatus           multiStatus = propFindMethod.getResponseBodyAsMultiStatus();
-      MultiStatusResponse[] responses   = multiStatus.getResponses();
-
+      MultiStatus            multiStatus         = propFindMethod.getResponseBodyAsMultiStatus();
+      MultiStatusResponse[]  responses           = multiStatus.getResponses();
       List<CalDavCollection> returnedCollections = getCollectionsFromMultiStatusResponses(this, responses);
 
       if (returnedCollections.size() == 0)
-        Optional.absent();
+        return Optional.absent();
 
       return Optional.of(returnedCollections.get(0));
 
     } catch (DavException e) {
+
       if (e.getErrorCode() == DavServletResponse.SC_NOT_FOUND)
         return Optional.absent();
 
@@ -316,8 +285,8 @@ public class CalDavStore extends AbstractDavComponentStore<CalDavCollection>
     DavPropertyNameSet calendarProps = hack.getPropertyNamesForFetch();
 
     PropFindMethod method = new PropFindMethod(getHostHREF().concat(calHomeSetUri.get()),
-                                                                    calendarProps,
-                                                                    PropFindMethod.DEPTH_1);
+                                               calendarProps,
+                                               PropFindMethod.DEPTH_1);
 
     try {
 
@@ -332,21 +301,4 @@ public class CalDavStore extends AbstractDavComponentStore<CalDavCollection>
       method.releaseConnection();
     }
   }
-
-  @Override
-  public void removeCollection(String path) throws DavException, IOException {
-    DeleteMethod deleteMethod = new DeleteMethod(getHostHREF().concat(path));
-
-    try {
-
-      getClient().execute(deleteMethod);
-
-      if (!deleteMethod.succeeded())
-        throw new DavException(deleteMethod.getStatusCode(), deleteMethod.getStatusText());
-
-    } finally {
-      deleteMethod.releaseConnection();
-    }
-  }
-
 }

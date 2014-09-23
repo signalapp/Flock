@@ -476,7 +476,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
     try {
 
       client.execute(deleteMethod);
-      if (!deleteMethod.succeeded())
+      if (!deleteMethod.succeeded() && deleteMethod.getStatusCode() != DavServletResponse.SC_OK)
         throw new DavException(deleteMethod.getStatusCode(), deleteMethod.getStatusText());
 
     } finally {
