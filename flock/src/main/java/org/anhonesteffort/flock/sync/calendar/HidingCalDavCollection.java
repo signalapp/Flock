@@ -23,12 +23,17 @@ import android.util.Log;
 
 import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.sync.DecryptedMultiStatusResult;
+import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
+import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
+import org.anhonesteffort.flock.webdav.MultiStatusResult;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.ConstraintViolationException;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -36,8 +41,11 @@ import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.XProperty;
+import net.fortuna.ical4j.util.Calendars;
+
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.HidingDavCollection;
@@ -162,20 +170,14 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
     patchProperties(updateProperties, new DavPropertyNameSet());
   }
 
-  @Override
-  public Optional<ComponentETagPair<Calendar>> getHiddenComponent(String uid)
-      throws InvalidComponentException, DavException,
-      InvalidMacException, GeneralSecurityException, IOException
+  protected ComponentETagPair<Calendar> getHiddenComponent(ComponentETagPair<Calendar> exposedComponentPair)
+      throws InvalidRemoteComponentException, InvalidMacException, GeneralSecurityException, IOException
   {
-    Optional<ComponentETagPair<Calendar>> originalComponentPair = super.getComponent(uid);
-    if (!originalComponentPair.isPresent())
-      return Optional.absent();
-
-    Calendar  exposedComponent   = originalComponentPair.get().getComponent();
+    Calendar  exposedComponent   = exposedComponentPair.getComponent();
     XProperty protectedComponent = (XProperty) exposedComponent.getProperty(PROPERTY_NAME_FLOCK_HIDDEN_CALENDAR);
 
     if (protectedComponent == null)
-      return originalComponentPair;
+      return exposedComponentPair;
 
     String          recoveredComponentText = HidingUtil.decodeAndDecryptIfNecessary(masterCipher, protectedComponent.getValue());
     StringReader    stringReader           = new StringReader(recoveredComponentText);
@@ -184,56 +186,100 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
     try {
 
       Calendar recoveredComponent = calendarBuilder.build(stringReader);
-      return Optional.of(new ComponentETagPair<Calendar>(recoveredComponent,
-                                                         originalComponentPair.get().getETag()));
+      return new ComponentETagPair<Calendar>(recoveredComponent, exposedComponentPair.getETag());
 
     } catch (ParserException e) {
       Log.e(TAG, "caught exception while trying to build from hidden component", e);
-      throw new InvalidComponentException("caught exception while trying to build from hidden component",
-                                          true, CalDavConstants.CALDAV_NAMESPACE, getPath(), uid, e);
+
+      try {
+
+        Uid uid = Calendars.getUid(exposedComponent);
+        if (uid != null) {
+          throw new InvalidRemoteComponentException("caught exception while trying to build from hidden component",
+                                                    CalDavConstants.CALDAV_NAMESPACE, getPath(), uid.getValue(), e);
+        }
+
+      } catch (ConstraintViolationException ex) { }
+      throw new InvalidRemoteComponentException("caught exception while trying to build from hidden component",
+                                                CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
     }
   }
 
   @Override
-  public List<ComponentETagPair<Calendar>> getHiddenComponents()
-      throws InvalidComponentException, DavException,
+  public Optional<ComponentETagPair<Calendar>> getHiddenComponent(String uid)
+      throws InvalidRemoteComponentException, DavException,
       InvalidMacException, GeneralSecurityException, IOException
   {
-    List<ComponentETagPair<Calendar>> exposedComponentPairs   = super.getComponents();
-    List<ComponentETagPair<Calendar>> recoveredComponentPairs = new LinkedList<ComponentETagPair<Calendar>>();
+    try {
 
-    for (ComponentETagPair<Calendar> exposedComponentPair : exposedComponentPairs) {
-      Calendar  exposedComponent   = exposedComponentPair.getComponent();
-      XProperty protectedComponent = (XProperty) exposedComponent.getProperty(PROPERTY_NAME_FLOCK_HIDDEN_CALENDAR);
+      Optional<ComponentETagPair<Calendar>> originalComponentPair = super.getComponent(uid);
 
-      if   (protectedComponent == null)
-        recoveredComponentPairs.add(exposedComponentPair);
-      else {
-        String          recoveredComponentText = HidingUtil.decodeAndDecryptIfNecessary(masterCipher, protectedComponent.getValue());
-        StringReader    stringReader           = new StringReader(recoveredComponentText);
-        CalendarBuilder calendarBuilder        = new CalendarBuilder();
+      if (!originalComponentPair.isPresent())
+        return Optional.absent();
 
-        try {
+      return Optional.of(getHiddenComponent(originalComponentPair.get()));
 
-          Calendar recoveredComponent = calendarBuilder.build(stringReader);
-          recoveredComponentPairs.add(new ComponentETagPair<Calendar>(recoveredComponent,
-                                                                      exposedComponentPair.getETag()));
+    } catch (InvalidComponentException e) {
+      throw new InvalidRemoteComponentException(e);
+    }
+  }
 
-        } catch (ParserException e) {
-          Log.e(TAG, "caught exception while trying to build from hidden component", e);
-          throw new InvalidComponentException("caught exception while trying to build from hidden component",
-                                              true, CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
-        }
+  @Override
+  public DecryptedMultiStatusResult<Calendar> getHiddenComponents(List<String> uids)
+      throws DavException, GeneralSecurityException, IOException
+  {
+    MultiStatusResult<Calendar>          exposedComponentPairs   = super.getComponents(uids);
+    DecryptedMultiStatusResult<Calendar> decryptedComponentPairs = new DecryptedMultiStatusResult<Calendar>(
+        new LinkedList<ComponentETagPair<Calendar>>(),
+        exposedComponentPairs.getInvalidComponentExceptions(),
+        new LinkedList<InvalidMacException>()
+    );
+
+    for (ComponentETagPair<Calendar> exposedComponentPair : exposedComponentPairs.getComponentETagPairs()) {
+      try {
+
+        decryptedComponentPairs.getComponentETagPairs().add(getHiddenComponent(exposedComponentPair));
+
+      } catch (InvalidRemoteComponentException e) {
+        decryptedComponentPairs.getInvalidComponentExceptions().add(e);
+      } catch (InvalidMacException e) {
+        decryptedComponentPairs.getInvalidMacExceptions().add(e);
       }
     }
 
-    return recoveredComponentPairs;
+    return decryptedComponentPairs;
+  }
+
+  @Override
+  public DecryptedMultiStatusResult<Calendar> getHiddenComponents()
+      throws DavException, GeneralSecurityException, IOException
+  {
+    MultiStatusResult<Calendar>          exposedComponentPairs   = super.getComponents();
+    DecryptedMultiStatusResult<Calendar> decryptedComponentPairs = new DecryptedMultiStatusResult<Calendar>(
+        new LinkedList<ComponentETagPair<Calendar>>(),
+        exposedComponentPairs.getInvalidComponentExceptions(),
+        new LinkedList<InvalidMacException>()
+    );
+
+    for (ComponentETagPair<Calendar> exposedComponentPair : exposedComponentPairs.getComponentETagPairs()) {
+      try {
+
+        decryptedComponentPairs.getComponentETagPairs().add(getHiddenComponent(exposedComponentPair));
+
+      } catch (InvalidRemoteComponentException e) {
+        decryptedComponentPairs.getInvalidComponentExceptions().add(e);
+      } catch (InvalidMacException e) {
+        decryptedComponentPairs.getInvalidMacExceptions().add(e);
+      }
+    }
+
+    return decryptedComponentPairs;
   }
 
   // NOTICE: All events starting within a given month will appear to start on the first day
   // NOTICE... of the month and end on the last day of this month... is this acceptable???
   protected void putHiddenComponentToServer(Calendar exposedComponent, Optional<String> ifMatchETag)
-      throws InvalidComponentException, GeneralSecurityException, IOException, DavException
+      throws InvalidLocalComponentException, GeneralSecurityException, IOException, DavException
   {
     exposedComponent.getProperties().remove(ProdId.PRODID);
     exposedComponent.getProperties().add(new ProdId(((CalDavStore)getStore()).getProductId()));
@@ -249,8 +295,8 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
     if (exposedEvent != null) {
       if (exposedEvent.getUid() == null || exposedEvent.getUid().getValue() == null) {
         Log.e(TAG, "was given a VEVENT with no UID");
-        throw new InvalidComponentException("Cannot put an iCal to server without UID!",
-                                            false, CalDavConstants.CALDAV_NAMESPACE, getPath());
+        throw new InvalidLocalComponentException("Cannot put an iCal to server without UID!",
+                                                 CalDavConstants.CALDAV_NAMESPACE, getPath());
       }
 
       Date startDate = exposedEvent.getStartDate().getDate();
@@ -274,8 +320,8 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
     else if (exposedToDo != null) {
       if (exposedToDo.getUid() == null || exposedToDo.getUid().getValue() == null) {
         Log.e(TAG, "was given a VTODO with no UID");
-        throw new InvalidComponentException("Cannot put an iCal to server without UID!",
-                                            false, CalDavConstants.CALDAV_NAMESPACE, getPath());
+        throw new InvalidLocalComponentException("Cannot put an iCal to server without UID!",
+                                                 CalDavConstants.CALDAV_NAMESPACE, getPath());
       }
 
       Date startDate = exposedToDo.getStartDate().getDate();
@@ -298,8 +344,8 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
     }
     else {
       Log.e(TAG, "was given an calendar component containing neither VEVENT or VTODO");
-      throw new InvalidComponentException("was given an calendar component containing neither VEVENT or VTODO",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, getPath());
+      throw new InvalidLocalComponentException("was given an calendar component containing neither VEVENT or VTODO",
+                                               CalDavConstants.CALDAV_NAMESPACE, getPath());
     }
 
     CalendarOutputter     calendarOutputter = new CalendarOutputter();
@@ -314,23 +360,25 @@ public class HidingCalDavCollection extends CalDavCollection implements HidingDa
 
       super.putComponentToServer(protectedComponent, ifMatchETag);
 
+    } catch (InvalidComponentException e) {
+      throw new InvalidLocalComponentException(e);
     } catch (ValidationException e) {
       Log.e(TAG, "caught exception while trying to output component to byte stream", e);
-      throw new InvalidComponentException("Caught exception while trying to output component to byte stream",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
+      throw new InvalidLocalComponentException("Caught exception while trying to output component to byte stream",
+                                               CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
     }
   }
 
   @Override
   public void addHiddenComponent(Calendar component)
-      throws InvalidComponentException, DavException, GeneralSecurityException, IOException
+      throws InvalidLocalComponentException, DavException, GeneralSecurityException, IOException
   {
     putHiddenComponentToServer(component, Optional.<String>absent());
   }
 
   @Override
   public void updateHiddenComponent(ComponentETagPair<Calendar> component)
-      throws InvalidComponentException, DavException, GeneralSecurityException, IOException
+      throws InvalidLocalComponentException, DavException, GeneralSecurityException, IOException
   {
     putHiddenComponentToServer(component.getComponent(), component.getETag());
   }

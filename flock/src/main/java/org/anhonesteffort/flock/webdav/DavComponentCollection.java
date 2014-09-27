@@ -64,7 +64,9 @@ public interface DavComponentCollection<T> {
 
   public Optional<ComponentETagPair<T>> getComponent(String uid) throws InvalidComponentException, DavException, IOException;
 
-  public List<ComponentETagPair<T>> getComponents() throws InvalidComponentException, DavException, IOException;
+  public MultiStatusResult<T> getComponents(List<String> uids) throws DavException, IOException;
+
+  public MultiStatusResult<T> getComponents() throws DavException, IOException;
 
   public void addComponent(T component) throws InvalidComponentException, DavException, IOException;
 

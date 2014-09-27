@@ -48,10 +48,10 @@ import ezvcard.property.Telephone;
 import ezvcard.property.Uid;
 import ezvcard.property.Url;
 
+import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
 import org.anhonesteffort.flock.util.Base64;
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 
@@ -89,6 +89,13 @@ public class ContactFactory {
   private static final String PARAMETER_EVENT_CUSTOM_LABEL = "X-EVENT-CUSTOM-LABEL";
 
   private static final String PROPERTY_INVISIBLE_CONTACT = "X-INVISIBLE-CONTACT";
+
+  private static String getUid(VCard vCard) {
+    if (vCard.getUid() != null)
+      return vCard.getUid().getValue();
+
+    return null;
+  }
 
   private static String propertyNameToLabel(String propertyName) {
     return WordUtils.capitalize(propertyName.toLowerCase().replace("x-", "").replace("_", " "));
@@ -364,7 +371,7 @@ public class ContactFactory {
   }
 
   protected static void addPhoneNumber(String path, VCard vCard, ContentValues phoneNumberValues)
-      throws InvalidComponentException
+      throws InvalidLocalComponentException
   {
     Integer type           = phoneNumberValues.getAsInteger(ContactsContract.CommonDataKinds.Phone.TYPE);
     String  label          = phoneNumberValues.getAsString(ContactsContract.CommonDataKinds.Phone.LABEL);
@@ -420,8 +427,8 @@ public class ContactFactory {
     }
     else {
       Log.e(TAG, "phone type or number is null, not adding anything");
-      throw new InvalidComponentException("phone type or number is null", false,
-                                          CardDavConstants.CARDDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("phone type or number is null",
+                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
     }
   }
 
@@ -490,7 +497,7 @@ public class ContactFactory {
   }
 
   protected static void addEmailAddress(String path, VCard vCard, ContentValues emailValues)
-      throws InvalidComponentException
+      throws InvalidLocalComponentException
   {
     Integer type           = emailValues.getAsInteger(ContactsContract.CommonDataKinds.Email.TYPE);
     String  label          = emailValues.getAsString(ContactsContract.CommonDataKinds.Email.LABEL);
@@ -529,8 +536,8 @@ public class ContactFactory {
     }
     else {
       Log.e(TAG, "email type or address is null, not adding anything");
-      throw new InvalidComponentException("email type or address is null", false,
-                                          CardDavConstants.CARDDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("email type or address is null",
+                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
     }
   }
 
@@ -569,7 +576,6 @@ public class ContactFactory {
       return Optional.of(values);
     }
 
-    Log.d(TAG, "no photos found in vcard, returning absent");
     return Optional.absent();
   }
 
@@ -710,7 +716,7 @@ public class ContactFactory {
   }
 
   protected static void addInstantMessaging(String path, VCard vCard, ContentValues imValues)
-      throws InvalidComponentException
+      throws InvalidLocalComponentException
   {
     Integer type           = imValues.getAsInteger(ContactsContract.CommonDataKinds.Im.TYPE);
     Integer protocol       = imValues.getAsInteger(ContactsContract.CommonDataKinds.Im.PROTOCOL);
@@ -768,8 +774,8 @@ public class ContactFactory {
     }
     else {
       Log.e(TAG, "im type, protocol, or handle is null, not adding anything");
-      throw new InvalidComponentException("im type, protocol, or handle is null", false,
-                                          CardDavConstants.CARDDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("im type, protocol, or handle is null",
+                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
     }
   }
 
@@ -829,6 +835,7 @@ public class ContactFactory {
     return values;
   }
 
+  // TODO: if base64 decode fails just add the raw text
   protected static List<ContentValues> getValuesForNote(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
@@ -893,6 +900,7 @@ public class ContactFactory {
     return values;
   }
 
+  // TODO: if base64 decode fails just add the raw text
   protected static List<ContentValues> getValuesForPostalAddresses(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
@@ -944,7 +952,7 @@ public class ContactFactory {
   }
 
   protected static void addPostalAddress(String path, VCard vCard, ContentValues addressValues)
-    throws InvalidComponentException
+    throws InvalidLocalComponentException
   {
     Integer addressType      = addressValues.getAsInteger(ContactsContract.CommonDataKinds.StructuredPostal.TYPE);
     String  formattedAddress = addressValues.getAsString(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS);
@@ -1001,8 +1009,8 @@ public class ContactFactory {
     }
     else {
       Log.e(TAG, "address type or formatted address is null, not adding anything");
-      throw new InvalidComponentException("address type or formatted address is null", false,
-                                          CardDavConstants.CARDDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("address type or formatted address is null",
+                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
     }
   }
 
@@ -1037,17 +1045,18 @@ public class ContactFactory {
   }
 
   protected static void addWebsite(String path, VCard vCard, ContentValues websiteValues)
-    throws InvalidComponentException
+    throws InvalidLocalComponentException
   {
     String urlText = websiteValues.getAsString(ContactsContract.CommonDataKinds.Website.URL);
 
     if (urlText != null) {
       Url url = new Url(urlText);
       vCard.addUrl(url);
-    } else {
+    }
+    else {
       Log.e(TAG, "url is null, not adding anything");
-      throw new InvalidComponentException("url is null", false,
-                                          CardDavConstants.CARDDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("website url is null",
+                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
     }
   }
 
@@ -1139,7 +1148,7 @@ public class ContactFactory {
   }
 
   protected static void addEvent(String path, VCard vCard, ContentValues eventValues)
-      throws InvalidComponentException
+      throws InvalidLocalComponentException
   {
     Integer          eventType      = eventValues.getAsInteger(ContactsContract.CommonDataKinds.Event.TYPE);
     String           eventLabel     = eventValues.getAsString(ContactsContract.CommonDataKinds.Event.LABEL);
@@ -1162,8 +1171,8 @@ public class ContactFactory {
         }
 
       } catch (ParseException e) {
-        throw new InvalidComponentException("caught exception while parsing birthday", false,
-                                            CardDavConstants.CARDDAV_NAMESPACE, path, e);
+        throw new InvalidLocalComponentException("caught exception while parsing birthday",
+                                                 CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard), e);
       }
 
       if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_ANNIVERSARY)
@@ -1176,8 +1185,8 @@ public class ContactFactory {
     }
     else {
       Log.e(TAG, "event type or event start date is null, not adding anything");
-      throw new InvalidComponentException("event type or event start date is null", false,
-                                          CardDavConstants.CARDDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("event type or event start date is null",
+                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
     }
   }
 

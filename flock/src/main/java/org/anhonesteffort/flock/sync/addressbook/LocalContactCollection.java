@@ -40,10 +40,11 @@ import ezvcard.parameter.ImageType;
 import ezvcard.property.Photo;
 import ezvcard.util.IOUtils;
 
+import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
+import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 import org.anhonesteffort.flock.sync.AbstractLocalComponentCollection;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -193,15 +194,13 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     preferences.edit().putString(getKeyForCTag(), cTag).commit();
   }
 
-  private void addStructuredNames(Long rawContactId, VCard vCard)
-    throws RemoteException
-  {
+  private void addStructuredNames(Long rawContactId, VCard vCard) throws RemoteException {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForStructuredName(),
@@ -217,14 +216,14 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void addPhoneNumbers(Long rawContactId, VCard vCard)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForPhoneNumber(),
@@ -240,7 +239,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void addEmailAddresses(Long rawContactId, VCard vCard)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
@@ -263,7 +262,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private Optional<Photo> getDisplayPhoto(Long rawContactId)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     try {
 
@@ -277,14 +276,12 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     } catch (FileNotFoundException e) {
       return Optional.absent();
     } catch (IOException e) {
-      throw new InvalidComponentException("caught exception while adding picture", false,
-                                          CardDavConstants.CARDDAV_NAMESPACE, getPath());
+      throw new InvalidLocalComponentException("caught exception while adding picture",
+                                               CardDavConstants.CARDDAV_NAMESPACE, getPath(), rawContactId, e);
     }
   }
 
-  private Optional<Photo> getThumbnailPhoto(Long rawContactId)
-      throws InvalidComponentException, RemoteException
-  {
+  private Optional<Photo> getThumbnailPhoto(Long rawContactId) throws RemoteException {
     String   SELECTION      = getColumnNameComponentDataLocalId()     + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
@@ -309,7 +306,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void addPhotos(Long rawContactId, VCard vCard)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     Optional<Photo> photo = getDisplayPhoto(rawContactId);
     if (!photo.isPresent())
@@ -319,15 +316,13 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
       vCard.addPhoto(photo.get());
   }
 
-  private void addOrganizations(Long rawContactId, VCard vCard)
-      throws RemoteException
-  {
+  private void addOrganizations(Long rawContactId, VCard vCard) throws RemoteException {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForOrganization(),
@@ -343,14 +338,14 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void addInstantMessaging(Long rawContactId, VCard vCard)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForInstantMessaging(),
@@ -365,15 +360,13 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     cursor.close();
   }
 
-  private void addNickNames(Long rawContactId, VCard vCard)
-      throws RemoteException
-  {
+  private void addNickNames(Long rawContactId, VCard vCard) throws RemoteException {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForNickName(),
@@ -388,15 +381,13 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     cursor.close();
   }
 
-  private void addNotes(Long rawContactId, VCard vCard)
-      throws RemoteException
-  {
+  private void addNotes(Long rawContactId, VCard vCard) throws RemoteException {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForNote(),
@@ -412,14 +403,14 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void addPostalAddresses(Long rawContactId, VCard vCard)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForPostalAddress(),
@@ -435,14 +426,14 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void addWebsites(Long rawContactId, VCard vCard)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForWebsite(),
@@ -458,14 +449,14 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void addEvents(Long rawContactId, VCard vCard)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForEvent(),
@@ -480,15 +471,13 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     cursor.close();
   }
 
-  private void addSipAddresses(Long rawContactId, VCard vCard)
-      throws RemoteException
-  {
+  private void addSipAddresses(Long rawContactId, VCard vCard) throws RemoteException {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[]{
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.SipAddress.CONTENT_ITEM_TYPE
-        };
+    };
 
     Cursor cursor = client.query(getUriForData(),
                                  ContactFactory.getProjectionForSipAddress(),
@@ -503,9 +492,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     cursor.close();
   }
 
-  private List<Long> getGroupIdsForContact(Long rawContactId)
-      throws RemoteException
-  {
+  private List<Long> getGroupIdsForContact(Long rawContactId) throws RemoteException {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
     String[] SELECTION_ARGS = new String[] {
@@ -515,10 +502,10 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
     List<Long> groupIds = new LinkedList<Long>();
     Cursor     cursor   = client.query(getUriForData(),
-        ContactFactory.getProjectionForGroupMembership(),
-        SELECTION,
-        SELECTION_ARGS,
-        null);
+                                       ContactFactory.getProjectionForGroupMembership(),
+                                       SELECTION,
+                                       SELECTION_ARGS,
+                                       null);
 
     while (cursor.moveToNext())
       groupIds.add(ContactFactory.getIdForGroupMembership(cursor));
@@ -527,9 +514,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     return groupIds;
   }
 
-  private boolean isContactWithoutGroupVisible()
-      throws RemoteException
-  {
+  private boolean isContactWithoutGroupVisible() throws RemoteException {
     boolean contactWithoutGroupVisible = true;
     Cursor  cursor                     = client.query(getSyncAdapterUri(ContactsContract.Settings.CONTENT_URI),
         new String[] {
@@ -546,9 +531,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     return contactWithoutGroupVisible;
   }
 
-  private void addInvisibleProperty(Long rawContactId, VCard vCard)
-      throws RemoteException
-  {
+  private void addInvisibleProperty(Long rawContactId, VCard vCard) throws RemoteException {
     boolean isMemberOfGroup = getGroupIdsForContact(rawContactId).size() > 0;
 
     if (!isMemberOfGroup && !isContactWithoutGroupVisible())
@@ -556,7 +539,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void buildContact(Long rawContactId, VCard vCard)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     addStructuredNames(  rawContactId, vCard);
     addPhoneNumbers(     rawContactId, vCard);
@@ -575,7 +558,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
   @Override
   public Optional<VCard> getComponent(Long rawContactId)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     Cursor cursor = client.query(ContentUris.withAppendedId(getUriForComponents(), rawContactId),
                                  ContactFactory.getProjectionForRawContact(),
@@ -601,7 +584,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
   @Override
   public Optional<ComponentETagPair<VCard>> getComponent(String uid)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     String   SELECTION      = getColumnNameComponentUid() + "=?";
     String[] SELECTION_ARGS = new String[]{uid};
@@ -633,7 +616,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
   @Override
   public List<ComponentETagPair<VCard>> getComponents()
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     List<ComponentETagPair<VCard>> vCards = new LinkedList<ComponentETagPair<VCard>>();
 
@@ -659,9 +642,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   @Override
-  public void addComponent(ComponentETagPair<VCard> vCard)
-      throws InvalidComponentException, RemoteException
-  {
+  public void addComponent(ComponentETagPair<VCard> vCard) throws RemoteException {
     ContentValues rawContactValues = ContactFactory.getValuesForRawContact(vCard);
 
     int raw_contact_op_index = pendingOperations.size();
@@ -769,7 +750,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
   @Override
   public void updateComponent(ComponentETagPair<VCard> vCard)
-      throws InvalidComponentException, RemoteException
+      throws InvalidRemoteComponentException, RemoteException
   {
     if (vCard.getComponent().getUid() != null) {
       removeComponent(vCard.getComponent().getUid().getValue());
@@ -777,13 +758,13 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     }
     else {
       Log.e(TAG, "was given a vcard with missing uid");
-      throw new InvalidComponentException("Cannot update a vCard without UID!", false,
-                                          CardDavConstants.CARDDAV_NAMESPACE, getPath());
+      throw new InvalidRemoteComponentException("Cannot update a vCard without UID!",
+                                                CardDavConstants.CARDDAV_NAMESPACE, getPath());
     }
   }
 
   public void copyToAccount(Account toAccount, ContactCopiedListener listener)
-      throws InvalidComponentException, RemoteException
+      throws RemoteException
   {
     LocalContactCollection toCollection = new LocalContactCollection(context, client, toAccount, getPath());
     List<Long>             componentIds = getComponentIds();
@@ -809,10 +790,10 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
           listener.onContactCopied(getAccount(), toAccount);
         }
         else
-          throw new InvalidComponentException("absent component for local id on copy",
-                                              false, CardDavConstants.CARDDAV_NAMESPACE, getPath());
+          throw new InvalidLocalComponentException("absent component for local id on copy",
+                                                   CardDavConstants.CARDDAV_NAMESPACE, getPath(), contactId);
 
-      } catch (InvalidComponentException e) {
+      } catch (InvalidLocalComponentException e) {
         listener.onContactCopyFailed(e, getAccount(), toAccount);
       } catch (RemoteException e) {
         listener.onContactCopyFailed(e, getAccount(), toAccount);

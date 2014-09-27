@@ -27,52 +27,44 @@ import org.apache.jackrabbit.webdav.xml.Namespace;
  */
 public class InvalidComponentException extends Exception {
 
-  private boolean   isServersFault;
-  private Namespace namespace;
-  private String    path;
-  private String    uid;
+  protected Namespace namespace;
+  protected String    path;
+  protected String    uid;
 
   public InvalidComponentException(String    message,
-                                   boolean   isServersFault,
                                    Namespace namespace,
                                    String    path)
   {
     super(message);
 
-    this.isServersFault = isServersFault;
-    this.namespace      = namespace;
-    this.path           = path;
+    this.namespace = namespace;
+    this.path      = path;
   }
 
   public InvalidComponentException(String    message,
-                                   boolean   isServersFault,
                                    Namespace namespace,
                                    String    path,
                                    String    uid)
   {
     super(message);
 
-    this.isServersFault = isServersFault;
-    this.namespace      = namespace;
-    this.path           = path;
-    this.uid            = uid;
+    this.namespace = namespace;
+    this.path      = path;
+    this.uid       = uid;
   }
 
   public InvalidComponentException(String    message,
-                                   boolean   isServersFault,
                                    Namespace namespace,
                                    String    path,
                                    Throwable cause)
   {
     super(message, cause);
 
-    this.isServersFault = isServersFault;
-    this.namespace      = namespace;
-    this.path           = path;
+    this.namespace = namespace;
+    this.path      = path;
   }
 
   public InvalidComponentException(String    message,
-                                   boolean   isServersFault,
                                    Namespace namespace,
                                    String    path,
                                    String    uid,
@@ -80,14 +72,9 @@ public class InvalidComponentException extends Exception {
   {
     super(message, cause);
 
-    this.isServersFault = isServersFault;
-    this.namespace      = namespace;
-    this.path           = path;
-    this.uid            = uid;
-  }
-
-  public boolean isServersFault() {
-    return isServersFault;
+    this.namespace = namespace;
+    this.path      = path;
+    this.uid       = uid;
   }
 
   public Namespace getNamespace() {
@@ -106,26 +93,22 @@ public class InvalidComponentException extends Exception {
   public String toString() {
     if (getCause() == null) {
       if (!getUid().isPresent()) {
-        return "message: " + getMessage() + ", is servers fault: " + isServersFault +
-               ", namespace: " + namespace.getURI() + ", path: " + path;
+        return "message: " + getMessage() + ", namespace: " + namespace.getURI() + ", path: " + path;
       }
       else {
-        return "message: " + getMessage() + ", is servers fault: " + isServersFault +
-               ", namespace: " + namespace.getURI() + ", path: " + path + ", uid: " + getUid().get();
+        return "message: " + getMessage() + ", namespace: " + namespace.getURI() + ", path: " + path +
+                ", uid: " + getUid().get();
       }
     }
     else {
       if (!getUid().isPresent()) {
-        return "message: " + getMessage() + ", is servers fault: " + isServersFault +
-               ", namespace: " + namespace.getURI() + ", path: " + path + ", cause: " + getCause();
+        return "message: " + getMessage() + ", namespace: " + namespace.getURI() + ", path: " + path +
+                ", cause: " + getCause();
       }
       else {
-        return "message: " + getMessage() + ", is servers fault: " + isServersFault +
-               ", namespace: " + namespace.getURI() + ", path: " + path +
+        return "message: " + getMessage() + ", namespace: " + namespace.getURI() + ", path: " + path +
                ", uid: " + getUid().get() + ", cause: " + getCause();
       }
     }
-
   }
-
 }

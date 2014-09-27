@@ -33,6 +33,7 @@ import net.fortuna.ical4j.util.Calendars;
 import org.anhonesteffort.flock.webdav.AbstractDavComponentCollection;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
+import org.anhonesteffort.flock.webdav.MultiStatusResult;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.jackrabbit.webdav.DavException;
@@ -48,7 +49,6 @@ import org.apache.jackrabbit.webdav.security.report.PrincipalMatchReport;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -245,48 +245,51 @@ public class CalDavCollection extends AbstractDavComponentCollection<Calendar> i
   }
 
   @Override
-  protected List<ComponentETagPair<Calendar>> getComponentsFromMultiStatus(MultiStatusResponse[] msResponses)
-    throws InvalidComponentException
-  {
-    List<ComponentETagPair<Calendar>> calendars = new LinkedList<ComponentETagPair<Calendar>>();
+  protected MultiStatusResult<Calendar> getComponentsFromMultiStatus(MultiStatusResponse[] msResponses) {
+    List<ComponentETagPair<Calendar>> calendars  = new LinkedList<ComponentETagPair<Calendar>>();
+    List<InvalidComponentException>   exceptions = new LinkedList<InvalidComponentException>();
 
-    try {
+    for (MultiStatusResponse response : msResponses) {
+      Calendar       calendar    = null;
+      String         eTag        = null;
+      DavPropertySet propertySet = response.getProperties(DavServletResponse.SC_OK);
 
-      for (MultiStatusResponse response : msResponses) {
-        Calendar       calendar    = null;
-        String         eTag        = null;
-        DavPropertySet propertySet = response.getProperties(DavServletResponse.SC_OK);
+      if (propertySet.get(CalDavConstants.PROPERTY_NAME_CALENDAR_DATA) != null) {
+        String calendarData = (String) propertySet.get(CalDavConstants.PROPERTY_NAME_CALENDAR_DATA).getValue();
 
-        if (propertySet.get(CalDavConstants.PROPERTY_NAME_CALENDAR_DATA) != null) {
-          String calendarData = (String) propertySet.get(CalDavConstants.PROPERTY_NAME_CALENDAR_DATA).getValue();
+        // OwnCloud :(
+        if (!calendarData.contains("\r"))
+          calendarData = calendarData.replace("\n", "\r\n");
 
-          // OwnCloud :(
-          if (!calendarData.contains("\r"))
-            calendarData = calendarData.replace("\n", "\r\n");
+        try {
 
           calendar = new CalendarBuilder().build(new StringReader(calendarData));
+
+        } catch (IOException e) {
+          exceptions.add(
+              new InvalidComponentException("Caught exception while parsing MultiStatus",
+                                            CalDavConstants.CALDAV_NAMESPACE, getPath(), e)
+          );
+        } catch (ParserException e) {
+          exceptions.add(
+              new InvalidComponentException("Caught exception while parsing MultiStatus",
+                                            CalDavConstants.CALDAV_NAMESPACE, getPath(), e)
+          );
         }
-
-        if (propertySet.get(DavPropertyName.GETETAG) != null)
-          eTag = (String) propertySet.get(DavPropertyName.GETETAG).getValue();
-
-        if (calendar != null)
-          calendars.add(new ComponentETagPair<Calendar>(calendar, Optional.fromNullable(eTag)));
       }
 
-    } catch (IOException e) {
-      throw new InvalidComponentException("Caught exception while parsing MultiStatus", false,
-                                          CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
-    } catch (ParserException e) {
-      throw new InvalidComponentException("Caught exception while parsing calendar data", true,
-                                          CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
+      if (propertySet.get(DavPropertyName.GETETAG) != null)
+        eTag = (String) propertySet.get(DavPropertyName.GETETAG).getValue();
+
+      if (calendar != null)
+        calendars.add(new ComponentETagPair<Calendar>(calendar, Optional.fromNullable(eTag)));
     }
 
-    return calendars;
+    return new MultiStatusResult<Calendar>(calendars, exceptions);
   }
 
-  private List<ComponentETagPair<Calendar>> getComponentsByType(String componentType)
-      throws InvalidComponentException, DavException, IOException
+  private MultiStatusResult<Calendar> getComponentsByType(String componentType)
+      throws DavException, IOException
   {
     try {
       Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -323,22 +326,19 @@ public class CalDavCollection extends AbstractDavComponentCollection<Calendar> i
         reportMethod.releaseConnection();
       }
 
-    } catch (DOMException e) {
-      throw new InvalidComponentException("Caught exception while parsing DOM", false,
-                                          CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
     } catch (ParserConfigurationException e) {
       throw new IOException("Caught exception while building document.", e);
     }
   }
 
-  public List<ComponentETagPair<Calendar>> getEventComponents()
-      throws InvalidComponentException, DavException, IOException
+  public MultiStatusResult<Calendar> getEventComponents()
+      throws DavException, IOException
   {
     return getComponentsByType(Component.VEVENT);
   }
 
-  public List<ComponentETagPair<Calendar>> getToDoComponents()
-      throws InvalidComponentException, DavException, IOException
+  public MultiStatusResult<Calendar> getToDoComponents()
+      throws DavException, IOException
   {
     return getComponentsByType(Component.VTODO);
   }
@@ -353,7 +353,7 @@ public class CalDavCollection extends AbstractDavComponentCollection<Calendar> i
     try {
 
       if (Calendars.getUid(calendar) == null)
-        throw new InvalidComponentException("Cannot put iCal to server without UID!", false,
+        throw new InvalidComponentException("Cannot put iCal to server without UID!",
                                             CalDavConstants.CALDAV_NAMESPACE, getPath());
 
       String    calendarUid = Calendars.getUid(calendar).getValue();
@@ -378,8 +378,8 @@ public class CalDavCollection extends AbstractDavComponentCollection<Calendar> i
         if (status == DavServletResponse.SC_REQUEST_ENTITY_TOO_LARGE ||
             status == DavServletResponse.SC_FORBIDDEN)
         {
-          throw new InvalidComponentException("Put method returned bad status " + status, false,
-                                              CalDavConstants.CALDAV_NAMESPACE, getPath());
+          throw new InvalidComponentException("Put method returned bad status " + status,
+                                              CalDavConstants.CALDAV_NAMESPACE, getPath(), calendarUid);
         }
 
         if (status < DavServletResponse.SC_OK ||
@@ -393,10 +393,10 @@ public class CalDavCollection extends AbstractDavComponentCollection<Calendar> i
       }
 
     } catch (ConstraintViolationException e) {
-      throw new InvalidComponentException("Caught exception while parsing UID from calendar", false,
+      throw new InvalidComponentException("Caught exception while parsing UID from calendar",
                                           CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
     } catch (ValidationException e) {
-      throw new InvalidComponentException("Caught exception whie outputting calendar to stream", false,
+      throw new InvalidComponentException("Caught exception whie outputting calendar to stream",
                                           CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
     }
   }

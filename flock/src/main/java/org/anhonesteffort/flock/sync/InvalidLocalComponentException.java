@@ -19,6 +19,8 @@
 
 package org.anhonesteffort.flock.sync;
 
+import com.google.common.base.Optional;
+
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.apache.jackrabbit.webdav.xml.Namespace;
 
@@ -29,12 +31,26 @@ public class InvalidLocalComponentException extends InvalidComponentException {
 
   private long localId;
 
+  public InvalidLocalComponentException(InvalidComponentException e) {
+    super(e.getMessage(), e.getNamespace(), e.getPath(), e.getCause());
+
+    if (e.getUid().isPresent())
+      this.uid = e.getUid().get();
+  }
+
+  public InvalidLocalComponentException(String    message,
+                                        Namespace namespace,
+                                        String    path)
+  {
+    super(message, namespace, path);
+  }
+
   public InvalidLocalComponentException(String    message,
                                         Namespace namespace,
                                         String    path,
-                                        long      localId)
+                                        Long      localId)
   {
-    super(message, false, namespace, path);
+    super(message, namespace, path);
 
     this.localId = localId;
   }
@@ -42,21 +58,18 @@ public class InvalidLocalComponentException extends InvalidComponentException {
   public InvalidLocalComponentException(String    message,
                                         Namespace namespace,
                                         String    path,
-                                        long      localId,
-                                        Throwable cause)
-  {
-    super(message, false, namespace, path, cause);
-
-    this.localId = localId;
-  }
-
-  public InvalidLocalComponentException(String    message,
-                                        Namespace namespace,
-                                        String    path,
-                                        long      localId,
                                         String    uid)
   {
-    super(message, false, namespace, path, uid);
+    super(message, namespace, path, uid);
+  }
+
+  public InvalidLocalComponentException(String    message,
+                                        Namespace namespace,
+                                        String    path,
+                                        String    uid,
+                                        Long      localId)
+  {
+    super(message, namespace, path, uid);
 
     this.localId = localId;
   }
@@ -64,22 +77,52 @@ public class InvalidLocalComponentException extends InvalidComponentException {
   public InvalidLocalComponentException(String    message,
                                         Namespace namespace,
                                         String    path,
-                                        long      localId,
+                                        Throwable cause)
+  {
+    super(message, namespace, path, cause);
+  }
+
+  public InvalidLocalComponentException(String    message,
+                                        Namespace namespace,
+                                        String    path,
+                                        Long      localId,
+                                        Throwable cause)
+  {
+    super(message, namespace, path, cause);
+
+    this.localId = localId;
+  }
+
+  public InvalidLocalComponentException(String    message,
+                                        Namespace namespace,
+                                        String    path,
                                         String    uid,
                                         Throwable cause)
   {
-    super(message, false, namespace, path, uid, cause);
+    super(message, namespace, path, uid, cause);
+  }
+
+  public InvalidLocalComponentException(String    message,
+                                        Namespace namespace,
+                                        String    path,
+                                        String    uid,
+                                        Long      localId,
+                                        Throwable cause)
+  {
+    super(message, namespace, path, uid, cause);
 
     this.localId = localId;
   }
 
-  public Long getLocalId() {
-    return localId;
+  public Optional<Long> getLocalId() {
+    return Optional.fromNullable(localId);
   }
 
   @Override
   public String toString() {
-    return super.toString() + ", local id: " + localId;
-  }
+    if (getLocalId().isPresent())
+      return super.toString() + ", local id: " + getLocalId().get();
 
+    return super.toString();
+  }
 }

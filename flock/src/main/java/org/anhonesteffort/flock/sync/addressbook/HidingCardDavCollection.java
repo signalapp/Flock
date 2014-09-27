@@ -19,8 +19,6 @@
 
 package org.anhonesteffort.flock.sync.addressbook;
 
-import android.util.Log;
-
 import com.google.common.base.Optional;
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
@@ -29,6 +27,10 @@ import ezvcard.property.Photo;
 import ezvcard.property.RawProperty;
 import ezvcard.property.StructuredName;
 
+import org.anhonesteffort.flock.sync.DecryptedMultiStatusResult;
+import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
+import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
+import org.anhonesteffort.flock.webdav.MultiStatusResult;
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.MasterCipher;
@@ -118,68 +120,108 @@ public class HidingCardDavCollection extends CardDavCollection implements Hiding
     delegate.setHiddenDisplayName(displayName);
   }
 
-  @Override
-  public Optional<ComponentETagPair<VCard>> getHiddenComponent(String uid)
-      throws InvalidComponentException, DavException,
-      InvalidMacException, GeneralSecurityException, IOException
+  protected ComponentETagPair<VCard> getHiddenComponent(ComponentETagPair<VCard> exposedComponentPair)
+      throws InvalidRemoteComponentException, InvalidMacException, GeneralSecurityException, IOException
   {
-    Optional<ComponentETagPair<VCard>> originalComponentPair = super.getComponent(uid);
-    if (!originalComponentPair.isPresent())
-      return Optional.absent();
-
-    VCard       exposedVCard   = originalComponentPair.get().getComponent();
+    VCard       exposedVCard   = exposedComponentPair.getComponent();
     RawProperty protectedVCard = exposedVCard.getExtendedProperty(PROPERTY_NAME_FLOCK_HIDDEN);
 
     if (protectedVCard == null)
-      return originalComponentPair;
+      return exposedComponentPair;
 
     String recoveredVCardText = HidingUtil.decodeAndDecryptIfNecessary(masterCipher, protectedVCard.getValue());
-    VCard  recoveredVCard     = Ezvcard.parse(recoveredVCardText.replace("\\n", "\n")).first();
 
-    if (exposedVCard.getPhotos().size() > 0) {
-      Photo  protectedPhoto            = exposedVCard.getPhotos().get(0);
-      String parameterFlockHiddenPhoto = protectedPhoto.getParameter(PARAMETER_NAME_FLOCK_HIDDEN_PHOTO);
-      if (parameterFlockHiddenPhoto != null && parameterFlockHiddenPhoto.equals("true")) {
-        byte[] recoveredPhotoData = HidingUtil.decodeAndDecryptIfNecessary(masterCipher, protectedPhoto.getData());
-        Photo  recoveredPhoto     = new Photo(recoveredPhotoData, ImageType.JPEG);
-        recoveredVCard.addPhoto(recoveredPhoto);
+    try {
+
+      VCard recoveredVCard = Ezvcard.parse(recoveredVCardText.replace("\\n", "\n")).first();
+
+      if (exposedVCard.getPhotos().size() > 0) {
+        Photo  protectedPhoto            = exposedVCard.getPhotos().get(0);
+        String parameterFlockHiddenPhoto = protectedPhoto.getParameter(PARAMETER_NAME_FLOCK_HIDDEN_PHOTO);
+        if (parameterFlockHiddenPhoto != null && parameterFlockHiddenPhoto.equals("true")) {
+          byte[] recoveredPhotoData = HidingUtil.decodeAndDecryptIfNecessary(masterCipher, protectedPhoto.getData());
+          Photo  recoveredPhoto     = new Photo(recoveredPhotoData, ImageType.JPEG);
+          recoveredVCard.addPhoto(recoveredPhoto);
+        }
       }
-      else
-        Log.e(TAG, "received vcard a photo missing the " + PARAMETER_NAME_FLOCK_HIDDEN_PHOTO + " parameter.");
+
+      return new ComponentETagPair<VCard>(recoveredVCard, exposedComponentPair.getETag());
+
+    } catch (RuntimeException e) {
+      if (exposedVCard.getUid() != null) {
+        throw new InvalidRemoteComponentException("caught exception while parsing vcard from multi-status response",
+                                                  CardDavConstants.CARDDAV_NAMESPACE, getPath(),
+                                                  exposedVCard.getUid().getValue(), e);
+      }
+      throw new InvalidRemoteComponentException("caught exception while parsing vcard from multi-status response",
+                                                CardDavConstants.CARDDAV_NAMESPACE, getPath(), e);
     }
-    return Optional.of(new ComponentETagPair<VCard>(recoveredVCard,
-                                                    originalComponentPair.get().getETag()));
   }
 
   @Override
-  public List<ComponentETagPair<VCard>> getHiddenComponents()
-      throws InvalidComponentException, DavException,
+  public Optional<ComponentETagPair<VCard>> getHiddenComponent(String uid)
+      throws InvalidRemoteComponentException, DavException,
       InvalidMacException, GeneralSecurityException, IOException
   {
-    List<ComponentETagPair<VCard>> exposedComponentPairs   = super.getComponents();
-    List<ComponentETagPair<VCard>> recoveredComponentPairs = new LinkedList<ComponentETagPair<VCard>>();
+    try {
 
-    for (ComponentETagPair<VCard> exposedComponentPair : exposedComponentPairs) {
-      VCard       exposedVCard   = exposedComponentPair.getComponent();
-      RawProperty protectedVCard = exposedVCard.getExtendedProperty(PROPERTY_NAME_FLOCK_HIDDEN);
+      Optional<ComponentETagPair<VCard>> originalComponentPair = super.getComponent(uid);
+      if (!originalComponentPair.isPresent())
+        return Optional.absent();
 
-      if (protectedVCard == null)
-        recoveredComponentPairs.add(exposedComponentPair);
+      return Optional.of(getHiddenComponent(originalComponentPair.get()));
 
-      else {
-        String recoveredVCardText = HidingUtil.decodeAndDecryptIfNecessary(masterCipher, protectedVCard.getValue());
-        VCard  recoveredVCard     = Ezvcard.parse(recoveredVCardText.replace("\\n", "\n")).first();
+    } catch (InvalidComponentException e) {
+      throw new InvalidRemoteComponentException(e);
+    }
+  }
 
-        if (exposedVCard.getPhotos().size() > 0) {
-          Photo protectedPhoto = exposedVCard.getPhotos().get(0);
-          if (protectedPhoto.getParameter(PARAMETER_NAME_FLOCK_HIDDEN_PHOTO).equals("true")) {
-            byte[] recoveredPhotoData = HidingUtil.decodeAndDecryptIfNecessary(masterCipher, protectedPhoto.getData());
-            Photo  recoveredPhoto     = new Photo(recoveredPhotoData, ImageType.JPEG);
-            recoveredVCard.addPhoto(recoveredPhoto);
-          }
-        }
-        recoveredComponentPairs.add(new ComponentETagPair<VCard>(recoveredVCard,
-                                                                 exposedComponentPair.getETag()));
+  @Override
+  public DecryptedMultiStatusResult<VCard> getHiddenComponents(List<String> uids)
+      throws DavException, GeneralSecurityException, IOException
+  {
+    MultiStatusResult<VCard>          exposedComponentPairs   = super.getComponents(uids);
+    DecryptedMultiStatusResult<VCard> recoveredComponentPairs = new DecryptedMultiStatusResult<VCard>(
+        new LinkedList<ComponentETagPair<VCard>>(),
+        exposedComponentPairs.getInvalidComponentExceptions(),
+        new LinkedList<InvalidMacException>()
+    );
+
+    for (ComponentETagPair<VCard> exposedComponentPair : exposedComponentPairs.getComponentETagPairs()) {
+      try {
+
+        recoveredComponentPairs.getComponentETagPairs().add(getHiddenComponent(exposedComponentPair));
+
+      } catch (InvalidRemoteComponentException e) {
+        recoveredComponentPairs.getInvalidComponentExceptions().add(e);
+      } catch (InvalidMacException e) {
+        recoveredComponentPairs.getInvalidMacExceptions().add(e);
+      }
+    }
+
+    return recoveredComponentPairs;
+  }
+
+  @Override
+  public DecryptedMultiStatusResult<VCard> getHiddenComponents()
+      throws DavException, GeneralSecurityException, IOException
+  {
+    MultiStatusResult<VCard>          exposedComponentPairs   = super.getComponents();
+    DecryptedMultiStatusResult<VCard> recoveredComponentPairs = new DecryptedMultiStatusResult<VCard>(
+        new LinkedList<ComponentETagPair<VCard>>(),
+        exposedComponentPairs.getInvalidComponentExceptions(),
+        new LinkedList<InvalidMacException>()
+    );
+
+    for (ComponentETagPair<VCard> exposedComponentPair : exposedComponentPairs.getComponentETagPairs()) {
+      try {
+
+        recoveredComponentPairs.getComponentETagPairs().add(getHiddenComponent(exposedComponentPair));
+
+      } catch (InvalidRemoteComponentException e) {
+        recoveredComponentPairs.getInvalidComponentExceptions().add(e);
+      } catch (InvalidMacException e) {
+        recoveredComponentPairs.getInvalidMacExceptions().add(e);
       }
     }
 
@@ -187,11 +229,11 @@ public class HidingCardDavCollection extends CardDavCollection implements Hiding
   }
 
   protected void putHiddenComponentToServer(VCard exposedVCard, Optional<String> ifMatchETag)
-      throws InvalidComponentException, GeneralSecurityException, IOException, DavException
+      throws InvalidLocalComponentException, GeneralSecurityException, IOException, DavException
   {
     if (exposedVCard.getUid() == null)
-      throw new InvalidComponentException("Cannot put a VCard to server without UID!", false,
-                                          CardDavConstants.CARDDAV_NAMESPACE, getPath());
+      throw new InvalidLocalComponentException("Cannot put a VCard to server without UID!",
+                                               CardDavConstants.CARDDAV_NAMESPACE, getPath());
 
     VCard protectedVCard = new VCard();
     protectedVCard.setVersion(exposedVCard.getVersion());
@@ -217,19 +259,25 @@ public class HidingCardDavCollection extends CardDavCollection implements Hiding
     protectedVCard.addExtendedProperty(PROPERTY_NAME_FLOCK_HIDDEN,
                                        HidingUtil.encryptEncodeAndPrefix(masterCipher, Ezvcard.write(exposedVCard).go()));
 
-    super.putComponentToServer(protectedVCard, ifMatchETag);
+    try {
+
+      super.putComponentToServer(protectedVCard, ifMatchETag);
+
+    } catch (InvalidComponentException e) {
+      throw new InvalidLocalComponentException(e);
+    }
   }
 
   @Override
   public void addHiddenComponent(VCard component)
-      throws InvalidComponentException, DavException, GeneralSecurityException, IOException
+      throws InvalidLocalComponentException, DavException, GeneralSecurityException, IOException
   {
     putHiddenComponentToServer(component, Optional.<String>absent());
   }
 
   @Override
   public void updateHiddenComponent(ComponentETagPair<VCard> component)
-      throws InvalidComponentException, DavException, GeneralSecurityException, IOException
+      throws InvalidLocalComponentException, DavException, GeneralSecurityException, IOException
   {
     putHiddenComponentToServer(component.getComponent(), component.getETag());
   }

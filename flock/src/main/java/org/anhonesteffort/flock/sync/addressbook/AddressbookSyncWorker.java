@@ -23,7 +23,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
 
+import com.google.common.base.Optional;
+
 import ezvcard.VCard;
+import ezvcard.property.Uid;
 
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
@@ -52,8 +55,12 @@ public class AddressbookSyncWorker extends AbstractDavSyncWorker<VCard> {
   }
 
   @Override
-  protected boolean componentHasUid(VCard component) {
-    return component.getUid() != null && component.getUid().getValue() != null;
+  protected Optional<String> getComponentUid(VCard component) {
+    Uid uid = component.getUid();
+    if (uid != null)
+      return Optional.of(uid.getValue());
+
+    return Optional.absent();
   }
 
   @Override

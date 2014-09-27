@@ -33,6 +33,8 @@ import android.util.Log;
 
 import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
+import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 
 import net.fortuna.ical4j.model.Calendar;
@@ -302,7 +304,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
     return Optional.absent();
   }
 
-  public void setTimeZone(Calendar timezone) throws InvalidComponentException {
+  public void setTimeZone(Calendar timezone) throws PropertyParseException {
     VTimeZone vTimeZone = (VTimeZone) timezone.getComponent(VTimeZone.VTIMEZONE);
 
     if (vTimeZone != null && vTimeZone.getTimeZoneId() != null) {
@@ -311,8 +313,8 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
           .build());
     }
     else
-      throw new InvalidComponentException("Calendar object must contain a valid VTimeZone component.",
-                                          true, CalDavConstants.CALDAV_NAMESPACE, getPath());
+      throw new PropertyParseException("Calendar object must contain a valid VTimeZone component.",
+                                       getPath(), CalDavConstants.PROPERTY_NAME_CALENDAR_TIMEZONE);
   }
 
   public Optional<Integer> getOrder() throws RemoteException {
@@ -338,7 +340,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
   }
 
   private void addAttendees(Long eventId, Calendar component)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     String   SELECTION      = CalendarContract.Attendees.EVENT_ID + "=?";
     String[] SELECTION_ARGS = new String[]{eventId.toString()};
@@ -357,7 +359,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
   }
 
   private void addReminders(Long eventId, Calendar component)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     String   SELECTION      = CalendarContract.Reminders.EVENT_ID + "=?";
     String[] SELECTION_ARGS = new String[]{eventId.toString()};
@@ -376,7 +378,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
   }
 
   private void buildEvent(Long eventId, Calendar component)
-      throws InvalidComponentException, RemoteException
+      throws InvalidLocalComponentException, RemoteException
   {
     addAttendees(eventId, component);
     addReminders(eventId, component);
@@ -384,7 +386,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
   @Override
   public Optional<Calendar> getComponent(Long eventId)
-      throws RemoteException, InvalidComponentException
+      throws RemoteException, InvalidLocalComponentException
   {
     Cursor cursor = client.query(ContentUris.withAppendedId(getUriForComponents(), eventId),
                                  EventFactory.getProjectionForEvent(),
@@ -410,7 +412,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
   @Override
   public Optional<ComponentETagPair<Calendar>> getComponent(String uid)
-      throws RemoteException, InvalidComponentException
+      throws RemoteException, InvalidLocalComponentException
   {
     String   SELECTION      = getColumnNameComponentUid() + "=?";
     String[] SELECTION_ARGS = new String[]{uid};
@@ -439,7 +441,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
   @Override
   public List<ComponentETagPair<Calendar>> getComponents()
-      throws RemoteException, InvalidComponentException
+      throws RemoteException, InvalidLocalComponentException
   {
     String   SELECTION      = getColumnNameCollectionLocalId() + "=?";
     String[] SELECTION_ARGS = new String[]{localId.toString()};
@@ -463,10 +465,13 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
         buildEvent(eventValues.getAsLong(CalendarContract.Events._ID), component.getComponent());
         components.add(component);
 
-      } catch (InvalidComponentException e) {
-        if (eventId == null)
-          throw new InvalidComponentException(e.getMessage(), e.isServersFault(), CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
-        throw new InvalidLocalComponentException(e.getMessage(), CalDavConstants.CALDAV_NAMESPACE, getPath(), eventId, e);
+      } catch (InvalidLocalComponentException e) {
+        if (e.getUid().isPresent())
+          throw new InvalidLocalComponentException(e.getMessage(), CalDavConstants.CALDAV_NAMESPACE,
+                                                   getPath(), e.getUid().get(), eventId, e);
+
+        throw new InvalidLocalComponentException(e.getMessage(), CalDavConstants.CALDAV_NAMESPACE,
+                                                 getPath(), eventId, e);
       }
     }
 
@@ -476,7 +481,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
   @Override
   public void addComponent(ComponentETagPair<Calendar> component)
-      throws RemoteException, InvalidComponentException
+      throws RemoteException, InvalidRemoteComponentException
   {
     ContentValues eventValues    = EventFactory.getValuesForEvent(this, localId, component);
     int           event_op_index = pendingOperations.size();
@@ -529,7 +534,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
   @Override
   public void updateComponent(ComponentETagPair<Calendar> component)
-      throws RemoteException, InvalidComponentException
+      throws RemoteException, InvalidRemoteComponentException
   {
     try {
 
@@ -540,8 +545,8 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
     } catch (ConstraintViolationException e) {
       Log.d(TAG, "caught exception while updating component ", e);
-      throw new InvalidComponentException("Caught exception while parsing UID from calendar", false,
-                                          CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
+      throw new InvalidRemoteComponentException("Caught exception while parsing UID from calendar",
+                                                CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
     }
   }
 
@@ -610,7 +615,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
   }
 
   private void handleCorrectOrganizersAndAttendees(VEvent vEvent, Account toAccount)
-      throws InvalidComponentException
+      throws InvalidLocalComponentException
   {
     Uid uid = vEvent.getUid();
     if (uid != null)
@@ -638,8 +643,8 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
     } catch (URISyntaxException e) {
       Log.e(TAG, "caught exception while copying collection to account ", e);
-      throw new InvalidComponentException("caught exception while copying collection to account",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
+      throw new InvalidLocalComponentException("caught exception while copying collection to account",
+                                               CalDavConstants.CALDAV_NAMESPACE, getPath(), e);
     }
   }
 
@@ -653,8 +658,8 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
         Optional<Calendar> copyComponent = getComponent(eventId);
         if (!copyComponent.isPresent())
-          throw new InvalidComponentException("absent returned on copy of " + eventId + " from " + localId,
-                                              false, CalDavConstants.CALDAV_NAMESPACE, getPath());
+          throw new InvalidLocalComponentException("absent returned on copy of " + eventId + " from " + localId,
+                                                   CalDavConstants.CALDAV_NAMESPACE, getPath(), eventId);
 
         VEvent vEvent = (VEvent) copyComponent.get().getComponent(VEvent.VEVENT);
         if (vEvent != null) {
@@ -673,14 +678,14 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
             Optional<Long> originalId = getOriginalIdForRecurrenceException(eventId);
             if (!originalId.isPresent()) {
-              throw new InvalidComponentException("could not get original ID for recurrence exception",
-                                                  false, CalDavConstants.CALDAV_NAMESPACE, getPath());
+              throw new InvalidLocalComponentException("could not get original ID for recurrence exception",
+                                                       CalDavConstants.CALDAV_NAMESPACE, getPath(), eventId);
             }
 
             Optional<String> parentUid = toCollection.getUidForCopiedEventLocalId(originalId.get());
             if (!parentUid.isPresent()) {
-              throw new InvalidComponentException("could not get uid for copied event local id",
-                                                  false, CalDavConstants.CALDAV_NAMESPACE, getPath());
+              throw new InvalidLocalComponentException("could not get uid for copied event local id",
+                                                       CalDavConstants.CALDAV_NAMESPACE, getPath(), eventId);
             }
 
             EventFactory.handleReplaceOriginalSyncId(getPath(), parentUid.get(), vEvent);
@@ -690,8 +695,8 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
           }
         }
         else
-          throw new InvalidComponentException("could not parse VEvent from calendar component.",
-                                              false, CalDavConstants.CALDAV_NAMESPACE, getPath());
+          throw new InvalidLocalComponentException("could not parse VEvent from calendar component.",
+                                                   CalDavConstants.CALDAV_NAMESPACE, getPath(), eventId);
 
       } catch (InvalidComponentException e) {
         listener.onEventCopyFailed(e, getAccount(), toAccount, localId);
@@ -747,8 +752,8 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
         Optional<Calendar> copyComponent = getComponent(eventId);
         if (!copyComponent.isPresent())
-          throw new InvalidComponentException("absent returned on copy of " + eventId + " from " + localId,
-                                              false, CalDavConstants.CALDAV_NAMESPACE, getPath());
+          throw new InvalidLocalComponentException("absent returned on copy of " + eventId + " from " + localId,
+                                                   CalDavConstants.CALDAV_NAMESPACE, getPath(), eventId);
 
         VEvent vEvent = (VEvent) copyComponent.get().getComponent(VEvent.VEVENT);
         if (vEvent != null) {
@@ -777,8 +782,8 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
           }
         }
         else
-          throw new InvalidComponentException("could not parse VEvent from calendar component.",
-                                              false, CalDavConstants.CALDAV_NAMESPACE, getPath());
+          throw new InvalidLocalComponentException("could not parse VEvent from calendar component.",
+                                                   CalDavConstants.CALDAV_NAMESPACE, getPath(), eventId);
 
       } catch (InvalidComponentException e) {
         listener.onEventCopyFailed(e, getAccount(), toAccount, localId);

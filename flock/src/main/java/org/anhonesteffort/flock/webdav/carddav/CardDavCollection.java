@@ -27,6 +27,7 @@ import ezvcard.property.ProductId;
 import org.anhonesteffort.flock.webdav.AbstractDavComponentCollection;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
+import org.anhonesteffort.flock.webdav.MultiStatusResult;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.jackrabbit.webdav.DavException;
@@ -120,17 +121,27 @@ public class CardDavCollection extends AbstractDavComponentCollection<VCard> imp
   }
 
   @Override
-  protected List<ComponentETagPair<VCard>> getComponentsFromMultiStatus(MultiStatusResponse[] msResponses) {
-    List<ComponentETagPair<VCard>> vCards = new LinkedList<ComponentETagPair<VCard>>();
+  protected MultiStatusResult<VCard> getComponentsFromMultiStatus(MultiStatusResponse[] msResponses) {
+    List<ComponentETagPair<VCard>>  vCards     = new LinkedList<ComponentETagPair<VCard>>();
+    List<InvalidComponentException> exceptions = new LinkedList<InvalidComponentException>();
 
     for (MultiStatusResponse response : msResponses) {
-      VCard vCard = null;
-      String         eTag  = null;
+      VCard          vCard       = null;
+      String         eTag        = null;
       DavPropertySet propertySet = response.getProperties(DavServletResponse.SC_OK);
 
       if (propertySet.get(CardDavConstants.PROPERTY_NAME_ADDRESS_DATA) != null) {
         String addressData = (String) propertySet.get(CardDavConstants.PROPERTY_NAME_ADDRESS_DATA).getValue();
-               vCard       = Ezvcard.parse(addressData).first();
+        try {
+
+          vCard = Ezvcard.parse(addressData).first();
+
+        } catch (RuntimeException e) {
+          exceptions.add(
+              new InvalidComponentException("caught exception while parsing vcard from multi-status response",
+                                            CardDavConstants.CARDDAV_NAMESPACE, getPath(), e)
+          );
+        }
       }
 
       if (propertySet.get(DavPropertyName.GETETAG) != null)
@@ -140,7 +151,7 @@ public class CardDavCollection extends AbstractDavComponentCollection<VCard> imp
         vCards.add(new ComponentETagPair<VCard>(vCard, Optional.fromNullable(eTag)));
     }
 
-    return vCards;
+    return new MultiStatusResult<VCard>(vCards, exceptions);
   }
 
   @Override
@@ -148,7 +159,7 @@ public class CardDavCollection extends AbstractDavComponentCollection<VCard> imp
       throws IOException, DavException, InvalidComponentException
   {
     if (vCard.getUid() == null || vCard.getUid().getValue() == null)
-      throw new InvalidComponentException("Cannot put a VCard to server without UID!", false,
+      throw new InvalidComponentException("Cannot put a VCard to server without UID!",
                                           CardDavConstants.CARDDAV_NAMESPACE, getPath());
 
     vCard.getProperties().add(new ProductId(((CardDavStore)getStore()).getProductId()));
@@ -167,7 +178,6 @@ public class CardDavCollection extends AbstractDavComponentCollection<VCard> imp
     putMethod.setRequestEntity(new ByteArrayRequestEntity(byteStream.toByteArray(),
                                                           CardDavConstants.HEADER_CONTENT_TYPE_VCARD));
 
-
     byteStream = new ByteArrayOutputStream();
     Ezvcard.write(vCard).go(byteStream);
 
@@ -179,8 +189,8 @@ public class CardDavCollection extends AbstractDavComponentCollection<VCard> imp
       if (status == DavServletResponse.SC_REQUEST_ENTITY_TOO_LARGE ||
           status == DavServletResponse.SC_FORBIDDEN)
       {
-        throw new InvalidComponentException("Put method returned bad status " + status, false,
-                                            CardDavConstants.CARDDAV_NAMESPACE, getPath());
+        throw new InvalidComponentException("Put method returned bad status " + status,
+                                            CardDavConstants.CARDDAV_NAMESPACE, getPath(), vCardUid);
       }
 
       if (putMethod.getStatusCode() < DavServletResponse.SC_OK ||

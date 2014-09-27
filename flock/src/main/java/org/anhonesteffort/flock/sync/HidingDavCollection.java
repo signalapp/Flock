@@ -22,7 +22,6 @@ package org.anhonesteffort.flock.sync;
 import com.google.common.base.Optional;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -55,18 +54,20 @@ public interface HidingDavCollection<T> {
   public HashMap<String, String> getComponentETags() throws DavException, IOException;
 
   public Optional<ComponentETagPair<T>> getHiddenComponent(String uid)
-      throws InvalidComponentException, DavException,
+      throws InvalidRemoteComponentException, DavException,
       InvalidMacException, GeneralSecurityException, IOException;
 
-  public List<ComponentETagPair<T>> getHiddenComponents()
-      throws InvalidComponentException, DavException,
-      InvalidMacException, GeneralSecurityException, IOException;
+  public DecryptedMultiStatusResult<T> getHiddenComponents(List<String> uids)
+      throws DavException, GeneralSecurityException, IOException;
+
+  public DecryptedMultiStatusResult<T> getHiddenComponents()
+      throws DavException, GeneralSecurityException, IOException;
 
   public void addHiddenComponent(T component)
-      throws InvalidComponentException, DavException, GeneralSecurityException, IOException;
+      throws InvalidLocalComponentException, DavException, GeneralSecurityException, IOException;
 
   public void updateHiddenComponent(ComponentETagPair<T> component)
-      throws InvalidComponentException, DavException, GeneralSecurityException, IOException;
+      throws InvalidLocalComponentException, DavException, GeneralSecurityException, IOException;
 
   public void removeComponent(String path) throws DavException, IOException;
 

@@ -17,8 +17,8 @@ import net.fortuna.ical4j.model.property.Version;
 
 import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.webdav.AbstractDavComponentCollection;
-import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
+import org.anhonesteffort.flock.webdav.MultiStatusResult;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.anhonesteffort.flock.webdav.caldav.CalDavCollection;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
@@ -34,7 +34,6 @@ import org.apache.jackrabbit.webdav.security.report.PrincipalMatchReport;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * rhodey
@@ -222,9 +221,7 @@ public class DavKeyCollection extends AbstractDavComponentCollection<Calendar> {
   }
 
   @Override
-  protected List<ComponentETagPair<Calendar>> getComponentsFromMultiStatus(MultiStatusResponse[] msResponses)
-      throws InvalidComponentException
-  {
+  protected MultiStatusResult<Calendar> getComponentsFromMultiStatus(MultiStatusResponse[] msResponses) {
     return null;
   }
 

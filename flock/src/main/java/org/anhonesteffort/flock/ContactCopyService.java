@@ -39,7 +39,6 @@ import android.util.Pair;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.ContactCopiedListener;
 import org.anhonesteffort.flock.sync.addressbook.LocalContactCollection;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -199,9 +198,6 @@ public class ContactCopyService extends Service implements ContactCopiedListener
 
         fromCollection.copyToAccount(copyPair.second, this);
 
-      } catch (InvalidComponentException e) {
-        ErrorToaster.handleShowError(getBaseContext(), e);
-        return;
       } catch (RemoteException e) {
         ErrorToaster.handleShowError(getBaseContext(), e);
         return;

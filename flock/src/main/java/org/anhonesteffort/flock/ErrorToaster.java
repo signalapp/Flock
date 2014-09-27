@@ -33,6 +33,7 @@ import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.registration.AuthorizationException;
 import org.anhonesteffort.flock.registration.RegistrationApiClientException;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
+import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
 import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
@@ -119,7 +120,7 @@ public class ErrorToaster {
 
     else if (e instanceof InvalidComponentException) {
       InvalidComponentException ex = (InvalidComponentException) e;
-      if (ex.isServersFault())
+      if (ex instanceof InvalidRemoteComponentException)
         bundle.putInt(KEY_STATUS_CODE, CODE_DAV_SERVER_ERROR);
       else
         bundle.putInt(KEY_STATUS_CODE, CODE_DAV_CLIENT_ERROR);

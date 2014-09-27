@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.google.common.base.Optional;
 
@@ -33,11 +32,11 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ConstraintViolationException;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.Calendars;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.xml.Namespace;
@@ -76,14 +75,17 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
   }
 
   @Override
-  protected boolean componentHasUid(Calendar component) {
+  protected Optional<String> getComponentUid(Calendar component) {
     try {
 
-      Calendars.getUid(component).getValue();
-      return true;
+      Uid uid = Calendars.getUid(component);
+      if (uid != null)
+        return Optional.of(uid.getValue());
+
+      return Optional.absent();
 
     } catch (ConstraintViolationException e) {
-      return false;
+      return Optional.absent();
     }
   }
 
@@ -101,7 +103,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
   @Override
   protected void pushLocallyCreatedProperties(SyncResult result) {
     super.pushLocallyCreatedProperties(result);
-    Log.d(TAG, "pushLocallyCreatedProperties()");
+    handleLogMessage("pushLocallyCreatedProperties()");
 
     try {
 
@@ -110,7 +112,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         Optional<Integer> remoteColor = getRemoteHidingCollection().getHiddenColor();
 
         if (!remoteColor.isPresent()) {
-          Log.d(TAG, "remote hidden color not present, setting using local");
+          handleLogMessage("remote hidden color not present, setting using local");
           getRemoteHidingCollection().setHiddenColor(localColor.get());
           result.stats.numInserts++;
         }
@@ -137,7 +139,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         Optional<Calendar> remoteTimeZone = getRemoteHidingCollection().getTimeZone();
 
         if (!remoteTimeZone.isPresent()) {
-          Log.d(TAG, "remote time zone not present, setting using local");
+          handleLogMessage("remote time zone not present, setting using local");
           getRemoteHidingCollection().setTimeZone(localTimeZone.get());
           result.stats.numInserts++;
         }
@@ -157,7 +159,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
   @Override
   protected void pushLocallyChangedProperties(SyncResult result) {
     super.pushLocallyChangedProperties(result);
-    Log.d(TAG, "pushLocallyChangedProperties()");
+    handleLogMessage("pushLocallyChangedProperties()");
 
     if (localCTag.isPresent() && remoteCTag.isPresent() && localCTag.get().equals(remoteCTag.get())) {
       try {
@@ -166,7 +168,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         if (localColor.isPresent()) {
           Optional<Integer> remoteColor = getRemoteHidingCollection().getHiddenColor();
           if (remoteColor.isPresent() && !localColor.get().equals(remoteColor.get())) {
-            Log.d(TAG, "remote hidden color present, updating using local");
+            handleLogMessage("remote hidden color present, updating using local");
             getRemoteHidingCollection().setHiddenColor(localColor.get());
             result.stats.numUpdates++;
           }
@@ -192,7 +194,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         if (localTimeZone.isPresent()) {
           Optional<Calendar> remoteTimeZone = getRemoteHidingCollection().getTimeZone();
           if (remoteTimeZone.isPresent() && !localTimeZone.get().equals(remoteTimeZone.get())) {
-            Log.d(TAG, "remote time zone present, updating using local");
+            handleLogMessage("remote time zone present, updating using local");
             getRemoteHidingCollection().setTimeZone(localTimeZone.get());
             result.stats.numUpdates++;
           }
@@ -213,7 +215,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
   @Override
   protected void pullRemotelyCreatedProperties(SyncResult result) {
     super.pullRemotelyCreatedProperties(result);
-    Log.d(TAG, "pullRemotelyCreatedProperties()");
+    handleLogMessage("pullRemotelyCreatedProperties()");
 
     try {
 
@@ -222,7 +224,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         Optional<Integer> localColor = getLocalCollection().getColor();
 
         if (!localColor.isPresent()) {
-          Log.d(TAG, "local color not present, setting using remote");
+          handleLogMessage("local color not present, setting using remote");
           getLocalCollection().setColor(remoteColor.get());
           localCollection.commitPendingOperations();
           result.stats.numInserts++;
@@ -250,7 +252,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         Optional<Calendar> localTimeZone = getLocalCollection().getTimeZone();
 
         if (!localTimeZone.isPresent()) {
-          Log.d(TAG, "local time zone not present, setting using remote");
+          handleLogMessage("local time zone not present, setting using remote");
           getLocalCollection().setTimeZone(remoteTimeZone.get());
           localCollection.commitPendingOperations();
           result.stats.numInserts++;
@@ -263,15 +265,13 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
       AbstractDavSyncAdapter.handleException(context, e, result);
     } catch (PropertyParseException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
-    } catch (InvalidComponentException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
     }
   }
 
   @Override
   protected void pullRemotelyChangedProperties(SyncResult result) {
     super.pullRemotelyChangedProperties(result);
-    Log.d(TAG, "pullRemotelyChangedProperties()");
+    handleLogMessage("pullRemotelyChangedProperties()");
 
     if (localCTag.isPresent() && remoteCTag.isPresent() && !localCTag.get().equals(remoteCTag.get())) {
       try {
@@ -280,7 +280,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         if (remoteColor.isPresent()) {
           Optional<Integer> localColor = getLocalCollection().getColor();
           if (localColor.isPresent() && !localColor.get().equals(remoteColor.get())) {
-            Log.d(TAG, "local color present, updating using remote");
+            handleLogMessage("local color present, updating using remote");
             getLocalCollection().setColor(remoteColor.get());
             localCollection.commitPendingOperations();
             result.stats.numUpdates++;
@@ -307,7 +307,7 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         if (remoteTimeZone.isPresent()) {
           Optional<Calendar> localTimeZone = getLocalCollection().getTimeZone();
           if (localTimeZone.isPresent() && !localTimeZone.get().equals(remoteTimeZone.get())) {
-            Log.d(TAG, "local time zone present, updating using remote");
+            handleLogMessage("local time zone present, updating using remote");
             getLocalCollection().setTimeZone(remoteTimeZone.get());
             localCollection.commitPendingOperations();
             result.stats.numUpdates++;
@@ -319,8 +319,6 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
       } catch (OperationApplicationException e) {
         AbstractDavSyncAdapter.handleException(context, e, result);
       } catch (PropertyParseException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
-      } catch (InvalidComponentException e) {
         AbstractDavSyncAdapter.handleException(context, e, result);
       }
     }

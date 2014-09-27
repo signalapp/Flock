@@ -45,13 +45,15 @@ public interface LocalComponentCollection<T> {
 
   public HashMap<String, String> getComponentETags() throws RemoteException;
 
-  public Optional<ComponentETagPair<T>> getComponent(String uid) throws RemoteException, InvalidComponentException;
+  public Optional<ComponentETagPair<T>> getComponent(String uid) throws RemoteException, InvalidLocalComponentException;
 
-  public List<ComponentETagPair<T>> getComponents() throws RemoteException, InvalidComponentException;
+  public Optional<T> getComponent(Long localId) throws RemoteException, InvalidLocalComponentException;
 
-  public void addComponent(ComponentETagPair<T> component) throws RemoteException, InvalidComponentException;
+  public List<ComponentETagPair<T>> getComponents() throws RemoteException, InvalidLocalComponentException;
 
-  public void updateComponent(ComponentETagPair<T> component) throws RemoteException, InvalidComponentException;
+  public void addComponent(ComponentETagPair<T> component) throws RemoteException, InvalidRemoteComponentException;
+
+  public void updateComponent(ComponentETagPair<T> component) throws RemoteException, InvalidRemoteComponentException;
 
   public void removeComponent(String path) throws RemoteException;
 

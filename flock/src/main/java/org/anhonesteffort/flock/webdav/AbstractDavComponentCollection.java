@@ -135,7 +135,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
     baseProperties.add(WebDavConstants.PROPERTY_NAME_QUOTA_AVAILABLE_BYTES);
     baseProperties.add(WebDavConstants.PROPERTY_NAME_QUOTA_USED_BYTES);
     baseProperties.add(WebDavConstants.PROPERTY_NAME_RESOURCE_ID);
-    baseProperties.add(WebDavConstants.PROPERTY_NAME_SUPPORTED_REPORT_SET); // TODO getter method for this.
+    baseProperties.add(WebDavConstants.PROPERTY_NAME_SUPPORTED_REPORT_SET);
     baseProperties.add(WebDavConstants.PROPERTY_NAME_SYNC_TOKEN);
 
     baseProperties.add(CalDavConstants.PROPERTY_NAME_CTAG);
@@ -286,7 +286,8 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
         DavPropertySet foundProperties = responses[0].getProperties(DavServletResponse.SC_OK);
         if (foundProperties != null)
           properties = foundProperties;
-      } else
+      }
+      else
         throw new DavException(propFindMethod.getStatusCode(), propFindMethod.getStatusText());
 
     } finally {
@@ -295,27 +296,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
   }
 
   public void fetchProperties() throws DavException, IOException {
-    DavPropertyNameSet fetchProps     = getPropertyNamesForFetch();
-    PropFindMethod     propFindMethod = new PropFindMethod(getPath(), fetchProps, PropFindMethod.DEPTH_0);
-
-    try {
-
-      client.execute(propFindMethod);
-
-      if (propFindMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS) {
-        MultiStatus           multiStatus = propFindMethod.getResponseBodyAsMultiStatus();
-        MultiStatusResponse[] responses   = multiStatus.getResponses();
-
-        DavPropertySet foundProperties = responses[0].getProperties(DavServletResponse.SC_OK);
-        if (foundProperties != null)
-          properties = foundProperties;
-      }
-      else
-        throw new DavException(propFindMethod.getStatusCode(), propFindMethod.getStatusText());
-
-    } finally {
-      propFindMethod.releaseConnection();
-    }
+    fetchProperties(getPropertyNamesForFetch());
   }
 
   @Override
@@ -378,45 +359,35 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
     return componentETagPairs;
   }
 
-  protected abstract List<ComponentETagPair<T>> getComponentsFromMultiStatus(MultiStatusResponse[] msResponses)
-      throws InvalidComponentException;
+  protected abstract MultiStatusResult<T> getComponentsFromMultiStatus(MultiStatusResponse[] msResponses);
 
   @Override
-  public Optional<ComponentETagPair<T>> getComponent(String uid)
-      throws InvalidComponentException, DavException, IOException
+  public MultiStatusResult<T> getComponents(List<String> uids)
+      throws DavException, IOException
   {
     ReportInfo reportInfo = new ReportInfo(getMultiGetReportType(), 1, getPropertyNamesForReports());
 
     try {
 
-      Document document      = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-      Element  componentHREF = DomUtil.createElement(document, DavConstants.XML_HREF, DavConstants.NAMESPACE);
-      componentHREF.setTextContent(getComponentPathFromUid(uid));
-      reportInfo.setContentElement(componentHREF);
+      if (uids.size() > 0) {
+        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        for (String uid : uids) {
+          Element componentHREF = DomUtil.createElement(document, DavConstants.XML_HREF, DavConstants.NAMESPACE);
+          componentHREF.setTextContent(getComponentPathFromUid(uid));
+          reportInfo.setContentElement(componentHREF);
+        }
+      }
 
       ReportMethod reportMethod = new ReportMethod(getPath(), reportInfo);
 
       try {
 
         client.execute(reportMethod);
-        if (reportMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS) {
-          try {
 
-            List<ComponentETagPair<T>> components =
-                getComponentsFromMultiStatus(reportMethod.getResponseBodyAsMultiStatus().getResponses());
-
-            if (components.size() == 0)
-              return Optional.absent();
-            return Optional.of(components.get(0));
-
-          } catch (InvalidComponentException e) {
-            if (e.getCause() == null)
-              throw new InvalidComponentException(e.getMessage(), e.isServersFault(), e.getNamespace(), e.getPath(), uid);
-
-            throw new InvalidComponentException(e.getMessage(), e.isServersFault(), e.getNamespace(), e.getPath(), uid, e.getCause());
-          }
-        } else if (reportMethod.getStatusCode() == DavServletResponse.SC_NOT_FOUND)
-          return Optional.absent();
+        if (reportMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS)
+          return getComponentsFromMultiStatus(reportMethod.getResponseBodyAsMultiStatus().getResponses());
+        else if (reportMethod.getStatusCode() == DavServletResponse.SC_NOT_FOUND)
+          return new MultiStatusResult<T>(new LinkedList<ComponentETagPair<T>>(), new LinkedList<InvalidComponentException>());
         else
           throw new DavException(reportMethod.getStatusCode(), reportMethod.getStatusText());
 
@@ -430,24 +401,28 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
   }
 
   @Override
-  public List<ComponentETagPair<T>> getComponents()
+  public Optional<ComponentETagPair<T>> getComponent(String uid)
       throws InvalidComponentException, DavException, IOException
   {
-    ReportInfo   reportInfo   = new ReportInfo(getQueryReportType(), 1, getPropertyNamesForReports());
-    ReportMethod reportMethod = new ReportMethod(getPath(), reportInfo);
+    List<String> uids = new LinkedList<String>();
+    uids.add(uid);
 
-    try {
+    MultiStatusResult<T> multiStatusResult = getComponents(uids);
 
-      client.execute(reportMethod);
+    if (multiStatusResult.getInvalidComponentExceptions().size() > 0)
+      throw multiStatusResult.getInvalidComponentExceptions().get(0);
 
-      if (reportMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS)
-        return getComponentsFromMultiStatus(reportMethod.getResponseBodyAsMultiStatus().getResponses());
+    if (multiStatusResult.getComponentETagPairs().isEmpty())
+      return Optional.absent();
 
-      throw new DavException(reportMethod.getStatusCode(), reportMethod.getStatusText());
+    return Optional.of(multiStatusResult.getComponentETagPairs().get(0));
+  }
 
-    } finally {
-      reportMethod.releaseConnection();
-    }
+  @Override
+  public MultiStatusResult<T> getComponents()
+      throws DavException, IOException
+  {
+    return getComponents(new LinkedList<String>());
   }
 
   protected abstract void putComponentToServer(T calendar, Optional<String> ifMatchETag)
@@ -458,7 +433,6 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
       throws InvalidComponentException, DavException, IOException
   {
     putComponentToServer(component, Optional.<String>absent());
-    fetchProperties();
   }
 
   @Override
@@ -466,7 +440,6 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
       throws InvalidComponentException, DavException, IOException
   {
     putComponentToServer(component.getComponent(), component.getETag());
-    fetchProperties();
   }
 
   @Override

@@ -31,7 +31,6 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.google.common.base.Optional;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -201,6 +200,29 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
     return result;
   }
 
+  public Optional<String> getETagForUid(String uid) throws RemoteException {
+    final String[] PROJECTION     = new String[]{getColumnNameComponentETag()};
+    final String   SELECTION      = getColumnNameComponentUid() + "=? AND " +
+                                    getColumnNameCollectionLocalId() + "=" + localId;
+    final String[] SELECTION_ARGS = new String[]{uid};
+
+    Cursor cursor = client.query(getUriForComponents(),
+                                 PROJECTION,
+                                 SELECTION,
+                                 SELECTION_ARGS,
+                                 null);
+
+    if (cursor == null)
+      throw new RemoteException("Content provider client gave us a null cursor!");
+
+    Optional<String> result = Optional.absent();
+    if (cursor.moveToNext())
+      result = Optional.fromNullable(cursor.getString(0));
+
+    cursor.close();
+    return result;
+  }
+
   public Optional<String> getUidForLocalId(Long localId) throws RemoteException {
     final String[] PROJECTION     = new String[]{getColumnNameComponentUid()};
     final String   SELECTION      = getColumnNameComponentLocalId()  + "=" + localId + " AND " +
@@ -240,8 +262,6 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
     commitPendingOperations();
     return rand;
   }
-
-  public abstract Optional<T> getComponent(Long localId) throws RemoteException, InvalidComponentException;
 
   public void removeComponent(Long localId) {
     Log.d(TAG, "removeComponent() localId " + localId);
@@ -337,10 +357,9 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
   }
 
   public void commitPendingOperations() throws OperationApplicationException, RemoteException {
-    Log.d(TAG, "commitPendingOperations()");
-
     if (!pendingOperations.isEmpty())
       client.applyBatch(pendingOperations);
+
     pendingOperations.clear();
   }
 

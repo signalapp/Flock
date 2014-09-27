@@ -68,16 +68,10 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
     this.remoteCollection = remoteCollection;
   }
 
-  protected void handleMakeFlockCollection()
-      throws PropertyParseException, DavException,
-             RemoteException, GeneralSecurityException, IOException
-  {
-    if (!remoteCollection.isFlockCollection()) {
-      if (!localCollection.getDisplayName().isPresent())
-        remoteCollection.makeFlockCollection(" ");
-      else
-        remoteCollection.makeFlockCollection(localCollection.getDisplayName().get());
-    }
+  protected abstract Namespace getNamespace();
+
+  protected void handleLogMessage(String message) {
+    Log.d(TAG, localCollection.getPath() + " - " + message);
   }
 
   @Override
@@ -87,20 +81,20 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
 
     try {
 
-      handleMakeFlockCollection();
+      SyncWorkerUtil.handleMakeFlockCollection(localCollection, remoteCollection);
 
       localCTag  = localCollection.getCTag();
       remoteCTag = remoteCollection.getCTag();
 
       if (localCTag.isPresent())
-        Log.d(TAG, "local ctag pre push local: " + localCTag.get());
+        handleLogMessage("local ctag pre push local: " + localCTag.get());
       else
-        Log.d(TAG, "local ctag not present pre push local");
+        handleLogMessage("local ctag not present pre push local");
 
       if (remoteCTag.isPresent())
-        Log.d(TAG, "remote ctag pre push local: " + remoteCTag.get());
+        handleLogMessage("remote ctag pre push local: " + remoteCTag.get());
       else
-        Log.d(TAG, "remote ctag not present pre push local");
+        handleLogMessage("remote ctag not present pre push local");
 
       pushLocallyCreatedProperties(result);
       pushLocallyChangedProperties(result);
@@ -128,25 +122,22 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
       purgeRemotelyDeletedComponents(result);
 
       if (remoteCTag.isPresent()) {
-        Log.d(TAG, "remote ctag post pull remote: " + remoteCTag.get());
+        handleLogMessage("remote ctag post pull remote: " + remoteCTag.get());
 
         if (result.stats.numAuthExceptions  > 0 ||
             result.stats.numSkippedEntries  > 0 ||
             result.stats.numParseExceptions > 0 ||
             result.stats.numIoExceptions    > 0)
         {
-          Log.w(TAG, "sync result has errors, will not save remote CTag to local collection");
+          handleLogMessage("sync result has errors, will not save remote CTag to local collection");
           return;
         }
 
         localCollection.setCTag(remoteCTag.get());
         localCollection.commitPendingOperations();
-
-        if (localCollection.getCTag().isPresent())
-          Log.d(TAG, "local ctag post pull remote: "  + localCollection.getCTag().get());
       }
       else
-        throw new PropertyParseException("Remote collection is missing CTag, things could get funny.",
+        throw new PropertyParseException("Remote collection is missing CTag, things could get funny",
                                          remoteCollection.getPath(), CalDavConstants.PROPERTY_NAME_CTAG);
 
     } catch (PropertyParseException e) {
@@ -164,12 +155,10 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
     }
   }
 
-  protected abstract Namespace getNamespace();
-
-  protected abstract boolean componentHasUid(T component);
+  protected abstract Optional<String> getComponentUid(T component);
 
   protected void pushLocallyCreatedProperties(SyncResult result) {
-    Log.d(TAG, "pushLocallyCreatedProperties()");
+    handleLogMessage("pushLocallyCreatedProperties()");
 
     try {
 
@@ -178,7 +167,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
 
         Optional<String> remoteDisplayName = remoteCollection.getHiddenDisplayName();
         if (!remoteDisplayName.isPresent()) {
-          Log.d(TAG, "remote display name not present, setting using local");
+          handleLogMessage("remote display name not present, setting using local");
           remoteCollection.setHiddenDisplayName(localDisplayName.get());
           result.stats.numInserts++;
         }
@@ -200,7 +189,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
   }
 
   protected void pushLocallyChangedProperties(SyncResult result) {
-    Log.d(TAG, "pushLocallyChangedProperties()");
+    handleLogMessage("pushLocallyChangedProperties()");
 
     try {
 
@@ -210,7 +199,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
 
           Optional<String> remoteDisplayName = remoteCollection.getHiddenDisplayName();
           if (remoteDisplayName.isPresent() && !localDisplayName.get().equals(remoteDisplayName.get())) {
-            Log.d(TAG, "remote display name present, updating using local");
+            handleLogMessage("remote display name present, updating using local");
             remoteCollection.setHiddenDisplayName(localDisplayName.get());
             result.stats.numUpdates++;
           }
@@ -233,18 +222,17 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
   }
 
   protected void pushLocallyDeletedComponents(SyncResult result) {
-    Log.d(TAG, "pushLocallyDeletedComponents()");
+    handleLogMessage("pushLocallyDeletedComponents()");
 
    try {
 
      List<Pair<Long, String>> deletedIds = localCollection.getDeletedComponentIds();
-     Log.d(TAG, "found + " + deletedIds.size() + " locally deleted components");
+     handleLogMessage("found " + deletedIds.size() + " locally deleted components");
 
      for (Pair<Long, String> componentId : deletedIds) {
-       Log.d(TAG, "removing remote component: (" + componentId.first + ", " + componentId.second + ")");
-
        try {
 
+         handleLogMessage("removing remote component: (" + componentId.first + ", " + componentId.second + ")");
          remoteCollection.removeComponent(componentId.second);
          localCollection.removeComponent(componentId.first);
          localCollection.commitPendingOperations();
@@ -261,46 +249,21 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
        }
      }
 
-     if (deletedIds.size() > 0) {
-       try {
-
-         remoteCollection.fetchProperties();
-
-       }  catch (DavException e) {
-         AbstractDavSyncAdapter.handleException(context, e, result);
-       } catch (IOException e) {
-         AbstractDavSyncAdapter.handleException(context, e, result);
-       }
-     }
+     if (deletedIds.size() > 0)
+       SyncWorkerUtil.handleRefreshCollectionProperties(context, result, remoteCollection);
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
-    }
-
-  }
-
-  protected void handleServerRejectedLocalComponent(SyncResult result, Long localId) {
-    Log.e(TAG, "handleServerRejectedLocalComponent() >> " + localId);
-
-    try {
-
-      localCollection.removeComponent(localId);
-      localCollection.commitPendingOperations();
-
-    } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
-    } catch (OperationApplicationException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
     }
   }
 
   protected void pushLocallyChangedComponents(SyncResult result) {
-    Log.d(TAG, "pushLocallyChangedComponents()");
+    handleLogMessage("pushLocallyChangedComponents()");
 
     try {
 
       List<Pair<Long, String>> updatedIds = localCollection.getUpdatedComponentIds();
-      Log.d(TAG, "found + " + updatedIds.size() + " locally updated components");
+      handleLogMessage("found " + updatedIds.size() + " locally updated components");
 
       for (Pair<Long, String> componentId : updatedIds) {
         try {
@@ -308,20 +271,19 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
           Optional<ComponentETagPair<T>> component = localCollection.getComponent(componentId.second);
 
           if (component.isPresent()) {
-            Log.d(TAG, "updating remote component: (" + componentId.first + ", " + componentId.second + ")");
-
+            handleLogMessage("updating remote component: (" + componentId.first + ", " + componentId.second + ")");
             remoteCollection.updateHiddenComponent(component.get());
             localCollection.cleanComponent(componentId.first);
             localCollection.commitPendingOperations();
             result.stats.numUpdates++;
           }
           else
-            Log.e(TAG, "could not get component with id " + componentId.second + " from local collection");
+            handleLogMessage("could not get component with id " + componentId.second + " from local collection");
 
         } catch (InvalidComponentException e) {
 
           AbstractDavSyncAdapter.handleException(context, e, result);
-          handleServerRejectedLocalComponent(result, componentId.first);
+          SyncWorkerUtil.handleServerRejectedLocalComponent(localCollection, componentId.first, context, result);
 
         } catch (GeneralSecurityException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
@@ -336,34 +298,10 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
         }
       }
 
-      if (updatedIds.size() > 0) {
-        try {
-
-          remoteCollection.fetchProperties();
-
-        }  catch (DavException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (IOException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        }
-      }
+      if (updatedIds.size() > 0)
+        SyncWorkerUtil.handleRefreshCollectionProperties(context, result, remoteCollection);
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
-    }
-  }
-
-  protected void handleServerErrorOnPushNewLocalComponent(SyncResult result, Long localId) {
-    Log.e(TAG, "handleServerErrorOnPushNewLocalComponent() >> " + localId);
-
-    try {
-
-      localCollection.setUidToNull(localId);
-      localCollection.commitPendingOperations();
-
-    } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
-    } catch (OperationApplicationException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
     }
   }
@@ -371,23 +309,21 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
   protected abstract void prePushLocallyCreatedComponent(T component);
 
   protected void pushLocallyCreatedComponents(SyncResult result) {
-    Log.d(TAG, "pushLocallyCreatedComponents()");
+    handleLogMessage("pushLocallyCreatedComponents()");
 
     try {
 
       List<Long> newIds = localCollection.getNewComponentIds();
-      Log.d(TAG, "found + " + newIds.size() + " locally created components");
+      handleLogMessage("found " + newIds.size() + " locally created components");
 
       for (Long componentId : newIds) {
         try {
 
-          Log.d(TAG, "new local component id >> " + componentId);
           String      uid       = localCollection.populateComponentUid(componentId);
           Optional<T> component = localCollection.getComponent(componentId);
 
           if (component.isPresent()) {
-            Log.d(TAG, "creating remote component " + componentId + " with uid " + uid);
-
+            handleLogMessage("creating remote component: (" + componentId + ", " + uid + ")");
             prePushLocallyCreatedComponent(component.get());
             remoteCollection.addHiddenComponent(component.get());
             localCollection.cleanComponent(componentId);
@@ -395,23 +331,22 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
             result.stats.numInserts++;
           }
           else
-            Log.e(TAG, "could not get component with id " + componentId +
-                        " from local collection");
+            handleLogMessage("could not get component (" + componentId + ", " + uid + ") from local collection");
 
         } catch (InvalidComponentException e) {
 
           AbstractDavSyncAdapter.handleException(context, e, result);
-          handleServerRejectedLocalComponent(result, componentId);
+          SyncWorkerUtil.handleServerRejectedLocalComponent(localCollection, componentId, context, result);
 
         } catch (DavException e) {
 
           AbstractDavSyncAdapter.handleException(context, e, result);
-          handleServerErrorOnPushNewLocalComponent(result, componentId);
+          SyncWorkerUtil.handleServerErrorOnPushNewLocalComponent(localCollection, componentId, context, result);
 
         } catch (IOException e) {
 
           AbstractDavSyncAdapter.handleException(context, e, result);
-          handleServerErrorOnPushNewLocalComponent(result, componentId);
+          SyncWorkerUtil.handleServerErrorOnPushNewLocalComponent(localCollection, componentId, context, result);
 
         } catch (GeneralSecurityException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
@@ -422,17 +357,8 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
         }
       }
 
-      if (newIds.size() > 0) {
-        try {
-
-          remoteCollection.fetchProperties();
-
-        }  catch (DavException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (IOException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        }
-      }
+      if (newIds.size() > 0)
+        SyncWorkerUtil.handleRefreshCollectionProperties(context, result, remoteCollection);
 
     } catch (RemoteException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
@@ -440,7 +366,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
   }
 
   protected void pullRemotelyCreatedProperties(SyncResult result) {
-    Log.d(TAG, "pullRemotelyCreatedProperties()");
+    handleLogMessage("pullRemotelyCreatedProperties()");
 
     try {
 
@@ -449,7 +375,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
         Optional<String> localDisplayName = localCollection.getDisplayName();
 
         if (!localDisplayName.isPresent()) {
-          Log.d(TAG, "local display name not present, setting using remote");
+          handleLogMessage("local display name not present, setting using remote");
           localCollection.setDisplayName(remoteDisplayName.get());
           localCollection.commitPendingOperations();
           result.stats.numInserts++;
@@ -472,7 +398,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
   }
 
   protected void pullRemotelyChangedProperties(SyncResult result) {
-    Log.d(TAG, "pullRemotelyChangedProperties()");
+    handleLogMessage("pullRemotelyChangedProperties()");
 
     try {
 
@@ -482,7 +408,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
 
           Optional<String> localDisplayName = localCollection.getDisplayName();
           if (localDisplayName.isPresent() && !localDisplayName.get().equals(remoteDisplayName.get())) {
-            Log.d(TAG, "local display name present, updating using remote");
+            handleLogMessage("local display name present, updating using remote");
             localCollection.setDisplayName(remoteDisplayName.get());
             localCollection.commitPendingOperations();
             result.stats.numUpdates++;
@@ -505,74 +431,81 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
     }
   }
 
-  // NOTICE: it would be *almost* safe to pull remote ETags only once for all the following methods...
   protected void pullRemotelyCreatedComponents(SyncResult result) {
-    Log.d(TAG, "pullRemotelyCreatedComponents()");
+    handleLogMessage("pullRemotelyCreatedComponents()");
     List<ComponentETagPair<T>> retryList = new LinkedList<ComponentETagPair<T>>();
 
     try {
 
-      HashMap<String, String> remoteETagMap = remoteCollection.getComponentETags();
-      Log.d(TAG, "found " + remoteETagMap.size() + " remote components");
+      HashMap<String, String> remoteETagMap      = remoteCollection.getComponentETags();
+      List<String>            uidsMissingLocally = SyncWorkerUtil.handleFilterUidsMissingLocally(localCollection, remoteETagMap.keySet());
+      List<List<String>>      reportLists        = SyncWorkerUtil.handlePartitionUidsForReports(uidsMissingLocally);
 
-      for (java.util.Map.Entry<String, String> remoteETagEntry : remoteETagMap.entrySet()) {
+      handleLogMessage("found " + remoteETagMap.size() + " remote components, " + uidsMissingLocally.size() +
+                      " are missing locally, will require " + reportLists.size() + " multi-get report(s)");
+
+      for (List<String> uidsForReport : reportLists) {
         try {
 
-          Optional<ComponentETagPair<T>> localComponent = localCollection.getComponent(remoteETagEntry.getKey());
-          if (!localComponent.isPresent()) {
+          DecryptedMultiStatusResult<T> remoteComponents = remoteCollection.getHiddenComponents(uidsForReport);
+          SyncWorkerUtil.handleDoStuffWithMultiStatusResult(uidsForReport, remoteComponents, context, result);
 
-            Log.d(TAG, "remote component " + remoteETagEntry.getKey() + " not present locally");
-            Optional<ComponentETagPair<T>> remoteComponent = remoteCollection.getHiddenComponent(remoteETagEntry.getKey());
-            if (remoteComponent.isPresent()) {
+          for (ComponentETagPair<T> remoteComponent : remoteComponents.getComponentETagPairs()) {
+            try {
 
-              if (componentHasUid(remoteComponent.get().getComponent())) {
+              Optional<String> componentUid = getComponentUid(remoteComponent.getComponent());
+              if (componentUid.isPresent()) {
                 try {
 
-                  Log.d(TAG, "creating local component " + remoteETagEntry.getKey() + " using remote");
-                  localCollection.addComponent(remoteComponent.get());
+                  handleLogMessage("creating local component " + componentUid.get() + " using remote");
+                  localCollection.addComponent(remoteComponent);
                   localCollection.commitPendingOperations();
                   result.stats.numInserts++;
 
                 } catch (InvalidComponentException e) {
-                  Log.w(TAG, "caught invalid component exception. could be a recurrence exception " +
-                             "who's parent has yet to get pulled down.");
-                  retryList.add(remoteComponent.get());
+                  handleLogMessage("caught invalid component exception, could be a recurrence exception " +
+                                   "who's parent has yet to get pulled down, will retry.");
+                  retryList.add(remoteComponent);
                 }
 
               }
               else
-                throw new InvalidComponentException("remote component is missing UID", true, getNamespace(),
-                                                    remoteCollection.getPath(), remoteETagEntry.getKey());
+                throw new InvalidRemoteComponentException("remote component is missing UID",
+                                                          getNamespace(), remoteCollection.getPath());
+
+            } catch (InvalidRemoteComponentException e) {
+              AbstractDavSyncAdapter.handleException(context, e, result);
+            } catch (RemoteException e) {
+              AbstractDavSyncAdapter.handleException(context, e, result);
+            } catch (OperationApplicationException e) {
+              AbstractDavSyncAdapter.handleException(context, e, result);
             }
-            else
-              Log.e(TAG, "remote component " + remoteETagEntry.getKey() + " from etag set not present remotely");
           }
 
-        } catch (InvalidComponentException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (InvalidMacException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
         } catch (GeneralSecurityException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
         } catch (DavException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
         } catch (IOException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (RemoteException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (OperationApplicationException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
         }
       }
 
       for (ComponentETagPair<T> retryComponent : retryList) {
+        Optional<String> componentUid = getComponentUid(retryComponent.getComponent());
         try {
 
-          localCollection.addComponent(retryComponent);
-          localCollection.commitPendingOperations();
-          result.stats.numInserts++;
+          if (componentUid.isPresent()) {
+            handleLogMessage("retying creation of local component " + componentUid.get() + " using remote");
+            localCollection.addComponent(retryComponent);
+            localCollection.commitPendingOperations();
+            result.stats.numInserts++;
+          }
+          else
+            throw new InvalidRemoteComponentException("retry remote component is missing UID",
+                                                      getNamespace(), remoteCollection.getPath());
 
-        } catch (InvalidComponentException e) {
+        } catch (InvalidRemoteComponentException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
         } catch (RemoteException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
@@ -582,6 +515,8 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
       }
 
     } catch (DavException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (RemoteException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
     } catch (IOException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
@@ -589,57 +524,58 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
   }
 
   protected void pullRemotelyChangedComponents(SyncResult result) {
-    Log.d(TAG, "pullRemotelyChangedComponents()");
+    handleLogMessage("pullRemotelyChangedComponents()");
 
     try {
 
-      HashMap<String, String> remoteETagMap = remoteCollection.getComponentETags();
-      Log.d(TAG, "found + " + remoteETagMap.size() + " remote components");
+      HashMap<String, String>           remoteETagMap  = remoteCollection.getComponentETags();
+      HashMap<String, Optional<String>> changedETagMap = SyncWorkerUtil.handleFilterUidsChangedRemotely(localCollection, remoteETagMap);
+      List<List<String>>                reportLists    = SyncWorkerUtil.handlePartitionUidsForReports(changedETagMap.keySet());
 
-      for (java.util.Map.Entry<String, String> remoteETagEntry : remoteETagMap.entrySet()) {
+      handleLogMessage("found " + remoteETagMap.size() + " remote components, " + changedETagMap.size() +
+                      " are updated remotely, will require " + reportLists.size() + " multi-get report(s)");
+
+      for (List<String> uidsForReport : reportLists) {
         try {
 
-          Optional<ComponentETagPair<T>> localComponent = localCollection.getComponent(remoteETagEntry.getKey());
-          if (localComponent.isPresent()) {
-            Log.d(TAG, "remote component " + remoteETagEntry.getKey() + " is present locally");
+          DecryptedMultiStatusResult<T> remoteComponents = remoteCollection.getHiddenComponents(uidsForReport);
+          SyncWorkerUtil.handleDoStuffWithMultiStatusResult(uidsForReport, remoteComponents, context, result);
 
-            if (!localComponent.get().getETag().isPresent() ||
-                !localComponent.get().getETag().get().equals(remoteETagEntry.getValue())) {
+          for (ComponentETagPair<T> remoteComponent : remoteComponents.getComponentETagPairs()) {
+            try {
 
-              Optional<ComponentETagPair<T>> remoteComponent = remoteCollection.getHiddenComponent(remoteETagEntry.getKey());
-              if (remoteComponent.isPresent()) {
+              Optional<String> componentUid = getComponentUid(remoteComponent.getComponent());
+              if (componentUid.isPresent()) {
+                handleLogMessage("updating local component " + componentUid.get() + " using remote");
+                localCollection.updateComponent(remoteComponent);
+                localCollection.commitPendingOperations();
+                result.stats.numUpdates++;
+              }
+              else
+                throw new InvalidRemoteComponentException("remote component is missing UID",
+                                                          getNamespace(), remoteCollection.getPath());
 
-                if (componentHasUid(remoteComponent.get().getComponent())) {
-                  Log.d(TAG, "updating local component " + remoteETagEntry.getKey() + " using remote");
-                  localCollection.updateComponent(remoteComponent.get());
-                  localCollection.commitPendingOperations();
-                  result.stats.numUpdates++;
-                } else
-                  throw new InvalidComponentException("remote component is missing UID", true, getNamespace(),
-                                                      remoteCollection.getPath(), remoteETagEntry.getKey());
-              } else
-                Log.e(TAG, "remote component " + remoteETagEntry.getKey() + " from etag set not present remotely");
+            } catch (InvalidRemoteComponentException e) {
+              AbstractDavSyncAdapter.handleException(context, e, result);
+            } catch (RemoteException e) {
+              AbstractDavSyncAdapter.handleException(context, e, result);
+            } catch (OperationApplicationException e) {
+              AbstractDavSyncAdapter.handleException(context, e, result);
             }
           }
 
-        } catch (InvalidComponentException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (InvalidMacException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
         } catch (GeneralSecurityException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
         } catch (DavException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
         } catch (IOException e) {
           AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (RemoteException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
-        } catch (OperationApplicationException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
         }
       }
 
     } catch (DavException e) {
+      AbstractDavSyncAdapter.handleException(context, e, result);
+    } catch (RemoteException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
     } catch (IOException e) {
       AbstractDavSyncAdapter.handleException(context, e, result);
@@ -647,15 +583,12 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
   }
 
   protected void purgeRemotelyDeletedComponents(SyncResult result) {
-    Log.d(TAG, "pullRemotelyDeletedComponents()");
+    handleLogMessage("pullRemotelyDeletedComponents()");
 
     try {
 
       HashMap<String, String> localETagMap  = localCollection.getComponentETags();
       HashMap<String, String> remoteETagMap = remoteCollection.getComponentETags();
-
-      Log.d(TAG, "found " + remoteETagMap.size() + " remote components");
-      Log.d(TAG, "found " + localETagMap.size()  + " local components");
 
       List<String> componentsMissingRemotely = new LinkedList<String>();
       for (java.util.Map.Entry<String, String> localETagEntry : localETagMap.entrySet()) {
@@ -670,11 +603,11 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
           componentsMissingRemotely.add(localETagEntry.getKey());
       }
 
+      handleLogMessage("found " + componentsMissingRemotely.size()  + " local components missing remotely");
       for (String remoteUid : componentsMissingRemotely) {
-        Log.d(TAG, "deleting local component " + remoteUid + " missing from remote");
-
         try {
 
+          handleLogMessage("deleting local component " + remoteUid + " missing from remote");
           localCollection.removeComponent(remoteUid);
           localCollection.commitPendingOperations();
           result.stats.numDeletes++;

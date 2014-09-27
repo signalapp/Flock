@@ -30,10 +30,13 @@ import android.util.Log;
 
 import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
+import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ComponentList;
+import net.fortuna.ical4j.model.ConstraintViolationException;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
@@ -70,8 +73,9 @@ import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.XProperty;
+import net.fortuna.ical4j.util.Calendars;
+
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -99,6 +103,27 @@ public class EventFactory {
   private   static final String PROPERTY_NAME_FLOCK_ORIGINAL_SYNC_ID       = "X-FLOCK-ORIGINAL-SYNC-ID";
   private   static final String PROPERTY_NAME_FLOCK_ORIGINAL_INSTANCE_TIME = "X-FLOCK-ORIGINAL-INSTANCE-TIME";
   protected static final String PROPERTY_NAME_FLOCK_COPY_EVENT_ID          = "X-FLOCK-COPY-EVENT-ID";
+
+  private static String getUid(VEvent vEvent) {
+    if (vEvent.getUid() != null)
+      return vEvent.getUid().getValue();
+
+    return null;
+  }
+
+  private static String getUid(Calendar component) {
+    try {
+
+      Uid uid = Calendars.getUid(component);
+      if (uid != null)
+        return uid.getValue();
+
+      return null;
+
+    } catch (ConstraintViolationException e) {
+      return null;
+    }
+  }
 
   protected static String[] getProjectionForEvent() {
     return new String[] {
@@ -217,7 +242,7 @@ public class EventFactory {
   }
 
   protected static void handleReplaceOriginalSyncId(String path, String syncId, VEvent event)
-    throws InvalidComponentException
+    throws InvalidLocalComponentException
   {
     try {
 
@@ -228,30 +253,33 @@ public class EventFactory {
         event.getProperties().add(new XProperty(PROPERTY_NAME_FLOCK_ORIGINAL_SYNC_ID, syncId));
 
     } catch (ParseException e) {
-      throw new InvalidComponentException("cmon now ical4j", false, CalDavConstants.CALDAV_NAMESPACE, path, e);
+      throw new InvalidLocalComponentException("cmon now ical4j", CalDavConstants.CALDAV_NAMESPACE,
+                                               path, getUid(event), e);
     } catch (URISyntaxException e) {
-      throw new InvalidComponentException("cmon now ical4j", false, CalDavConstants.CALDAV_NAMESPACE, path, e);
+      throw new InvalidLocalComponentException("cmon now ical4j", CalDavConstants.CALDAV_NAMESPACE,
+                                               path, getUid(event), e);
     } catch (IOException e) {
-      throw new InvalidComponentException("cmon now ical4j", false, CalDavConstants.CALDAV_NAMESPACE, path, e);
+      throw new InvalidLocalComponentException("cmon now ical4j", CalDavConstants.CALDAV_NAMESPACE,
+                                               path, getUid(event), e);
     }
   }
 
   private static void handleAddValuesForDeletionExceptionToRecurring(LocalEventCollection hack,
                                                                      VEvent               vEvent,
                                                                      ContentValues        eventValues)
-      throws InvalidComponentException, RemoteException
+      throws InvalidRemoteComponentException, RemoteException
   {
     Log.w(TAG, "gonna try and import deletion exception to androids recurrence model...");
 
     Property originalSyncIdProp = vEvent.getProperty(PROPERTY_NAME_FLOCK_ORIGINAL_SYNC_ID);
 
     if (originalSyncIdProp  == null || TextUtils.isEmpty(originalSyncIdProp.getValue()))
-      throw new InvalidComponentException("original sync id prop required on recurring event deletion exceptions",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, hack.getPath());
+      throw new InvalidRemoteComponentException("original sync id prop required on recurring event deletion exceptions",
+                                                CalDavConstants.CALDAV_NAMESPACE, hack.getPath(), getUid(vEvent));
 
     if (vEvent.getStartDate() == null || vEvent.getStartDate().getDate() == null)
-      throw new InvalidComponentException("deletion exception VEvents must have a start time",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, hack.getPath());
+      throw new InvalidRemoteComponentException("deletion exception VEvents must have a start time",
+                                                CalDavConstants.CALDAV_NAMESPACE, hack.getPath(), getUid(vEvent));
 
     eventValues.put(CalendarContract.Events.ORIGINAL_INSTANCE_TIME,
                     vEvent.getStartDate().getDate().getTime());
@@ -274,10 +302,10 @@ public class EventFactory {
 
     Optional<Long> originalLocalId = hack.getLocalIdForUid(originalSyncIdProp.getValue());
     if (!originalLocalId.isPresent()) {
-      throw new InvalidComponentException("unable to build content values for recurrence deletion " +
-                                          "exception, cannot find original event " +
-                                          originalSyncIdProp.getValue() + " in collection",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, hack.getPath());
+      throw new InvalidRemoteComponentException("unable to build content values for recurrence deletion " +
+                                                "exception, cannot find original event " +
+                                                originalSyncIdProp.getValue() + " in collection",
+                                                CalDavConstants.CALDAV_NAMESPACE, hack.getPath(), getUid(vEvent));
     }
 
     eventValues.put(CalendarContract.Events.ORIGINAL_ID,      originalLocalId.get());
@@ -288,7 +316,7 @@ public class EventFactory {
   private static void handleAddValuesForEditExceptionToRecurring(LocalEventCollection hack,
                                                                  VEvent               vEvent,
                                                                  ContentValues        eventValues)
-      throws InvalidComponentException, RemoteException
+      throws InvalidRemoteComponentException, RemoteException
   {
     Log.w(TAG, "gonna try and import edit exception to androids recurrence model...");
 
@@ -296,12 +324,12 @@ public class EventFactory {
     Property originalInstanceTime = vEvent.getProperty(PROPERTY_NAME_FLOCK_ORIGINAL_INSTANCE_TIME);
 
     if (originalSyncIdProp == null || TextUtils.isEmpty(originalSyncIdProp.getValue()))
-      throw new InvalidComponentException("original sync id prop required on recurring event edit exceptions",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, hack.getPath());
+      throw new InvalidRemoteComponentException("original sync id prop required on recurring event edit exceptions",
+                                                CalDavConstants.CALDAV_NAMESPACE, hack.getPath(), getUid(vEvent));
 
     if (originalInstanceTime == null || TextUtils.isEmpty(originalInstanceTime.getValue()))
-      throw new InvalidComponentException("original instance time prop required on recurring event edit exceptions",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, hack.getPath());
+      throw new InvalidRemoteComponentException("original instance time prop required on recurring event edit exceptions",
+                                                CalDavConstants.CALDAV_NAMESPACE, hack.getPath(), getUid(vEvent));
 
 
     eventValues.put(CalendarContract.Events.ORIGINAL_INSTANCE_TIME,
@@ -325,10 +353,10 @@ public class EventFactory {
 
     Optional<Long> originalLocalId = hack.getLocalIdForUid(originalSyncIdProp.getValue());
     if (!originalLocalId.isPresent()) {
-      throw new InvalidComponentException("unable to build content values for recurrence edit " +
-                                          "exception, cannot find original event " +
-                                          originalSyncIdProp.getValue() + " in collection",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, hack.getPath());
+      throw new InvalidRemoteComponentException("unable to build content values for recurrence edit " +
+                                                "exception, cannot find original event " +
+                                                originalSyncIdProp.getValue() + " in collection",
+                                                CalDavConstants.CALDAV_NAMESPACE, hack.getPath(), getUid(vEvent));
     }
 
     eventValues.put(CalendarContract.Events.ORIGINAL_ID,      originalLocalId.get());
@@ -338,7 +366,7 @@ public class EventFactory {
   protected static ContentValues getValuesForEvent(LocalEventCollection        hack,
                                                    Long                        calendarId,
                                                    ComponentETagPair<Calendar> component)
-      throws InvalidComponentException, RemoteException
+      throws InvalidRemoteComponentException, RemoteException
   {
     VEvent vEvent = (VEvent) component.getComponent().getComponent(VEvent.VEVENT);
 
@@ -365,8 +393,8 @@ public class EventFactory {
       }
       else {
         Log.e(TAG, "no start date found on event");
-        throw new InvalidComponentException("no start date found on event", false,
-                                            CalDavConstants.CALDAV_NAMESPACE, hack.getPath());
+        throw new InvalidRemoteComponentException("no start date found on event",
+                                                  CalDavConstants.CALDAV_NAMESPACE, hack.getPath(), getUid(vEvent));
       }
 
       Status   status                   = vEvent.getStatus();
@@ -462,14 +490,14 @@ public class EventFactory {
     }
 
     Log.e(TAG, "no VEVENT found in component");
-    throw new InvalidComponentException("no VEVENT found in component", false,
-                                        CalDavConstants.CALDAV_NAMESPACE, hack.getPath());
+    throw new InvalidRemoteComponentException("no VEVENT found in component", CalDavConstants.CALDAV_NAMESPACE,
+                                              hack.getPath(), getUid(component.getComponent()));
   }
 
   private static void handleAddPropertiesForDeletionExceptionToRecurring(String        path,
                                                                          ContentValues eventValues,
                                                                          VEvent        vEvent)
-      throws InvalidComponentException
+      throws InvalidLocalComponentException
   {
     Log.w(TAG, "gonna try and export deletion exception from androids recurrence model...");
     vEvent.getProperties().add(Status.VEVENT_CANCELLED);
@@ -479,12 +507,12 @@ public class EventFactory {
     String syncId          = eventValues.getAsString(CalendarContract.Events._SYNC_ID);
 
     if (TextUtils.isEmpty(originalSyncId))
-      throw new InvalidComponentException("original sync id required on recurring event deletion exceptions",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("original sync id required on recurring event deletion exceptions",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(vEvent));
 
     if (originalLocalId == null || originalLocalId < 1)
-      throw new InvalidComponentException("original local id required on recurring event deletion exceptions",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("original local id required on recurring event deletion exceptions",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(vEvent));
 
     if (vEvent.getUid() == null)
       vEvent.getProperties().add(new Uid(syncId));
@@ -498,7 +526,7 @@ public class EventFactory {
   private static void handleAddPropertiesForEditExceptionToRecurring(String        path,
                                                                      ContentValues eventValues,
                                                                      VEvent        vEvent)
-      throws InvalidComponentException
+      throws InvalidLocalComponentException
   {
     Log.w(TAG, "gonna try and export edit exception from androids recurrence model...");
 
@@ -508,12 +536,12 @@ public class EventFactory {
     String syncId               = eventValues.getAsString(CalendarContract.Events._SYNC_ID);
 
     if (TextUtils.isEmpty(originalSyncId))
-      throw new InvalidComponentException("original sync id required on recurring event edit exceptions",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("original sync id required on recurring event edit exceptions",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(vEvent));
 
     if (originalLocalId == null || originalLocalId < 1 || originalInstanceTime == null)
-      throw new InvalidComponentException("original local id and instance time required on recurring event edit exceptions",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("original local id and instance time required on recurring event edit exceptions",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(vEvent));
 
     if (vEvent.getUid() == null)
       vEvent.getProperties().add(new Uid(syncId));
@@ -526,7 +554,7 @@ public class EventFactory {
 
   protected static ComponentETagPair<Calendar> getEventComponent(String        path,
                                                                  ContentValues eventValues)
-    throws InvalidComponentException
+    throws InvalidLocalComponentException
   {
     Calendar         calendar = new Calendar();
     VEvent           vEvent   = new VEvent();
@@ -552,8 +580,8 @@ public class EventFactory {
 
     } catch (URISyntaxException e) {
       Log.e(TAG, "caught exception while parsing URI from organizerText", e);
-      throw new InvalidComponentException("caught exception while parsing URI from organizerText",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, path, e);
+      throw new InvalidLocalComponentException("caught exception while parsing URI from organizerText",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(vEvent), e);
     }
 
     String summaryText = eventValues.getAsString(CalendarContract.Events.TITLE);
@@ -615,8 +643,8 @@ public class EventFactory {
     }
     else {
       Log.e(TAG, "no start date found on event");
-      throw new InvalidComponentException("no start date found on event", false,
-                                          CalDavConstants.CALDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("no start date found on event",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(vEvent));
     }
 
     Boolean allDay            = eventValues.getAsBoolean(CalendarContract.Events.ALL_DAY);
@@ -678,8 +706,8 @@ public class EventFactory {
 
     } catch (ParseException e) {
       Log.e(TAG, "caught exception while parsing recurrence rule stuff from event values", e);
-      throw new InvalidComponentException("caught exception while parsing recurrence rule stuff from event values",
-                                          false, CalDavConstants.CALDAV_NAMESPACE, path, e);
+      throw new InvalidLocalComponentException("caught exception while parsing recurrence rule stuff from event values",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(vEvent), e);
     }
 
     calendar.getComponents().add(vEvent);
@@ -797,13 +825,13 @@ public class EventFactory {
   }
 
   protected static void addAttendee(String path, Calendar component, ContentValues attendeeValues)
-      throws InvalidComponentException
+      throws InvalidLocalComponentException
   {
     VEvent vEvent = (VEvent) component.getComponent(VEvent.VEVENT);
     if (vEvent == null) {
       Log.e(TAG, "unable to add attendee to component with no VEVENT");
-      throw new InvalidComponentException("unable to add attendee to component with no VEVENT", false,
-                                          CalDavConstants.CALDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("unable to add attendee to component with no VEVENT",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(component));
     }
 
     String  email        = attendeeValues.getAsString(CalendarContract.Attendees.ATTENDEE_EMAIL);
@@ -814,8 +842,8 @@ public class EventFactory {
 
     if (StringUtils.isEmpty(email)) {
       Log.e(TAG, "attendee email is null or empty");
-      throw new InvalidComponentException("attendee email is null or empty", false,
-                                          CalDavConstants.CALDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("attendee email is null or empty",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(vEvent));
     }
 
     try {
@@ -858,8 +886,8 @@ public class EventFactory {
 
     } catch (URISyntaxException e) {
       Log.e(TAG, "caught exception while adding email to attendee", e);
-      throw new InvalidComponentException("caught exception while adding email to attendee", false,
-                                          CalDavConstants.CALDAV_NAMESPACE, path, e);
+      throw new InvalidLocalComponentException("caught exception while adding email to attendee",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(vEvent), e);
     }
   }
 
@@ -872,7 +900,7 @@ public class EventFactory {
   }
 
   protected static ContentValues getValuesForReminder(String path, Cursor cursor)
-      throws InvalidComponentException
+      throws InvalidLocalComponentException
   {
     if (!cursor.isNull(0) && !cursor.isNull(1)) {
       ContentValues values = new ContentValues(3);
@@ -884,8 +912,8 @@ public class EventFactory {
     }
 
     Log.e(TAG, "reminder event id or minutes is null");
-    throw new InvalidComponentException("reminder event id or minutes is null", false,
-                                        CalDavConstants.CALDAV_NAMESPACE, path);
+    throw new InvalidLocalComponentException("reminder event id or minutes is null",
+                                             CalDavConstants.CALDAV_NAMESPACE, path);
   }
 
   protected static List<ContentValues> getValuesForReminders(Calendar component) {
@@ -920,7 +948,7 @@ public class EventFactory {
 
   // TODO: can we support more alarm types?
   protected static void addReminder(String path, Calendar component, ContentValues reminderValues)
-    throws InvalidComponentException
+    throws InvalidLocalComponentException
   {
     Integer minutes = reminderValues.getAsInteger(CalendarContract.Reminders.MINUTES);
 
@@ -944,9 +972,8 @@ public class EventFactory {
     }
     else {
       Log.e(TAG, "reminder minutes is null");
-      throw new InvalidComponentException("reminder minutes is null", false,
-                                          CalDavConstants.CALDAV_NAMESPACE, path);
+      throw new InvalidLocalComponentException("reminder minutes is null",
+                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(component));
     }
   }
-
 }
