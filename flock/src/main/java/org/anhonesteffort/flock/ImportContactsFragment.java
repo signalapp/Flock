@@ -178,8 +178,7 @@ public class ImportContactsFragment extends AccountAndKeyRequiredFragment
       contactCount += copyAccount.contact_count;
 
     if (selectedAccounts.size() > 0) {
-      String toastMessage = getString(R.string.started_background_import_of) + " " +
-                            contactCount + " " + getString(R.string.contacts);
+      String toastMessage = getString(R.string.started_background_import_of_contacts, contactCount);
       Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_SHORT).show();
     }
 

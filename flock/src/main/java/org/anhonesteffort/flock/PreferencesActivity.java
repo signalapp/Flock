@@ -172,7 +172,7 @@ public class PreferencesActivity extends PreferenceActivity
 
     if (value.isPresent()) {
       String colorName = colorUtils.getColorNameFromHex(value.get());
-      calendarColorPreference.setSummary(getString(R.string.new_calendars_will_be) + " '" + colorName + "'");
+      calendarColorPreference.setSummary(getString(R.string.new_calendars_will_be, colorName));
     }
     else {
       SharedPreferences settings        = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -181,7 +181,7 @@ public class PreferencesActivity extends PreferenceActivity
       String            colorName       = colorUtils.getColorNameFromHex(calendarColor);
 
       if (colorName != null)
-        calendarColorPreference.setSummary(getString(R.string.new_calendars_will_be) + " '" + colorName + "'");
+        calendarColorPreference.setSummary(getString(R.string.new_calendars_will_be, colorName));
     }
   }
 

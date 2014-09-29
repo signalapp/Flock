@@ -115,9 +115,7 @@ public class ImportCalendarsFragment extends AccountAndKeyRequiredFragment
     Log.d(TAG, "handleBackgroundImportStarted()");
 
     if (selectedCalendars.size() > 0) {
-      String toastMessage = getString(R.string.started_background_import_of) + " " +
-                                      selectedCalendars.size() + " " +
-                                      getString(R.string.calendars);
+      String toastMessage = getString(R.string.started_background_import_of_calendars, selectedCalendars.size());
       Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_SHORT).show();
     }
 

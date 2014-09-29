@@ -4,36 +4,32 @@
     <string name="app_name">Flock</string>
     <string name="at_flock_sync">\@flock</string>
 
-
-    <string name="period">.</string>
-
-    <string name="previous">Previous</string>
     <string name="begin">Begin</string>
     <string name="next">Next</string>
     <string name="skip">Skip</string>
+    <string name="previous">Previous</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="finish">Finish</string>
 
     <string name="days">days</string>
     <string name="addressbook">addressbook</string>
-    <string name="failed">failed</string>
-
     <string name="display_name_missing">Display name missing</string>
-    <string name="display_name_unavailable">Display name unavailable</string>
 
 
     <!-- Notifications -->
     <string name="notification_contact_import">Contact import</string>
     <string name="notification_importing_contacts">Importing contacts.</string>
-    <string name="notification_importing_contacts_from">Importing contacts from</string>
+    <string name="notification_importing_contacts_from">Importing contacts from %1$s</string>
+    <string name="notification_import_complete_copied_contacts">Import complete, copied %1$d contacts.</string>
+    <string name="notification_import_complete_copied_contacts_failed">Import complete, copied %1$d contacts, %2$d failed.</string>
+
     <string name="notification_calendar_import">Calendar import</string>
     <string name="notification_importing_calendars">Importing calendars.</string>
-    <string name="notification_importing_events_from">Importing events from</string>
-    <string name="notification_finalizing_imported_calendars">Finalizing imported calendars.</string>
-    <string name="notification_import_complete_copied">Import complete, copied</string>
-    <string name="notification_import_complete_failed_to_copy_all">Import complete, failed to copy all</string>
+    <string name="notification_importing_events_from">Importing events from %1$s</string>
+    <string name="notification_import_complete_copied_events">Import complete, copied %1$d events.</string>
+    <string name="notification_import_complete_copied_events_failed">Import complete, copied %1$d events, %2$d failed.</string>
+
     <string name="notification_flock_login_error">Flock login error</string>
     <string name="notification_tap_to_correct_password">Tap to correct password.</string>
     <string name="notification_flock_encryption_error">Flock encryption error</string>
@@ -52,7 +48,6 @@
     <string name="status_header_status_their_sync_service_error">WebDAV server has errors</string>
     <string name="status_header_status_registration_service_error">Registration service temporarily unavailable…</string>
     <string name="status_header_status_migration_in_progress">Migration in progress</string>
-    <string name="checking_if_migration_required">Checking if migration required…</string>
     <string name="please_wait_this_will_take_a_few_minutes">Please wait, this will take a few minutes…</string>
 
     <string name="status_header_sync_time">Last synced on %1$s</string>
@@ -89,8 +84,6 @@
     <string name="title_server_tests">Server tests</string>
     <string name="tests_not_yet_started">Tests not yet started…</string>
     <string name="tests_interrupted">Tests interrupted…</string>
-    <string name="tests_complete">Tests complete!</string>
-    <string name="start_tests">Start tests</string>
     <string name="stop_tests">Stop tests</string>
     <string name="restart_tests">Restart tests</string>
     <string name="tests_completed_successfully">Tests completed successfully!</string>
@@ -134,7 +127,6 @@
         password for encryption.
     </string>
 
-    <string name="button_login">Login</string>
     <string name="hint_username">username</string>
     <string name="hint_password">password</string>
     <string name="hint_current_password">current password</string>
@@ -143,28 +135,17 @@
     <string name="hint_encryption_password">encryption password</string>
     <string name="hint_repeat_encryption_password">repeat encryption password</string>
 
-    <string name="generating_authentication_secrets">generating authentication secrets …</string>
     <string name="registering_account">registering account…</string>
-    <string name="account_register_completed_with_errors">Account register completed with errors.</string>
     <string name="account_register_failed">Account register failed.</string>
-    <string name="generating_encryption_secrets">generating encryption secrets …</string>
-    <string name="creating_default_addressbook">creating default addressbook…</string>
-    <string name="setting_up_calendars">setting up calendars…</string>
-    <string name="registration_interrupted">registration interrupted.</string>
 
-    <string name="logging_in">logging in…</string>
     <string name="importing_contacts_and_calendars">Importing contacts and calendars…</string>
     <string name="account_import_completed_with_errors">Account import completed with errors.</string>
     <string name="account_import_failed">Account import failed.</string>
     <string name="importing_encryption_secrets">Importing encryption secrets…</string>
-    <string name="importing_addressbook">importing addressbook…</string>
-    <string name="importing_calendars">importing calendars…</string>
-    <string name="account_import_interrupted">account import interrupted.</string>
 
 
     <!-- SetupActivity, import -->
     <string name="button_import">Import</string>
-    <string name="import_complete">Import complete!</string>
     <string name="local_storage">Local storage</string>
 
 
@@ -174,16 +155,15 @@
     </string>
     <string name="contacts">contacts</string>
     <string name="title_import_contacts">Import contacts</string>
-    <string name="started_background_import_of">Started background import of</string>
+    <string name="started_background_import_of_contacts">Started background import of %1$d contacts</string>
 
 
     <!-- SetupActivity, import calendars-->
     <string name="select_calendars_to_import">
         Select calendars to import
     </string>
-    <string name="calendars">calendars</string>
-    <string name="events">events</string>
     <string name="title_import_calendars">Import calendars</string>
+    <string name="started_background_import_of_calendars">Started background import of %1$d calendars</string>
 
 
     <!-- SetupActivity, select remote addressbook and calendars-->
@@ -207,9 +187,6 @@
     <string name="title_my_addressbooks">My addressbooks</string>
     <string name="title_edit_selected_addressbooks">Edit selected addressbooks</string>
     <string name="title_addressbook_properties">Addressbook properties</string>
-    <string name="title_delete_selected_addressbooks_dialog">Delete selected addressbooks?</string>
-    <string name="addressbook_saved">Addressbook saved!</string>
-    <string name="addressbooks_deleted">Addressbooks deleted.</string>
     <string name="addressbooks_selected">addressbooks selected</string>
     <string name="are_you_sure_you_want_to_delete_selected_addressbooks">
         Are you sure you want to delete selected addressbooks?
@@ -224,9 +201,6 @@
     <string name="title_edit_selected_calendars">Edit selected calendars</string>
     <string name="title_calendar_properties">Calendar properties</string>
     <string name="title_delete_selected_calendars_dialog">Delete selected calendars?</string>
-    <string name="calendar_created">Calendar created.</string>
-    <string name="calendar_saved">Calendar saved!</string>
-    <string name="calendars_deleted">Calendars deleted.</string>
     <string name="calendars_selected">calendars selected</string>
     <string name="are_you_sure_you_want_to_delete_selected_calendars">
         Are you sure you want to delete selected calendars?
@@ -238,7 +212,6 @@
 
     <!-- PreferencesActivity -->
     <string name="title_flock_settings">Flock settings</string>
-    <string name="title_settings">Settings</string>
 
     <string name="preference_group_sync">Sync</string>
     <string name="preference_title_sync_frequency">Sync frequency</string>
@@ -255,11 +228,9 @@
     <string name="preference_group_calendars">Calendars</string>
     <string name="preference_title_default_calendar_color">Default calendar color</string>
     <string name="minutes">minutes</string>
-    <string name="new_calendars_will_be">New calendars will be</string>
+    <string name="new_calendars_will_be">New calendars will be %1$s</string>
 
     <string name="preference_group_account">Account</string>
-    <string name="preference_title_change_encryption_password">Change encryption password</string>
-    <string name="preference_title_delete_account">Delete account</string>
 
 
     <!-- ChangeEncryptionPasswordActivity -->
@@ -268,7 +239,6 @@
     <string name="hint_new_password">new password</string>
     <string name="hint_new_password_repeat">repeat new password</string>
     <string name="encryption_password_saved">Encryption password saved!</string>
-    <string name="sending_request">sending request…</string>
     <string name="updating_encryption_secrets">updating encryption secrets…</string>
     <string name="password_change_failed">password change failed.</string>
 
@@ -277,7 +247,6 @@
     <string name="title_manage_subscription">Manage subscription</string>
     <string name="days_remain">days remain</string>
     <string name="subscription_history">Subscription history</string>
-    <string name="title_refreshing_subscription_details">Refreshing subscription details</string>
     <string name="auto_renew_disabled">auto-renew disabled</string>
     <string name="processing_payment">processing payment</string>
     <string name="auto_renew_enabled">auto-renew enabled</string>
@@ -302,7 +271,6 @@
 
     <!-- SendBitcoinActivity -->
     <string name="title_send_bitcoin">Send bitcoin</string>
-    <string name="title_refreshing_bitcoin_details">Refreshing bitcoin details</string>
     <string name="mBTC_to">mBTC to</string>
     <string name="address_copied_to_clipboard">Address copied to clipboard.</string>
     <string name="bitcoin_received">Bitcoin received!</string>
@@ -412,7 +380,6 @@
 
 
     <!-- misc errors -->
-    <string name="android_sync_disabled_please_enable">Android sync disabled, please enable!</string>
     <string name="error_multiple_accounts_not_allowed">Flock users may not have multiple accounts.</string>
     <string name="error_no_account_is_registered">No account is registered with this device.</string>
     <string name="error_password_unavailable_please_login">Password unavailable, please login.</string>

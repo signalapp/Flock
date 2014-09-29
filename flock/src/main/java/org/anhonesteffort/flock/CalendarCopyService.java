@@ -105,17 +105,13 @@ public class CalendarCopyService extends Service implements CalendarCopiedListen
     if (countEventCopiesFailed == 0) {
       notificationBuilder
           .setProgress(0, 0, false)
-          .setContentText(getString(R.string.notification_import_complete_copied) +
-                          " " + countEventsCopied + " " + getString(R.string.events) +
-                          getString(R.string.period));
+          .setContentText(getString(R.string.notification_import_complete_copied_events, countEventsCopied));
     }
     else {
       notificationBuilder
           .setProgress(0, 0, false)
-          .setContentText(getString(R.string.notification_import_complete_copied) +
-                          " " + countEventsCopied + " " + getString(R.string.events) +
-                          ", " + countEventCopiesFailed + " " + getString(R.string.failed) +
-                          getString(R.string.period));
+          .setContentText(getString(R.string.notification_import_complete_copied_events_failed,
+                                    countEventsCopied, countEventCopiesFailed));
     }
 
     notifyManager.notify(ID_CALENDAR_COPY_NOTIFICATION, notificationBuilder.build());
@@ -126,8 +122,7 @@ public class CalendarCopyService extends Service implements CalendarCopiedListen
     Log.d(TAG, "handleEventCopied() events copied: " + countEventsCopied);
 
     notificationBuilder
-        .setContentText(getString(R.string.notification_importing_events_from) +
-                        " " + fromAccount.name)
+        .setContentText(getString(R.string.notification_importing_events_from, fromAccount.name))
         .setProgress(countEventsToCopy,
                      countEventsCopied + countEventCopiesFailed,
                      false);
@@ -162,8 +157,7 @@ public class CalendarCopyService extends Service implements CalendarCopiedListen
     }
 
     notificationBuilder
-        .setContentText(getString(R.string.notification_importing_events_from) +
-                        " " + fromAccount.name)
+        .setContentText(getString(R.string.notification_importing_events_from, fromAccount.name))
         .setProgress(countEventsToCopy,
                      countEventsCopied + countEventCopiesFailed,
                      false);

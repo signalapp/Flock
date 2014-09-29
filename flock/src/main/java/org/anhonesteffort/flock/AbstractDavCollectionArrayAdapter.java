@@ -120,7 +120,7 @@ public abstract class AbstractDavCollectionArrayAdapter<T extends HidingDavColle
       collectionRowView.setBackgroundResource(0);
     }
 
-    viewHolder.displayName.setText(R.string.display_name_unavailable);
+    viewHolder.displayName.setText(R.string.display_name_missing);
 
     try {
 
@@ -132,8 +132,6 @@ public abstract class AbstractDavCollectionArrayAdapter<T extends HidingDavColle
       Optional<String> displayName = remoteCollections[position].getHiddenDisplayName();
       if (displayName.isPresent())
         viewHolder.displayName.setText(displayName.get());
-      else
-        viewHolder.displayName.setText(R.string.display_name_missing);
 
       if (hasSyncOption) {
         if (localStore.getCollection(remoteCollections[position].getPath()).isPresent())

@@ -89,8 +89,8 @@ public class ContactCopyService extends Service implements ContactCopiedListener
     Log.d(TAG, "handleContactCopied() contacts copied: " + countContactsCopied);
 
     notificationBuilder
-        .setContentText(getString(R.string.notification_importing_contacts_from) +
-                        " " + ((fromAccount != null) ? fromAccount.name : getString(R.string.local_storage)))
+        .setContentText(getString(R.string.notification_importing_contacts_from,
+                                 ((fromAccount != null) ? fromAccount.name : getString(R.string.local_storage))))
         .setProgress(countContactsToCopy, countContactsCopied + countContactCopiesFailed, false);
 
     notifyManager.notify(1023, notificationBuilder.build());
@@ -123,8 +123,7 @@ public class ContactCopyService extends Service implements ContactCopiedListener
     }
 
     notificationBuilder
-        .setContentText(getString(R.string.notification_importing_contacts_from) +
-                        " " + fromAccount.name)
+        .setContentText(getString(R.string.notification_importing_contacts_from, fromAccount.name))
         .setProgress(countContactsToCopy, countContactsCopied + countContactCopiesFailed, false);
 
     notifyManager.notify(1023, notificationBuilder.build());
@@ -145,17 +144,13 @@ public class ContactCopyService extends Service implements ContactCopiedListener
     if (countContactCopiesFailed == 0) {
       notificationBuilder
           .setProgress(0, 0, false)
-          .setContentText(getString(R.string.notification_import_complete_copied) +
-              " " + countContactsCopied + " " + getString(R.string.contacts) +
-              getString(R.string.period));
+          .setContentText(getString(R.string.notification_import_complete_copied_contacts, countContactsCopied));
     }
     else {
       notificationBuilder
           .setProgress(0, 0, false)
-          .setContentText(getString(R.string.notification_import_complete_copied) +
-              " " + countContactsCopied + " " + getString(R.string.contacts) + ", " +
-              countContactCopiesFailed + " " +
-              getString(R.string.failed) + getString(R.string.period));
+          .setContentText(getString(R.string.notification_import_complete_copied_contacts_failed,
+                                    countContactsCopied, countContactCopiesFailed));
     }
 
     notifyManager.notify(1023, notificationBuilder.build());
