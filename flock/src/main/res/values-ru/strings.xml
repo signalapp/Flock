@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Flock</string>
+    <string name="at_flock_sync">\@flock</string>
+
+
+    <string name="period">.</string>
+
+    <string name="previous">Назад</string>
+    <string name="begin">Начало</string>
+    <string name="next">Далее</string>
+    <string name="skip">Пропустить</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Отмена</string>
+    <string name="finish">Завершить</string>
+
+    <string name="days">дней</string>
+    <string name="addressbook">адресная книга</string>
+    <string name="failed">неудачно</string>
+
+    <string name="display_name_missing">Отображаемое имя отсутствует</string>
+    <string name="display_name_unavailable">Отображаемое имя недоступно</string>
+
+
+    <!-- Notifications -->
+    <string name="notification_contact_import">Импорт контактов</string>
+    <string name="notification_importing_contacts">Импортируются контакты.</string>
+    <string name="notification_importing_contacts_from">Импортируются контакты из</string>
+    <string name="notification_calendar_import">Импорт календаря</string>
+    <string name="notification_importing_calendars">Импортируются календари.</string>
+    <string name="notification_importing_events_from">Импортируются события из</string>
+    <string name="notification_finalizing_imported_calendars">Завершается импорт календаря.</string>
+    <string name="notification_import_complete_copied">Импорт завершен, скопировано</string>
+    <string name="notification_import_complete_failed_to_copy_all">Импорт завершен, не удалось скопировать все</string>
+    <string name="notification_flock_login_error">Ошибка входа Flock</string>
+    <string name="notification_tap_to_correct_password">Коснитесь, чтобы исправить пароль.</string>
+    <string name="notification_flock_encryption_error">Ошибка шифрования Flock</string>
+    <string name="notification_tap_to_correct_encryption_password">Коснитесь, чтобы исправить пароль шифрования.</string>
+    <string name="notification_flock_subscription_expired">Подписка Flock истекла</string>
+    <string name="notification_tap_to_update_subscription">Коснитесь, чтобы продлить подписку.</string>
+
+
+    <!-- status header stuff -->
+    <string name="status_header_status_good">Все работает!</string>
+    <string name="status_header_status_account_login_failed">Не удалось войти в аккаунт</string>
+    <string name="status_header_status_encryption_password_incorrect">Неверный пароль шифрования</string>
+    <string name="status_header_status_sync_disabled">Синхронизация Android отключена!</string>
+    <string name="status_header_status_auto_renew_error">Ошибка автопродления подписки</string>
+    <string name="status_header_status_our_sync_service_error">Синхронизация временно недоступна…</string>
+    <string name="status_header_status_their_sync_service_error">WebDAV-сервер содержит ошибки</string>
+    <string name="status_header_status_registration_service_error">Сервис регистрации временно недоступен…</string>
+
+    <string name="status_header_sync_time">Последняя синхронизация в %1$s</string>
+    <string name="status_header_sync_in_progress">Производится синхронизация…</string>
+
+    <!-- SetupActivity, intro -->
+    <string name="welcome_to_flock">Добро пожаловать в Flock!</string>
+    <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">
+        Flock синхронизирует Ваши контакты и календари между разными устройствами, защишая Вашу приватность
+        с помошью стойкой криптографии.
+    </string>
+
+
+    <!-- SetupActivity, select service provider -->
+    <string name="title_chose_sync_service">Выберите сервис синхронизации</string>
+    <string name="flock_sync">Flock Sync</string>
+    <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">
+        Flock Sync - это сервис компании Open Whisper Systems, доступный за $%.2f/год.
+        Испытайте бесплатно в течение 30 дней, информация об оплате не требуется.
+
+        <![CDATA[
+          <br/><br/>
+          <a href="https://whispersystems.org/flock/legal.html">Приватность и условия обслуживания</a>
+        ]]>
+    </string>
+    <string name="host_my_own">Host my own</string>
+    <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">
+        Вы можете выбрать свой собственный WebDAV-совместимый сервер в качестве сервиса синхронизации.
+        Перед использованием в Flock сервер должен пройти серию тестов.
+    </string>
+
+
+    <!-- SetupActivity, other server test -->
+    <string name="title_server_tests">Тесты сервера</string>
+    <string name="tests_not_yet_started">Тесты еще не запущено…</string>
+    <string name="tests_interrupted">Тесты прерваны…</string>
+    <string name="tests_complete">Тесты пройдены!</string>
+    <string name="start_tests">Начать тесты</string>
+    <string name="stop_tests">Остановить тесты</string>
+    <string name="restart_tests">Перезапустить тесты</string>
+    <string name="tests_completed_successfully">Тесты успешно завершены!</string>
+
+    <string name="test_dav_current_user_principal">DAV: current-user-principal</string>
+    <string name="test_error_carddav_current_user_principal">Сервер не поддерживает CardDAV well-known URI или DAV: current-user-principal.</string>
+    <string name="test_error_caldav_current_user_principal">Сервер не поддерживает CalDAV well-known URI или DAV: current-user-principal.</string>
+
+    <string name="test_carddav_addressbook_homeset">CardDAV: addressbook-homeset</string>
+    <string name="test_error_carddav_addressbook_homeset">Сервер не поддерживает CardDAV: addressbook-homeset.</string>
+
+    <string name="test_caldav_calendar_homeset">CalDAV: calendar-homeset</string>
+    <string name="test_error_caldav_calendar_homeset">Сервер не поддерживает CalDAV: calendar-homeset.</string>
+
+    <string name="test_caldav_create_and_delete_collections">DAV: создание и удаление коллекции</string>
+    <string name="test_error_caldav_create_and_delete_collections">Сервер не поддерживает создание и удаление коллекции календарей.</string>
+
+    <string name="test_caldav_create_and_edit_collection_properties">DAV: редактирование свойств коллекции</string>
+    <string name="test_error_caldav_create_and_edit_collection_properties">Сервер не поддерживает создание свойств коллекции.</string>
+
+    <string name="test_carddav_create_and_delete_contacts">CardDAV: создание и удаление контактов</string>
+    <string name="test_error_carddav_create_and_delete_contacts">Сервер не поддерживает создание и удаление контактов.</string>
+
+    <string name="test_caldav_create_and_delete_events">CalDAV: создание и удаление событий</string>
+    <string name="test_error_caldav_create_and_delete_events">Сервер не поддерживает создание и удаление событий календарей.</string>
+
+
+    <!-- SetupActivity, setup account -->
+    <string name="title_import_account">Импортировать аккаунт</string>
+    <string name="title_register_account">Зарегистрировать аккаунт</string>
+    <string name="title_setup_account">Настроить аккаунт</string>
+    <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">
+        Выберите имя пользователя для вашего аккаунта и строгий пароль для шифрования ваших данных.
+    </string>
+
+    <string name="do_you_have_a_flock_account">У Вас есть аккаунт Flock?</string>
+    <string name="yes_log_me_in">Да, авторизуйте меня</string>
+    <string name="no_register_me">Нет, зарегистрируйте меня</string>
+    <string name="text_setup_account_with_other">
+        Введите URL и учетные данные Вашего WebDAV-хоста, затем выберите отдельный
+        пароль для шифрования.
+    </string>
+
+    <string name="button_login">Логин</string>
+    <string name="hint_username">имя пользователя</string>
+    <string name="hint_password">пароль</string>
+    <string name="hint_current_password">текущий пароль</string>
+    <string name="hint_repeat_password">повторите пароль</string>
+    <string name="hint_href_webdav_host">https://example.com</string>
+    <string name="hint_encryption_password">пароль шифрования</string>
+    <string name="hint_repeat_encryption_password">повторите пароль шифрования</string>
+
+    <string name="generating_authentication_secrets">генерация ключа аутентификации …</string>
+    <string name="registering_account">регистрация аккаунта…</string>
+    <string name="account_register_completed_with_errors">Регистрация аккаунта завершена с ошибками.</string>
+    <string name="account_register_failed">Не удалось зарегистрировать аккаунт.</string>
+    <string name="generating_encryption_secrets">генерация ключа шифрования …</string>
+    <string name="creating_default_addressbook">создание адресной книги по умолчанию…</string>
+    <string name="setting_up_calendars">настройка календарей…</string>
+    <string name="registration_interrupted">регистрация прервана.</string>
+
+    <string name="logging_in">вход…</string>
+    <string name="importing_contacts_and_calendars">Импорт контактов и календарей…</string>
+    <string name="account_import_completed_with_errors">Импорт аккаунта завершен с ошибками.</string>
+    <string name="account_import_failed">Не удалось импортировать аккаунт.</string>
+    <string name="importing_encryption_secrets">Импорт ключей шифрования…</string>
+    <string name="importing_addressbook">импорт адресной книги…</string>
+    <string name="importing_calendars">импорт календарей…</string>
+    <string name="account_import_interrupted">импорт аккаунта прерван.</string>
+
+
+    <!-- SetupActivity, import -->
+    <string name="button_import">Импорт</string>
+    <string name="import_complete">Импорт завершен!</string>
+
+
+    <!-- SetupActivity, import contacts -->
+    <string name="select_accounts_to_import_contacts_from">
+        Выберите аккаунты для импорта контактов
+    </string>
+    <string name="contacts">контакты</string>
+    <string name="title_import_contacts">Импортировать контакты</string>
+    <string name="started_background_import_of">Начат фоновый импорт</string>
+
+
+    <!-- SetupActivity, import calendars-->
+    <string name="select_calendars_to_import">
+        Выберите календари для импорта
+    </string>
+    <string name="calendars">календари</string>
+    <string name="events">события</string>
+    <string name="title_import_calendars">Импортировать календари</string>
+
+
+    <!-- SetupActivity, select remote addressbook and calendars-->
+    <string name="select_a_single_remote_addressbook_in_which_to_store">
+        Выберите едиственную удаленную адресную книгу для хранения контактов Flock.
+    </string>
+    <string name="select_the_calendars_you_would_like_to_sync_with_this_device">
+        Выберите календари, которые Вы бы хотели синронизировать с этим устройством.
+    </string>
+    <string name="setup_complete">Настройка завершена!</string>
+
+
+    <!-- My calendars and my addressbooks... -->
+    <string name="hint_display_name">отображаемое имя</string>
+    <string name="heading_display_name">Отображаемое имя</string>
+    <string name="heading_sync">Синхронизация</string>
+    <string name="display_name_cannot_be_empty">Отображаемое имя не может быть пустым.</string>
+
+
+    <!-- My addressbooks -->
+    <string name="title_my_addressbooks">Мои адресные книги</string>
+    <string name="title_edit_selected_addressbooks">Редактировать выбранные адресные книги</string>
+    <string name="title_addressbook_properties">Настройки адресных книг</string>
+    <string name="title_delete_selected_addressbooks_dialog">Удалить выбранные адресные книги?</string>
+    <string name="addressbook_saved">Адресная книга сохранена!</string>
+    <string name="addressbooks_deleted">Адресные книги удалены.</string>
+    <string name="addressbooks_selected">aдресные книги выбраны</string>
+    <string name="are_you_sure_you_want_to_delete_selected_addressbooks">
+        Вы действительно хотите удалить выбранные адресные книги?
+    </string>
+    <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">
+        Вы не можете редактировать несинхронизированные адресные книги.
+    </string>
+
+
+    <!-- My calendars -->
+    <string name="title_my_calendars">Мои календари</string>
+    <string name="title_edit_selected_calendars">Редактировать выбранные календари</string>
+    <string name="title_calendar_properties">Настройки календарей</string>
+    <string name="title_delete_selected_calendars_dialog">Удалить выбранные календари?</string>
+    <string name="calendar_created">Календарь создан.</string>
+    <string name="calendar_saved">Календарь сохранен!</string>
+    <string name="calendars_deleted">Календарь удален.</string>
+    <string name="calendars_selected">календари выбраны</string>
+    <string name="are_you_sure_you_want_to_delete_selected_calendars">
+        Вы действительно хотите удалить выбранные календари?
+    </string>
+     <string name="you_cannot_edit_calendars_that_have_not_been_synced">
+        Вы не можете редактировать несинхронизированные календари.
+    </string>
+
+
+    <!-- PreferencesActivity -->
+    <string name="title_flock_settings">Настройки Flock</string>
+    <string name="title_settings">Настройки</string>
+
+    <string name="preference_group_sync">Синхронизация</string>
+    <string name="preference_title_sync_frequency">Частота синхронизации</string>
+
+    <string name="preference_title_sync_on_content_change">Синхронизировать при изменении</string>
+    <string name="preference_description_sync_on_content_change">
+        Синхронизировать контакты и календари как только они изменяются
+    </string>
+
+    <string name="preference_title_sync_now">Синхронизировать сейчас</string>
+    <string name="sync_requested_will_begin_when_possible">Запрошена синхронизация, начнется при возможности</string>
+
+    <string name="preference_group_contacts">Контакты</string>
+    <string name="preference_group_calendars">Календари</string>
+    <string name="preference_title_default_calendar_color">Цвет календаря по умолчанию</string>
+    <string name="minutes">минут</string>
+    <string name="new_calendars_will_be">Новые календари будут</string>
+
+    <string name="preference_group_account">Аккаунт</string>
+    <string name="preference_title_change_encryption_password">Изменить пароль шифрования</string>
+    <string name="preference_title_delete_account">Удалить аккаунт</string>
+
+
+    <!-- ChangeEncryptionPasswordActivity -->
+    <string name="title_change_encryption_password">Изменить пароль шифрования</string>
+    <string name="button_save_password">Сохранить пароль</string>
+    <string name="hint_new_password">новый пароль</string>
+    <string name="hint_new_password_repeat">повторить новый пароль</string>
+    <string name="encryption_password_saved">Пароль шифрования сохранен!</string>
+    <string name="sending_request">отправка запроса…</string>
+    <string name="updating_encryption_secrets">обновление ключей шифрования…</string>
+    <string name="password_change_failed">не удалось сменить пароль.</string>
+
+
+    <!-- ManageSubscriptionActivity -->
+    <string name="title_manage_subscription">Управление подпиской</string>
+    <string name="days_remain">дней осталось</string>
+    <string name="subscription_history">История подписки</string>
+    <string name="title_refreshing_subscription_details">Подробности обновления подписки</string>
+    <string name="auto_renew_disabled">автоплатеж отключен</string>
+    <string name="processing_payment">обработка платежа</string>
+    <string name="auto_renew_enabled">автоплатеж включен</string>
+    <string name="auto_renew_error">ошибка автоплатежа</string>
+    <string name="button_edit_payment_details">Редактировать подробности платежа</string>
+
+
+    <!-- EditAutoRenewActivity -->
+    <string name="usd_per_year">$%.2f/год</string>
+    <string name="with_auto_renew_flock_automatically_charges_your_card_before">
+        С автопродлением Flock автоматически списывает средства с карты за дней до истечения подписки.
+    </string>
+    <string name="button_save">Сохранить</string>
+    <string name="button_verify_and_save">Проверить и сохранить</string>
+    <string name="card_verified_and_saved">Карта проверена и сохранена!</string>
+    <string name="autorenew_saved">автопродление сохранено!</string>
+    <string name="enable_autorenew">включить автопродление</string>
+    <string name="hint_card_cvc">CVC</string>
+    <string name="hint_card_expiration">MM/YY</string>
+    <string name="hint_card_number">5555 5555 5555 5555</string>
+
+
+    <!-- SendBitcoinActivity -->
+    <string name="title_send_bitcoin">Отправить bitcoin</string>
+    <string name="title_refreshing_bitcoin_details">Обновление параметров bitcoin</string>
+    <string name="mBTC_to">mBTC на</string>
+    <string name="address_copied_to_clipboard">Адрес скопирован в буфер обмена.</string>
+    <string name="bitcoin_received">Bitcoin получены!</string>
+    <string name="minutes_until_address_expires">минут до истечения адреса</string>
+
+
+    <!-- DeleteAccountActivity -->
+    <string name="title_unregister_account">Отменить регистрацию</string>
+    <string name="if_you_chose_to_unregister_your_account_all_flock">
+        Если Вы выберите отмену регистрации, все контакты, календари Flock,
+        а также история подписок будут полностью удалены.
+    </string>
+    <string name="are_you_sure_you_want_to_unregister_your_account">
+        Вы действительно хотите отменить регистрацию аккаунт?
+    </string>
+    <string name="account_has_been_unregistered">Регистрация аккаунта отменена.</string>
+
+
+    <!-- DeleteAllContactsActivity -->
+    <string name="title_delete_all_contacts">Удалить все контакты</string>
+    <string name="all_contacts_have_been_deleted">Все контакты были удалены.</string>
+     <string name="if_you_chose_to_delete_your_flock_contacts">
+        Если Вы выберите удаление контактов Flock, они будут удалены со всех
+         устройств, использующих этот аккаунт Flock.
+    </string>
+    <string name="are_you_sure_you_want_to_delete_all_flock_contacts">
+        Вы действительно хотите удалить все контакты Flock?
+    </string>
+
+    <!-- CorrectPasswordActivity -->
+    <string name="title_correct_sync_password">Исправление пароля синхронизации</string>
+    <string name="unable_to_login_to_sync_service_please_correct_your_password">
+        Невозможно войти в службу синхронизации, пожалуйста, исправьте пароль.
+    </string>
+    <string name="login_successful">Успешный вход!</string>
+
+
+    <!-- CorrectEncryptionPasswordActivity -->
+    <string name="title_correct_encryption_password">Исправление пароля шифрования</string>
+    <string name="encryption_password_is_invalid_please_correct_your_encryption_password">
+        Неверный пароль шифрования, пожалуйста, исправьте пароль.
+    </string>
+    <string name="password_corrected">Пароль исправлен!</string>
+
+
+    <!-- ErrorToaster messages -->
+    <string name="error_login_unauthorized">Не удалось выполнить вход. Неверное имя или пароль</string>
+
+    <string name="error_registration_api_server_error">Извините, есть проблемы с нашими серверами регистрации.</string>
+    <string name="error_registration_api_client_error">Ошибка API клиента регистрации, пожалуйста, отправьте журналы отладки.</string>
+
+    <string name="error_our_dav_server_error">Извините, есть проблемы с нашими серверами синхронизации.</string>
+    <string name="error_their_dav_server_error">Ваш сервер синхронизации не работает как ожидается, проверьте журналы отладки.</string>
+    <string name="error_dav_client_error">Ошибка локального хранилища, пожалуйста, отправьте журналы отладки.</string>
+
+    <string name="error_connection_error">Ошибка соединения, пожалуйста, проверьте соединение с Интернетом.</string>
+    <string name="error_our_certificate_validation">Незащищенное соединение синхронизации, пожалуйста, отправьте журналы отладки.</string>
+    <string name="error_their_certificate_validation">Ошибка проверки сертификата, проверьте журналы отладки.</string>
+    <string name="error_unknown_io_error">Неизвестная ошибка ввода-вывода, пожалуйста, отправьте журналы отладки.</string>
+
+    <string name="error_invalid_encryption_password">Неверный пароль шифрования.</string>
+    <string name="error_invalid_mac_error">Ошибка расшифровки, пожалуйста, отправьте журналы отладки.</string>
+    <string name="error_unknown_crypto_error">Неизвестная криптографическая ошибка, пожалуйста, отправьте журналы отладки.</string>
+
+    <string name="error_url_cannot_be_empty">Url не может быть пуст</string>
+    <string name="error_username_empty">Имя пользователя не должно быть пустым.</string>
+    <string name="error_spaces_in_username">Имя пользователя не должно содержать пробелы.</string>
+    <string name="error_username_illegal">Имя пользователя должно содержать \'@\' и состоять не менее, чем из 5 символов.</string>
+    <string name="error_passwords_do_not_match">Пароли не совпадают.</string>
+    <string name="error_password_too_short">Пароль слишком короткий!</string>
+    <string name="error_username_already_registered">Пользователь уже зарегистрирован, попробуйте другое имя.</string>
+
+    <string name="error_card_number_could_not_be_verified">Номер карты не может быть проверен</string>
+    <string name="error_card_expiration_could_not_be_verified">Срок действия карты не может быть проверен</string>
+    <string name="error_card_security_code_could_not_be_verified">Код безопасности карты не может быть проверен</string>
+    <string name="error_your_card_could_not_be_verified">Ваша карта не может быть проверена</string>
+    <string name="error_stripe_api_error">Неизвестная ошибка обработки платежа, попробуйте еще раз или отправьте журналы отладки.</string>
+
+    <string name="error_android_account_manager_error">Неожиданная ошибка Android AccountManager!</string>
+
+
+    <!-- misc errors -->
+    <string name="android_sync_disabled_please_enable">Синхронизация Android отключена, пожалуйста, включите!</string>
+    <string name="error_multiple_accounts_not_allowed">Пользователи Flock не могут иметь нескольких аккаунтов.</string>
+    <string name="error_no_account_is_registered">Нет аккаунтов, зарегистрированных с данным устройством.</string>
+    <string name="error_password_unavailable_please_login">Пароль недоступен, пожалуйста, войдите.</string>
+</resources>
