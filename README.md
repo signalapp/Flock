@@ -11,6 +11,10 @@ multiple devices a "sync service" is required, this can be any standards complia
 3. RFC 6352 - CardDAV: vCard Extensions to Web Distributed Authoring and Versioning (WebDAV)
 4. RFC 4791 - Calendaring Extensions to WebDAV (CalDAV)
 
+Currently available on the Play store.
+
+*[![Play Store Badge](https://developer.android.com/images/brand/en_app_rgb_wo_60.png)](https://play.google.com/store/apps/details?id=org.anhonesteffort.flock)*
+
 ## Contributing bug reports
 Have a bug? Please create an issue here on GitHub!
 
