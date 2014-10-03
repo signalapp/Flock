@@ -89,12 +89,20 @@ public class PreferencesActivity extends PreferenceActivity
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
+    Intent nextIntent = null;
+
     switch (item.getItemId()) {
       case R.id.button_delete_all_contacts:
-        Intent nextIntent = new Intent(getBaseContext(), DeleteAllContactsActivity.class);
-        startActivity(nextIntent);
+        nextIntent = new Intent(getBaseContext(), DeleteAllContactsActivity.class);
+        break;
+
+      case R.id.button_send_debug_log:
+        nextIntent = new Intent(getBaseContext(), SendDebugLogActivity.class);
         break;
     }
+
+    if (nextIntent != null)
+      startActivity(nextIntent);
 
     return false;
   }

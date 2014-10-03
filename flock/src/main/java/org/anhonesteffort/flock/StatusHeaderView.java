@@ -36,7 +36,6 @@ import org.anhonesteffort.flock.crypto.InvalidCipherVersionException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.registration.RegistrationApi;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
-import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
 import org.anhonesteffort.flock.sync.key.DavKeyCollection;
@@ -174,7 +173,7 @@ public class StatusHeaderView extends LinearLayout {
       syncStatusText     = getContext().getString(R.string.status_header_status_account_login_failed);
       syncStatusDrawable = R.drawable.sad_cloud;
       if (!authNotificationShown) {
-        AbstractDavSyncAdapter.showAuthNotificationAndInvalidatePassword(getContext());
+        NotificationDrawer.handleInvalidatePasswordAndShowAuthNotification(getContext());
         authNotificationShown = true;
       }
     }
@@ -182,7 +181,7 @@ public class StatusHeaderView extends LinearLayout {
       syncStatusText     = getContext().getString(R.string.notification_flock_subscription_expired);
       syncStatusDrawable = R.drawable.sad_cloud;
       if (!subscriptionNotificationShown) {
-        AbstractDavSyncAdapter.showSubscriptionExpiredNotification(getContext());
+        NotificationDrawer.showSubscriptionExpiredNotification(getContext());
         subscriptionNotificationShown = true;
       }
     }

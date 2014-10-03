@@ -139,7 +139,7 @@ public class CorrectPasswordService extends Service {
 
       if (DavAccountHelper.isAuthenticated(getBaseContext(), account)) {
         DavAccountHelper.setAccountPassword(getBaseContext(), account.getAuthToken());
-        AbstractDavSyncAdapter.cancelAuthNotification(getBaseContext());
+        NotificationDrawer.cancelAuthNotification(getBaseContext());
 
         result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
       }

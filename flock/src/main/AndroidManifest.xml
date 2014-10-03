@@ -133,6 +133,10 @@
 
         <activity android:name="org.anhonesteffort.flock.MigrationReleaseNotesActivity" />
 
+        <activity android:name="org.anhonesteffort.flock.SendDebugLogActivity"
+                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
+                  android:windowSoftInputMode="stateHidden"/>
+
         <service android:name="org.anhonesteffort.flock.auth.AccountAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -205,6 +209,12 @@
         <receiver android:name="org.anhonesteffort.flock.sync.SyncBooter">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="org.anhonesteffort.flock.NotificationDrawer">
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.ACTION_STOP_ASKING_FOR_LOGS"/>
             </intent-filter>
         </receiver>
 

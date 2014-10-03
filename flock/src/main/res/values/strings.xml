@@ -3,6 +3,7 @@
 
     <string name="app_name">Flock</string>
     <string name="at_flock_sync">\@flock</string>
+    <string name="support_email_address">rhodey@anhonesteffort.org</string>
 
     <string name="begin">Begin</string>
     <string name="next">Next</string>
@@ -11,6 +12,7 @@
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="thanks">thanks!</string>
 
     <string name="days">days</string>
     <string name="addressbook">addressbook</string>
@@ -326,6 +328,16 @@
     <string name="after_updating_a_device_to_v08_simply_re_enable_sync">
         After updating a device to v0.8, simply re-enable sync and migration will complete automatically.
     </string>
+
+
+    <!-- SendDebugLogActivity -->
+    <string name="send_debug_log">Send debug log</string>
+    <string name="flock_debug_log">Flock debug log</string>
+    <string name="something_strange_happened_send_us_your_debug_log">
+        Something strange happened, send us your debug log and we\'ll fix it.
+    </string>
+    <string name="dont_ask_again">Don\'t ask again</string>
+    <string name="send_log">Send log</string>
 
 
     <!-- MigrationService -->
