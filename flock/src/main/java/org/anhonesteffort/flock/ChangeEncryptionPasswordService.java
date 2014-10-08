@@ -23,7 +23,6 @@ import org.anhonesteffort.flock.crypto.KeyStore;
 import org.anhonesteffort.flock.crypto.KeyUtil;
 import org.anhonesteffort.flock.registration.RegistrationApi;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
-import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.key.DavKeyCollection;
 import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
@@ -109,7 +108,7 @@ public class ChangeEncryptionPasswordService extends Service {
 
       registrationApi.setAccountPassword(account, newAuthToken);
       DavAccountHelper.setAccountPassword(getBaseContext(), newAuthToken);
-      AbstractDavSyncAdapter.disableAuthNotificationsForRunningAdapters(getBaseContext(), account.getOsAccount());
+      NotificationDrawer.disableAuthNotificationsForRunningAdapters(getBaseContext(), account.getOsAccount());
 
       account = new DavAccount(account.getUserId(), newAuthToken, account.getDavHostHREF());
 

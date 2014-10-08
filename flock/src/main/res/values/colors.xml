@@ -14,4 +14,6 @@
     <color name="bitcoin_orange">#ffec9912</color>
 
     <color name="text_light">#66000000</color>
+
+    <color name="libpastelog_confirmation_background">#40ff8800</color>
 </resources>
