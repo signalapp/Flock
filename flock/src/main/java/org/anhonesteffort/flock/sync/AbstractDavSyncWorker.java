@@ -34,6 +34,7 @@ import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 import org.apache.jackrabbit.webdav.DavException;
+import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.xml.Namespace;
 
 import java.io.IOException;
@@ -341,7 +342,11 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
         } catch (DavException e) {
 
           AbstractDavSyncAdapter.handleException(context, e, result);
-          SyncWorkerUtil.handleServerErrorOnPushNewLocalComponent(localCollection, componentId, context, result);
+
+          if (e.getErrorCode() == DavServletResponse.SC_PRECONDITION_FAILED)
+            SyncWorkerUtil.handleServerRejectedLocalComponent(localCollection, componentId, context, result);
+          else
+            SyncWorkerUtil.handleServerErrorOnPushNewLocalComponent(localCollection, componentId, context, result);
 
         } catch (IOException e) {
 
