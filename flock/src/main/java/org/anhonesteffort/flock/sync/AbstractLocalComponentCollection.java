@@ -22,6 +22,7 @@ package org.anhonesteffort.flock.sync;
 import android.accounts.Account;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentUris;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
@@ -356,11 +357,16 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
           .build());
   }
 
-  public void commitPendingOperations() throws OperationApplicationException, RemoteException {
+  public int commitPendingOperations()
+      throws OperationApplicationException, RemoteException
+  {
+    ContentProviderResult[] result = new ContentProviderResult[0];
+
     if (!pendingOperations.isEmpty())
-      client.applyBatch(pendingOperations);
+      result = client.applyBatch(pendingOperations);
 
     pendingOperations.clear();
+    return result.length;
   }
 
 }

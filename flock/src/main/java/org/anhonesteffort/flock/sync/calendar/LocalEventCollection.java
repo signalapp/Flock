@@ -480,7 +480,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
   }
 
   @Override
-  public void addComponent(ComponentETagPair<Calendar> component)
+  public int addComponent(ComponentETagPair<Calendar> component)
       throws RemoteException, InvalidRemoteComponentException
   {
     ContentValues eventValues    = EventFactory.getValuesForEvent(this, localId, component);
@@ -505,6 +505,8 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
           .withValueBackReference(CalendarContract.Reminders.EVENT_ID, event_op_index)
           .build());
     }
+
+    return pendingOperations.size() - event_op_index;
   }
 
   @Override
@@ -533,7 +535,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
   }
 
   @Override
-  public void updateComponent(ComponentETagPair<Calendar> component)
+  public int updateComponent(ComponentETagPair<Calendar> component)
       throws RemoteException, InvalidRemoteComponentException
   {
     try {
@@ -541,7 +543,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
       String componentUid = Calendars.getUid(component.getComponent()).getValue();
 
       removeComponent(componentUid);
-      addComponent(component);
+      return addComponent(component);
 
     } catch (ConstraintViolationException e) {
       Log.d(TAG, "caught exception while updating component ", e);
@@ -648,12 +650,59 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
     }
   }
 
+  private boolean handleCommitPendingIfFull(LocalEventCollection   toCollection,
+                                            List<Integer>          eventOperationCounts,
+                                            CalendarCopiedListener listener,
+                                            boolean                forceFull)
+  {
+    int operationSum = 0;
+    for (int operationCount : eventOperationCounts)
+      operationSum += operationCount;
+
+    if (operationSum >= 100 || forceFull) {
+      try {
+
+        int pendingCount = toCollection.pendingOperations.size();
+        int successCount = toCollection.commitPendingOperations();
+        int failCount    = pendingCount - successCount;
+
+        Log.d(TAG, pendingCount + " were pending " + successCount + " were committed");
+
+        for (int operationCount : eventOperationCounts)
+          listener.onEventCopied(account, toCollection.getAccount(), localId);
+
+        if (failCount > 0)
+          Log.e(TAG, "failed to commit " + failCount + "" +
+                      "operations but no idea which events they're from!");
+
+      } catch (OperationApplicationException e) {
+
+        for (int operationCount : eventOperationCounts)
+          listener.onEventCopyFailed(e, account, toCollection.getAccount(), localId);
+        toCollection.pendingOperations.clear();
+
+      } catch (RemoteException e) {
+
+        for (int operationCount : eventOperationCounts)
+          listener.onEventCopyFailed(e, account, toCollection.getAccount(), localId);
+        toCollection.pendingOperations.clear();
+
+      }
+
+      return true;
+    }
+    return false;
+  }
+
   private void handleCopyRecurrenceExceptions(Account                toAccount,
                                               LocalEventCollection   toCollection,
                                               CalendarCopiedListener listener)
       throws RemoteException
   {
-    for (Long eventId : getComponentIds()) {
+    List<Long>    componentIds         = getComponentIds();
+    List<Integer> eventOperationCounts = new LinkedList<Integer>();
+
+    for (Long eventId : componentIds) {
       try {
 
         Optional<Calendar> copyComponent = getComponent(eventId);
@@ -689,9 +738,10 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
             }
 
             EventFactory.handleReplaceOriginalSyncId(getPath(), parentUid.get(), vEvent);
-            toCollection.addComponent(correctedComponent);
-            toCollection.commitPendingOperations();
-            listener.onEventCopied(getAccount(), toAccount, localId);
+            eventOperationCounts.add(toCollection.addComponent(correctedComponent));
+
+            if (handleCommitPendingIfFull(toCollection, eventOperationCounts, listener, false))
+              eventOperationCounts.clear();
           }
         }
         else
@@ -700,12 +750,11 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
       } catch (InvalidComponentException e) {
         listener.onEventCopyFailed(e, getAccount(), toAccount, localId);
-      } catch (RemoteException e) {
-        listener.onEventCopyFailed(e, getAccount(), toAccount, localId);
-      } catch (OperationApplicationException e) {
-        listener.onEventCopyFailed(e, getAccount(), toAccount, localId);
       }
     }
+
+    if (toCollection.pendingOperations.size() > 0)
+      handleCommitPendingIfFull(toCollection, eventOperationCounts, listener, true);
   }
 
   public void copyToAccount(Account                toAccount,
@@ -714,12 +763,14 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
                             CalendarCopiedListener listener)
       throws RemoteException
   {
-    Log.d(TAG, "copy my " + getComponentIds().size() +
-               " events to account " + toAccount.name);
-
     LocalCalendarStore             toStore        = new LocalCalendarStore(client, toAccount);
     String                         tempRemotePath = UUID.randomUUID().toString();
     Optional<LocalEventCollection> toCollection   = Optional.absent();
+
+    List<Long>    componentIds         = getComponentIds();
+    List<Integer> eventOperationCounts = new LinkedList<Integer>();
+
+    Log.d(TAG, "copy my " + componentIds.size() + " events to account " + toAccount.name);
 
     try {
 
@@ -733,10 +784,9 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
       }
 
       toStore.setCollectionCopied(toCollection.get().getLocalId(), true);
-
       setVisible(false);
-      commitPendingOperations();
 
+      commitPendingOperations();
       listener.onCalendarCopied(getAccount(), toAccount, localId);
 
     } catch (RemoteException e) {
@@ -747,7 +797,7 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
       return;
     }
 
-    for (Long eventId : getComponentIds()) {
+    for (Long eventId : componentIds) {
       try {
 
         Optional<Calendar> copyComponent = getComponent(eventId);
@@ -771,14 +821,16 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
             Log.d(TAG, "found recurrence exception (" + eventId + ") during copy, will copy over next");
           else if (hasRecurrenceExceptions(eventId)) {
             EventFactory.handleAttachPropertiesForCopiedRecurrenceWithExceptions(vEvent, eventId);
-            toCollection.get().addComponent(correctedComponent);
-            toCollection.get().commitPendingOperations();
-            listener.onEventCopied(getAccount(), toAccount, localId);
+            eventOperationCounts.add(toCollection.get().addComponent(correctedComponent));
+
+            if (handleCommitPendingIfFull(toCollection.get(), eventOperationCounts, listener, false))
+              eventOperationCounts.clear();
           }
           else {
-            toCollection.get().addComponent(correctedComponent);
-            toCollection.get().commitPendingOperations();
-            listener.onEventCopied(getAccount(), toAccount, localId);
+            eventOperationCounts.add(toCollection.get().addComponent(correctedComponent));
+
+            if (handleCommitPendingIfFull(toCollection.get(), eventOperationCounts, listener, false))
+              eventOperationCounts.clear();
           }
         }
         else
@@ -787,12 +839,11 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
 
       } catch (InvalidComponentException e) {
         listener.onEventCopyFailed(e, getAccount(), toAccount, localId);
-      } catch (RemoteException e) {
-        listener.onEventCopyFailed(e, getAccount(), toAccount, localId);
-      } catch (OperationApplicationException e) {
-        listener.onEventCopyFailed(e, getAccount(), toAccount, localId);
       }
     }
+
+    if (toCollection.get().pendingOperations.size() > 0)
+      handleCommitPendingIfFull(toCollection.get(), eventOperationCounts, listener, true);
 
     handleCopyRecurrenceExceptions(toAccount, toCollection.get(), listener);
   }

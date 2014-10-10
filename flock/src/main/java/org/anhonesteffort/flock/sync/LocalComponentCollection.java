@@ -51,9 +51,9 @@ public interface LocalComponentCollection<T> {
 
   public List<ComponentETagPair<T>> getComponents() throws RemoteException, InvalidLocalComponentException;
 
-  public void addComponent(ComponentETagPair<T> component) throws RemoteException, InvalidRemoteComponentException;
+  public int addComponent(ComponentETagPair<T> component) throws RemoteException, InvalidRemoteComponentException;
 
-  public void updateComponent(ComponentETagPair<T> component) throws RemoteException, InvalidRemoteComponentException;
+  public int updateComponent(ComponentETagPair<T> component) throws RemoteException, InvalidRemoteComponentException;
 
   public void removeComponent(String path) throws RemoteException;
 

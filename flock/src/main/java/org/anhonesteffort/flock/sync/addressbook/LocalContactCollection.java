@@ -642,7 +642,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   @Override
-  public void addComponent(ComponentETagPair<VCard> vCard) throws RemoteException {
+  public int addComponent(ComponentETagPair<VCard> vCard) throws RemoteException {
     ContentValues rawContactValues = ContactFactory.getValuesForRawContact(vCard);
 
     int raw_contact_op_index = pendingOperations.size();
@@ -746,15 +746,17 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
           .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
           .build());
     }
+
+    return pendingOperations.size() - raw_contact_op_index;
   }
 
   @Override
-  public void updateComponent(ComponentETagPair<VCard> vCard)
+  public int updateComponent(ComponentETagPair<VCard> vCard)
       throws InvalidRemoteComponentException, RemoteException
   {
     if (vCard.getComponent().getUid() != null) {
       removeComponent(vCard.getComponent().getUid().getValue());
-      addComponent(vCard);
+      return addComponent(vCard);
     }
     else {
       Log.e(TAG, "was given a vcard with missing uid");
@@ -763,11 +765,56 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     }
   }
 
+  private boolean handleCommitPendingIfFull(LocalContactCollection toCollection,
+                                            List<Integer>          contactOperationCounts,
+                                            ContactCopiedListener  listener,
+                                            boolean                forceFull)
+  {
+    int operationSum = 0;
+    for (int operationCount : contactOperationCounts)
+      operationSum += operationCount;
+
+    if (operationSum >= 100 || forceFull) {
+      try {
+
+        int pendingCount = toCollection.pendingOperations.size();
+        int successCount = toCollection.commitPendingOperations();
+        int failCount    = pendingCount - successCount;
+
+        Log.d(TAG, pendingCount + " were pending " + successCount + " were committed");
+
+        for (int operationCount : contactOperationCounts)
+          listener.onContactCopied(account, toCollection.getAccount());
+
+        if (failCount > 0)
+          Log.e(TAG, "failed to commit " + failCount + "" +
+                     "operations but no idea which contacts they're from!");
+
+      } catch (OperationApplicationException e) {
+
+        for (int operationCount : contactOperationCounts)
+          listener.onContactCopyFailed(e, account, toCollection.getAccount());
+        toCollection.pendingOperations.clear();
+
+      } catch (RemoteException e) {
+
+        for (int operationCount : contactOperationCounts)
+          listener.onContactCopyFailed(e, account, toCollection.getAccount());
+        toCollection.pendingOperations.clear();
+
+      }
+
+      return true;
+    }
+    return false;
+  }
+
   public void copyToAccount(Account toAccount, ContactCopiedListener listener)
       throws RemoteException
   {
-    LocalContactCollection toCollection = new LocalContactCollection(context, client, toAccount, getPath());
-    List<Long>             componentIds = getComponentIds();
+    LocalContactCollection toCollection           = new LocalContactCollection(context, client, toAccount, getPath());
+    List<Long>             componentIds           = getComponentIds();
+    List<Integer>          contactOperationCounts = new LinkedList<Integer>();
 
     Log.d(TAG, "copy my " + componentIds.size() + " contacts to " + toAccount.name);
 
@@ -781,13 +828,15 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
             ComponentETagPair<VCard> correctedContact =
                 new ComponentETagPair<VCard>(copyContact.get(), Optional.<String>absent());
 
-            toCollection.addComponent(correctedContact);
-            toCollection.commitPendingOperations();
-          }
-          else
-            Log.w(TAG, "contact is entirely invisible to the user, skipping.");
+            contactOperationCounts.add(toCollection.addComponent(correctedContact));
 
-          listener.onContactCopied(getAccount(), toAccount);
+            if (handleCommitPendingIfFull(toCollection, contactOperationCounts, listener, false))
+              contactOperationCounts.clear();
+          }
+          else {
+            Log.w(TAG, "contact is entirely invisible to the user, ignoring.");
+            listener.onContactCopied(account, toAccount);
+          }
         }
         else
           throw new InvalidLocalComponentException("absent component for local id on copy",
@@ -795,11 +844,10 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
       } catch (InvalidLocalComponentException e) {
         listener.onContactCopyFailed(e, getAccount(), toAccount);
-      } catch (RemoteException e) {
-        listener.onContactCopyFailed(e, getAccount(), toAccount);
-      } catch (OperationApplicationException e) {
-        listener.onContactCopyFailed(e, getAccount(), toAccount);
       }
     }
+
+    if (toCollection.pendingOperations.size() > 0)
+      handleCommitPendingIfFull(toCollection, contactOperationCounts, listener, true);
   }
 }
