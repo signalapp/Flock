@@ -19,6 +19,7 @@
 
 package org.anhonesteffort.flock.sync.addressbook;
 
+import android.accounts.Account;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.provider.ContactsContract;
@@ -88,7 +89,8 @@ public class ContactFactory {
   private static final String PROPERTY_EVENT_CUSTOM        = "X-EVENT-CUSTOM";
   private static final String PARAMETER_EVENT_CUSTOM_LABEL = "X-EVENT-CUSTOM-LABEL";
 
-  private static final String PROPERTY_INVISIBLE_CONTACT = "X-INVISIBLE-CONTACT";
+  private static final String PROPERTY_INVISIBLE_CONTACT      = "X-INVISIBLE-CONTACT";
+  private static final String PROPERTY_AGGREGATION_EXCEPTIONS = "X-AGGREGATION-EXCEPTIONS";
 
   private static String getUid(VCard vCard) {
     if (vCard.getUid() != null)
@@ -1255,4 +1257,92 @@ public class ContactFactory {
     return vCard.getExtendedProperty(PROPERTY_INVISIBLE_CONTACT) != null;
   }
 
+  protected static void addAggregationExceptions(VCard vCard, List<AggregationException> exceptions) {
+    if (exceptions.isEmpty())
+      return;
+
+    Log.d(TAG, "need to add " + exceptions.size() + " aggregate exceptions.");
+
+    String exceptionsString = null;
+    for (AggregationException exception : exceptions) {
+      if (exceptionsString != null)
+        exceptionsString += "," + exception.toString();
+      else
+        exceptionsString = exception.toString();
+    }
+
+    vCard.addExtendedProperty(PROPERTY_AGGREGATION_EXCEPTIONS, exceptionsString);
+  }
+
+  protected static List<AggregationException> getAggregationExceptions(VCard vCard)
+      throws IllegalArgumentException
+  {
+    List<AggregationException> exceptions     = new LinkedList<AggregationException>();
+    RawProperty                exceptionsProp = vCard.getExtendedProperty(PROPERTY_AGGREGATION_EXCEPTIONS);
+
+    if (exceptionsProp != null && exceptionsProp.getValue() != null) {
+      String[] exceptionStrings = exceptionsProp.getValue().split(",");
+      for (String exceptionString : exceptionStrings)
+        exceptions.add(AggregationException.build(exceptionString));
+    }
+
+    return exceptions;
+  }
+
+  protected static class AggregationException {
+
+    private int     type;
+    private Account contactAccount;
+    private String  contactUid;
+
+    protected AggregationException(int type, Account contactAccount, String contactUid) {
+      this.type           = type;
+      this.contactAccount = contactAccount;
+      this.contactUid     = contactUid;
+    }
+
+    protected static AggregationException build(String stringEncodedAggregateException)
+        throws IllegalArgumentException
+    {
+      String[] parts = stringEncodedAggregateException.split(":");
+      if (parts.length < 4)
+        throw new IllegalArgumentException("invalid encoding for aggregate exception.");
+
+      try {
+
+        return new AggregationException(
+            Integer.parseInt(parts[0]),
+            new Account(
+                new String(Base64.decode(parts[1])),
+                new String(Base64.decode(parts[2]))
+            ),
+            new String(Base64.decode(parts[3])
+        ));
+
+      } catch (IOException e) {
+        throw new IllegalArgumentException("invalid encoding for aggregate exception.");
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException("invalid encoding for aggregate exception.");
+      }
+    }
+
+    protected int getType() {
+      return type;
+    }
+
+    protected Account getContactAccount() {
+      return contactAccount;
+    }
+
+    protected String getContactUid() {
+      return contactUid;
+    }
+
+    @Override
+    public String toString() {
+      return type + ":" + Base64.encodeBytes(contactAccount.name.getBytes()) +
+                    ":" + Base64.encodeBytes(contactAccount.type.getBytes()) +
+                    ":" + Base64.encodeBytes(contactUid.getBytes());
+    }
+  }
 }

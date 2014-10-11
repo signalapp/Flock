@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.util.Pair;
 
 import com.google.common.base.Optional;
 import ezvcard.VCard;
@@ -49,6 +50,7 @@ import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -538,22 +540,108 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
       ContactFactory.addInvisibleProperty(vCard);
   }
 
+  private List<Pair<Integer, Long>> getAggregateExceptionTypeIdPairs(Long rawContactId)
+      throws RemoteException
+  {
+    String[] PROJECTION     = new String[] {
+        ContactsContract.AggregationExceptions.TYPE,
+        ContactsContract.AggregationExceptions.RAW_CONTACT_ID1,
+        ContactsContract.AggregationExceptions.RAW_CONTACT_ID2
+    };
+    String   SELECTION      = ContactsContract.AggregationExceptions.RAW_CONTACT_ID1 + "=? OR " +
+                              ContactsContract.AggregationExceptions.RAW_CONTACT_ID2 + "=?";
+    String[] SELECTION_ARGS = new String[] { rawContactId.toString(), rawContactId.toString() };
+
+    List<Pair<Integer, Long>> typeIdPairs = new LinkedList<Pair<Integer, Long>>();
+    Cursor cursor = client.query(ContactsContract.AggregationExceptions.CONTENT_URI,
+                                 PROJECTION,
+                                 SELECTION,
+                                 SELECTION_ARGS,
+                                 null);
+
+    while (cursor.moveToNext()) {
+      if (cursor.getLong(1) != rawContactId)
+        typeIdPairs.add(new Pair<Integer, Long>(cursor.getInt(0), cursor.getLong(1)));
+      else
+        typeIdPairs.add(new Pair<Integer, Long>(cursor.getInt(0), cursor.getLong(2)));
+    }
+
+    cursor.close();
+    return typeIdPairs;
+  }
+
+  private Optional<Pair<Account, String>> getAccountUidPairForRawContact(Long rawContactId)
+      throws RemoteException
+  {
+    String[] PROJECTION     = new String[] {
+        ContactsContract.RawContacts.ACCOUNT_NAME,
+        ContactsContract.RawContacts.ACCOUNT_TYPE,
+        ContactsContract.RawContacts.SOURCE_ID
+    };
+    String   SELECTION      = ContactsContract.RawContacts._ID + "=? ";
+    String[] SELECTION_ARGS = new String[] { rawContactId.toString() };
+
+    Pair<Account, String> accountUidPair = null;
+    Cursor                cursor         = client.query(ContactsContract.RawContacts.CONTENT_URI,
+                                                        PROJECTION,
+                                                        SELECTION,
+                                                        SELECTION_ARGS,
+                                                        null);
+
+    if (cursor.moveToNext()) {
+      if (cursor.getString(2) != null) {
+        accountUidPair = new Pair<Account, String>(
+            new Account(cursor.getString(0), cursor.getString(1)),
+            cursor.getString(2)
+        );
+      }
+      else {
+        Log.e(TAG, "raw contact " + rawContactId +
+                   " has no SOURCE_ID :( is likely a local contact, must ignore.");
+      }
+    }
+
+    cursor.close();
+    return Optional.fromNullable(accountUidPair);
+  }
+
+  private void addAggregationExceptions(Long rawContactId, VCard vCard) throws RemoteException {
+    List<ContactFactory.AggregationException> exceptions  = new LinkedList<ContactFactory.AggregationException>();
+    List<Pair<Integer, Long>>                 typeIdPairs = getAggregateExceptionTypeIdPairs(rawContactId);
+
+    for (Pair<Integer, Long> typeIdPair : typeIdPairs) {
+      Optional<Pair<Account, String>> accountUidPair = getAccountUidPairForRawContact(typeIdPair.second);
+      if (accountUidPair.isPresent()) {
+        exceptions.add(new ContactFactory.AggregationException(
+            typeIdPair.first,
+            accountUidPair.get().first,
+            accountUidPair.get().second
+        ));
+      }
+      else
+        Log.e(TAG, "accountUidPair for raw contact " + typeIdPair.second + " is not present :(");
+    }
+
+    ContactFactory.addAggregationExceptions(vCard, exceptions);
+  }
+
   private void buildContact(Long rawContactId, VCard vCard)
       throws InvalidLocalComponentException, RemoteException
   {
-    addStructuredNames(  rawContactId, vCard);
-    addPhoneNumbers(     rawContactId, vCard);
-    addEmailAddresses(   rawContactId, vCard);
-    addPhotos(           rawContactId, vCard);
-    addOrganizations(    rawContactId, vCard);
-    addInstantMessaging( rawContactId, vCard);
-    addNickNames(        rawContactId, vCard);
-    addNotes(            rawContactId, vCard);
-    addPostalAddresses(  rawContactId, vCard);
-    addWebsites(         rawContactId, vCard);
-    addEvents(           rawContactId, vCard);
-    addSipAddresses(     rawContactId, vCard);
-    addInvisibleProperty(rawContactId, vCard);
+    addStructuredNames(      rawContactId, vCard);
+    addPhoneNumbers(         rawContactId, vCard);
+    addEmailAddresses(       rawContactId, vCard);
+    addPhotos(               rawContactId, vCard);
+    addOrganizations(        rawContactId, vCard);
+    addInstantMessaging(     rawContactId, vCard);
+    addNickNames(            rawContactId, vCard);
+    addNotes(                rawContactId, vCard);
+    addPostalAddresses(      rawContactId, vCard);
+    addWebsites(             rawContactId, vCard);
+    addEvents(               rawContactId, vCard);
+    addSipAddresses(         rawContactId, vCard);
+    addInvisibleProperty(    rawContactId, vCard);
+    addAggregationExceptions(rawContactId, vCard);
   }
 
   @Override
@@ -639,6 +727,55 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
     cursor.close();
     return vCards;
+  }
+
+  private ArrayList<ContentProviderOperation> getOperationsForAggregationExceptions(VCard vCard,
+                                                                                    int   idBackReference)
+      throws RemoteException
+  {
+    ArrayList<ContentProviderOperation>       operations = new ArrayList<ContentProviderOperation>();
+    List<ContactFactory.AggregationException> exceptions = null;
+
+    try {
+
+      exceptions = ContactFactory.getAggregationExceptions(vCard);
+      if (exceptions.isEmpty())
+        return operations;
+
+    } catch (IllegalArgumentException e) {
+      Log.e(TAG, "error parsing aggregation exceptions from vCard, ignoring :(", e);
+      return operations;
+    }
+
+    Log.d(TAG, "need to insert values for " + exceptions.size() + " aggregation exceptions.");
+    for (ContactFactory.AggregationException exception : exceptions) {
+      LocalContactCollection otherCollection =
+          new LocalContactCollection(context, client, exception.getContactAccount(), "hack");
+
+      Optional<Long> exceptionLocalId =
+          otherCollection.getLocalIdForUid(exception.getContactUid());
+
+      if (exceptionLocalId.isPresent()) {
+        ContentValues values = new ContentValues(2);
+
+        values.put(ContactsContract.AggregationExceptions.TYPE,            exception.getType());
+        values.put(ContactsContract.AggregationExceptions.RAW_CONTACT_ID2, exceptionLocalId.get());
+
+        operations.add(
+            ContentProviderOperation.newUpdate(ContactsContract.AggregationExceptions.CONTENT_URI)
+                .withValues(values)
+                .withValueBackReference(ContactsContract.AggregationExceptions.RAW_CONTACT_ID1, idBackReference)
+                .build()
+        );
+      }
+      else {
+        Log.e(TAG, "exceptionLocalId is not present for raw contact " + exception.getContactUid() +
+                   " of account (" + exception.getContactAccount().name + ", " +
+                   exception.getContactAccount().type + ")");
+      }
+    }
+
+    return operations;
   }
 
   @Override
@@ -746,6 +883,10 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
           .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
           .build());
     }
+
+    pendingOperations.addAll(
+        getOperationsForAggregationExceptions(vCard.getComponent(), raw_contact_op_index)
+    );
 
     return pendingOperations.size() - raw_contact_op_index;
   }

@@ -43,6 +43,7 @@ import java.util.UUID;
  * Programmer: rhodey
  * Date: 2/4/14
  */
+// TODO: I really don't think we need all of these null cursor checks...
 public abstract class AbstractLocalComponentCollection<T> implements LocalComponentCollection<T> {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.AbstractLocalComponentCollection";
@@ -180,13 +181,22 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
 
   public Optional<Long> getLocalIdForUid(String uid) throws RemoteException {
     final String[] PROJECTION     = new String[]{getColumnNameComponentLocalId()};
-    final String   SELECTION      = getColumnNameComponentUid() + "=? AND " +
-                                    getColumnNameCollectionLocalId() + "=" + localId;
     final String[] SELECTION_ARGS = new String[]{uid};
+          String   selection      = null;
+
+    if (account != null) {
+      selection = getColumnNameComponentUid()      + "=? AND " +
+                  getColumnNameCollectionLocalId() + "=" + localId;
+    }
+    else {
+      selection = getColumnNameComponentUid()      + "=? AND " +
+                  getColumnNameCollectionLocalId() + "=" + localId + " AND " +
+                  getColumnNameAccountType()       + " IS NULL";
+    }
 
     Cursor cursor = client.query(getUriForComponents(),
                                  PROJECTION,
-                                 SELECTION,
+                                 selection,
                                  SELECTION_ARGS,
                                  null);
 
