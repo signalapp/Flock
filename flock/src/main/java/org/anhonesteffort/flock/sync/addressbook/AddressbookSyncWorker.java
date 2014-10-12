@@ -28,6 +28,7 @@ import com.google.common.base.Optional;
 import ezvcard.VCard;
 import ezvcard.property.Uid;
 
+import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
 import org.apache.jackrabbit.webdav.xml.Namespace;
@@ -64,6 +65,22 @@ public class AddressbookSyncWorker extends AbstractDavSyncWorker<VCard> {
   }
 
   @Override
+  protected void pushLocallyCreatedProperties(SyncResult result) {
+    if (DavAccountHelper.isUsingOurServers(context))
+      return;
+
+    super.pushLocallyCreatedProperties(result);
+  }
+
+  @Override
+  protected void pushLocallyChangedProperties(SyncResult result) {
+    if (DavAccountHelper.isUsingOurServers(context))
+      return;
+
+    super.pushLocallyChangedProperties(result);
+  }
+
+  @Override
   protected void prePushLocallyCreatedComponent(VCard component) {
 
   }
@@ -76,4 +93,21 @@ public class AddressbookSyncWorker extends AbstractDavSyncWorker<VCard> {
     intent.setAction(ACTION_PUSH_CREATED_CONTACTS);
     context.sendBroadcast(intent);
   }
+
+  @Override
+  protected void pullRemotelyCreatedProperties(SyncResult result) {
+    if (DavAccountHelper.isUsingOurServers(context))
+      return;
+
+    super.pullRemotelyCreatedProperties(result);
+  }
+
+  @Override
+  protected void pullRemotelyChangedProperties(SyncResult result) {
+    if (DavAccountHelper.isUsingOurServers(context))
+      return;
+
+    super.pullRemotelyChangedProperties(result);
+  }
+
 }
