@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ /**
+  ~ * Copyright (C) Open 2014 Whisper Systems
+  ~ *
+  ~ * This program is free software: you can redistribute it and/or modify
+  ~ * it under the terms of the GNU General Public License as published by
+  ~ * the Free Software Foundation, either version 3 of the License, or
+  ~ * (at your option) any later version.
+  ~ *
+  ~ * This program is distributed in the hope that it will be useful,
+  ~ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ * GNU General Public License for more details.
+  ~ *
+  ~ * You should have received a copy of the GNU General Public License
+  ~ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+  ~ */
+  -->
+
 <resources>
 
     <string name="app_name">Flock</string>
@@ -57,10 +77,7 @@
 
     <!-- SetupActivity, intro -->
     <string name="welcome_to_flock">Welcome to Flock!</string>
-    <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">
-        Flock syncs your contacts and calendars between multiple devices while protecting your privacy
-        with strong encryption.
-    </string>
+    <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock syncs your contacts and calendars between multiple devices while protecting your privacy with strong encryption.</string>
 
 
     <!-- SetupActivity, select service provider -->
@@ -76,10 +93,7 @@
         ]]>
     </string>
     <string name="host_my_own">Host my own</string>
-    <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">
-        You may chose to run and configure your own WebDAV-compliant server as a sync service.
-        Before use with Flock the server must pass a series of tests.
-    </string>
+    <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">You may chose to run and configure your own WebDAV-compliant server as a sync service. Before use with Flock the server must pass a series of tests.</string>
 
 
     <!-- SetupActivity, other server test -->
@@ -117,17 +131,12 @@
     <string name="title_import_account">Import Account</string>
     <string name="title_register_account">Register Account</string>
     <string name="title_setup_account">Setup account</string>
-    <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">
-        Choose a username for your account and a strong password to encrypt your data.
-    </string>
+    <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">Choose a username for your account and a strong password to encrypt your data.</string>
 
     <string name="do_you_have_a_flock_account">Do you have a Flock account?</string>
     <string name="yes_log_me_in">Yes, log me in</string>
     <string name="no_register_me">No, register me</string>
-    <string name="text_setup_account_with_other">
-        Enter the URL and credentials for your WebDAV host then chose a separate
-        password for encryption.
-    </string>
+    <string name="text_setup_account_with_other">Enter the URL and credentials for your WebDAV host then chose a separate password for encryption.</string>
 
     <string name="hint_username">username</string>
     <string name="hint_password">password</string>
@@ -152,29 +161,21 @@
 
 
     <!-- SetupActivity, import contacts -->
-    <string name="select_accounts_to_import_contacts_from">
-        Select accounts to import contacts from
-    </string>
+    <string name="select_accounts_to_import_contacts_from">Select accounts to import contacts from</string>
     <string name="contacts">contacts</string>
     <string name="title_import_contacts">Import contacts</string>
     <string name="started_background_import_of_contacts">Started background import of %1$d contacts</string>
 
 
     <!-- SetupActivity, import calendars-->
-    <string name="select_calendars_to_import">
-        Select calendars to import
-    </string>
+    <string name="select_calendars_to_import">Select calendars to import</string>
     <string name="title_import_calendars">Import calendars</string>
     <string name="started_background_import_of_calendars">Started background import of %1$d calendars</string>
 
 
     <!-- SetupActivity, select remote addressbook and calendars-->
-    <string name="select_a_single_remote_addressbook_in_which_to_store">
-        Select a single remote addressbook in which to store Flock contacts.
-    </string>
-    <string name="select_the_calendars_you_would_like_to_sync_with_this_device">
-        Select the calendars you would like to sync with this device.
-    </string>
+    <string name="select_a_single_remote_addressbook_in_which_to_store">Select a single remote addressbook in which to store Flock contacts.</string>
+    <string name="select_the_calendars_you_would_like_to_sync_with_this_device">Select the calendars you would like to sync with this device.</string>
     <string name="setup_complete">Setup complete!</string>
 
 
@@ -190,12 +191,8 @@
     <string name="title_edit_selected_addressbooks">Edit selected addressbooks</string>
     <string name="title_addressbook_properties">Addressbook properties</string>
     <string name="addressbooks_selected">addressbooks selected</string>
-    <string name="are_you_sure_you_want_to_delete_selected_addressbooks">
-        Are you sure you want to delete selected addressbooks?
-    </string>
-    <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">
-        You cannot edit addressbooks that have not been synced.
-    </string>
+    <string name="are_you_sure_you_want_to_delete_selected_addressbooks">Are you sure you want to delete selected addressbooks?</string>
+    <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">You cannot edit addressbooks that have not been synced.</string>
 
 
     <!-- My calendars -->
@@ -204,12 +201,8 @@
     <string name="title_calendar_properties">Calendar properties</string>
     <string name="title_delete_selected_calendars_dialog">Delete selected calendars?</string>
     <string name="calendars_selected">calendars selected</string>
-    <string name="are_you_sure_you_want_to_delete_selected_calendars">
-        Are you sure you want to delete selected calendars?
-    </string>
-     <string name="you_cannot_edit_calendars_that_have_not_been_synced">
-        You cannot edit calendars that have not been synced.
-    </string>
+    <string name="are_you_sure_you_want_to_delete_selected_calendars">Are you sure you want to delete selected calendars?</string>
+    <string name="you_cannot_edit_calendars_that_have_not_been_synced">You cannot edit calendars that have not been synced.</string>
 
 
     <!-- PreferencesActivity -->
@@ -219,9 +212,7 @@
     <string name="preference_title_sync_frequency">Sync frequency</string>
 
     <string name="preference_title_sync_on_content_change">Sync on change</string>
-    <string name="preference_description_sync_on_content_change">
-        Synchronize contacts and calendars as soon as they change
-    </string>
+    <string name="preference_description_sync_on_content_change">Synchronize contacts and calendars as soon as they change</string>
 
     <string name="preference_title_sync_now">Sync now</string>
     <string name="sync_requested_will_begin_when_possible">Sync requested, will begin when possible</string>
@@ -258,9 +249,7 @@
 
     <!-- EditAutoRenewActivity -->
     <string name="usd_per_year">$%.2f/year</string>
-    <string name="with_auto_renew_flock_automatically_charges_your_card_before">
-        With auto-renew, Flock automatically charges your card seven days before your subscription runs out.
-    </string>
+    <string name="with_auto_renew_flock_automatically_charges_your_card_before">With auto-renew, Flock automatically charges your card seven days before your subscription runs out.</string>
     <string name="button_save">Save</string>
     <string name="button_verify_and_save">Verify and save</string>
     <string name="card_verified_and_saved">Card verified and saved!</string>
@@ -281,61 +270,39 @@
 
     <!-- DeleteAccountActivity -->
     <string name="title_unregister_account">Unregister account</string>
-    <string name="if_you_chose_to_unregister_your_account_all_flock">
-        If you chose to unregister your account, all Flock contacts, calendars,
-        and subscription history will be permanently deleted.
-    </string>
-    <string name="are_you_sure_you_want_to_unregister_your_account">
-        Are you sure you want to unregister your account?
-    </string>
+    <string name="if_you_chose_to_unregister_your_account_all_flock">If you chose to unregister your account, all Flock contacts, calendars, and subscription history will be permanently deleted.</string>
+    <string name="are_you_sure_you_want_to_unregister_your_account">Are you sure you want to unregister your account?</string>
     <string name="account_has_been_unregistered">Account has been unregistered.</string>
 
 
     <!-- DeleteAllContactsActivity -->
     <string name="title_delete_all_contacts">Delete all contacts</string>
     <string name="all_contacts_have_been_deleted">All contacts have been deleted.</string>
-     <string name="if_you_chose_to_delete_your_flock_contacts">
-        If you chose to delete your Flock contacts they will be removed from all
-         devices using this Flock account.
-    </string>
-    <string name="are_you_sure_you_want_to_delete_all_flock_contacts">
-        Are you sure you want to delete all Flock contacts?
-    </string>
+    <string name="if_you_chose_to_delete_your_flock_contacts">If you chose to delete your Flock contacts they will be removed from all devices using this Flock account.</string>
+    <string name="are_you_sure_you_want_to_delete_all_flock_contacts">Are you sure you want to delete all Flock contacts?</string>
 
     <!-- CorrectPasswordActivity -->
     <string name="title_correct_sync_password">Correct sync password</string>
-    <string name="unable_to_login_to_sync_service_please_correct_your_password">
-        Unable to login to sync service, please correct your password.
-    </string>
+    <string name="unable_to_login_to_sync_service_please_correct_your_password">Unable to login to sync service, please correct your password.</string>
     <string name="login_successful">Login successful!</string>
 
 
     <!-- CorrectEncryptionPasswordActivity -->
     <string name="title_correct_encryption_password">Correct encryption password</string>
-    <string name="encryption_password_is_invalid_please_correct_your_encryption_password">
-        Encryption password is invalid, please correct your encryption password.
-    </string>
+    <string name="encryption_password_is_invalid_please_correct_your_encryption_password">Encryption password is invalid, please correct your encryption password.</string>
     <string name="password_corrected">Password corrected!</string>
 
 
     <!-- MigrationReleaseNotesActivity -->
     <string name="release_notes">Release notes</string>
-    <string name="the_way_that_flock_syncs_data_has_changed_to_make_future_updates_run_more_smoothly">
-        The way that Flock syncs data has changed to make future updates run more
-        smoothly. To help facilitate this update users must temporarily
-        disable sync on all clients older than v0.8.
-    </string>
-    <string name="after_updating_a_device_to_v08_simply_re_enable_sync">
-        After updating a device to v0.8, simply re-enable sync and migration will complete automatically.
-    </string>
+    <string name="the_way_that_flock_syncs_data_has_changed_to_make_future_updates_run_more_smoothly">The way that Flock syncs data has changed to make future updates run more smoothly. To help facilitate this update users must temporarily disable sync on all clients older than v0.8.</string>
+    <string name="after_updating_a_device_to_v08_simply_re_enable_sync">After updating a device to v0.8, simply re-enable sync and migration will complete automatically.</string>
 
 
     <!-- SendDebugLogActivity -->
     <string name="send_debug_log">Send debug log</string>
     <string name="flock_debug_log">Flock debug log</string>
-    <string name="something_strange_happened_send_us_your_debug_log">
-        Something strange happened, send us your debug log and we\'ll fix it.
-    </string>
+    <string name="something_strange_happened_send_us_your_debug_log">Something strange happened, send us your debug log and we\'ll fix it.</string>
     <string name="dont_ask_again">Don\'t ask again</string>
     <string name="send_log">Send log</string>
 

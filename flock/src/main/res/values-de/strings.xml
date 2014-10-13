@@ -1,4 +1,24 @@
 <?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+  ~ /**
+  ~ * Copyright (C) Open 2014 Whisper Systems
+  ~ *
+  ~ * This program is free software: you can redistribute it and/or modify
+  ~ * it under the terms of the GNU General Public License as published by
+  ~ * the Free Software Foundation, either version 3 of the License, or
+  ~ * (at your option) any later version.
+  ~ *
+  ~ * This program is distributed in the hope that it will be useful,
+  ~ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ * GNU General Public License for more details.
+  ~ *
+  ~ * You should have received a copy of the GNU General Public License
+  ~ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+  ~ */
+  -->
+
 <resources>
   <string name="app_name">Flock</string>
   <string name="at_flock_sync">\@flock</string>
@@ -45,10 +65,7 @@
   <string name="status_header_sync_in_progress">Synchronisierung…</string>
   <!--SetupActivity, intro-->
   <string name="welcome_to_flock">Willkommen bei Flock!</string>
-  <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">
-	  Flock synchronisiert deine Kontakte und Kalender zwischen mehreren Geräten und schützt dabei
-	  deine Privatsphäre durch starke Verschlüsselung.
-    </string>
+  <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock synchronisiert deine Kontakte und Kalender zwischen mehreren Geräten und schützt dabei deine Privatsphäre durch starke Verschlüsselung.</string>
   <!--SetupActivity, select service provider-->
   <string name="title_chose_sync_service">Wähle einen Dienst</string>
   <string name="flock_sync">Flock Sync</string>
@@ -59,14 +76,11 @@
 
         <![CDATA[
           <br/><br/>
-          <a href=\"https://whispersystems.org/flock/legal.html\">Datenschutzerklärung und AGB</a>
+          <a href="https://whispersystems.org/flock/legal.html">Datenschutzerklärung und AGB</a>
         ]]>
     </string>
   <string name="host_my_own">Eigener Server</string>
-  <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">
-	  Du kannst deinen eigenen WebDAV-kompatiblen Server als Synchronisierungsdienst verwenden.
-	  Vor der Nutzung mit Flock muss der Server eine Reihe von Tests bestehen.
-    </string>
+  <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">Du kannst deinen eigenen WebDAV-kompatiblen Server als Synchronisierungsdienst verwenden. Vor der Nutzung mit Flock muss der Server eine Reihe von Tests bestehen.</string>
   <!--SetupActivity, other server test-->
   <string name="title_server_tests">Server-Überprüfung</string>
   <string name="tests_not_yet_started">Bitte starte den Test…</string>
@@ -93,16 +107,11 @@
   <string name="title_import_account">Account importieren</string>
   <string name="title_register_account">Account registrieren</string>
   <string name="title_setup_account">Account einrichten</string>
-  <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">
-	  Wähle einen Benutzernamen und ein starkes Passwort für die Verschlüsselung deiner Accountdaten.
-    </string>
+  <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">Wähle einen Benutzernamen und ein starkes Passwort für die Verschlüsselung deiner Accountdaten.</string>
   <string name="do_you_have_a_flock_account">Hast du einen Flock-Account?</string>
   <string name="yes_log_me_in">Ja</string>
   <string name="no_register_me">Nein</string>
-  <string name="text_setup_account_with_other">
-	  Gib die URL und die Zugangsdaten für deinen WebDAV-Host ein und wähle dann
-	  ein Passwort für die Verschlüsselung.
-    </string>
+  <string name="text_setup_account_with_other">Gib die URL und die Zugangsdaten für deinen WebDAV-Host ein und wähle dann ein Passwort für die Verschlüsselung.</string>
   <string name="hint_username">Benutzername</string>
   <string name="hint_password">Passwort</string>
   <string name="hint_current_password">Aktuelles Passwort</string>
@@ -120,26 +129,17 @@
   <string name="button_import">Übertragung</string>
   <string name="local_storage">Lokaler Speicher</string>
   <!--SetupActivity, import contacts-->
-  <string name="select_accounts_to_import_contacts_from">
-	  Wähle die Accounts für den Kontaktimport aus
-    </string>
+  <string name="select_accounts_to_import_contacts_from">Wähle die Accounts für den Kontaktimport aus</string>
   <string name="contacts">Kontakte</string>
   <string name="title_import_contacts">Importiere Kontakte</string>
   <string name="started_background_import_of_contacts">Hintergrundübertragung von Kontakten aus %1$d Kontakte</string>
   <!--SetupActivity, import calendars-->
-  <string name="select_calendars_to_import">
-        Wähle die Kalender für den Import aus
-    </string>
+  <string name="select_calendars_to_import">Wähle die Kalender für den Import aus</string>
   <string name="title_import_calendars">Kalender importieren</string>
   <string name="started_background_import_of_calendars">Hintergrundübertragung von Kontakten aus %1$d Kalendern wurde gestartet</string>
   <!--SetupActivity, select remote addressbook and calendars-->
-  <string name="select_a_single_remote_addressbook_in_which_to_store">
-	  Wähle ein einzelnes entferntes Adressbuch aus, in welchem die 
-	  Flock-Kontakte gespeichert werden sollen.
-    </string>
-  <string name="select_the_calendars_you_would_like_to_sync_with_this_device">
-	  Wähle die Kalender für die Synchronisierung mit diesem Gerät aus.
-    </string>
+  <string name="select_a_single_remote_addressbook_in_which_to_store">Wähle ein einzelnes entferntes Adressbuch aus, in welchem die Flock-Kontakte gespeichert werden sollen.</string>
+  <string name="select_the_calendars_you_would_like_to_sync_with_this_device">Wähle die Kalender für die Synchronisierung mit diesem Gerät aus.</string>
   <string name="setup_complete">Die Einrichtung ist abgeschlossen!</string>
   <!--My calendars and my addressbooks...-->
   <string name="hint_display_name">Name</string>
@@ -151,32 +151,22 @@
   <string name="title_edit_selected_addressbooks">Bearbeite ausgewählte Adressbücher</string>
   <string name="title_addressbook_properties">Adressbucheigenschaften</string>
   <string name="addressbooks_selected">Ausgewählte Adressbücher</string>
-  <string name="are_you_sure_you_want_to_delete_selected_addressbooks">
-	  Sollen die ausgewählten Adressbücher wirklich gelöscht werden?
-    </string>
-  <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">
-	  Adressbücher ohne Synchronisierung können nicht bearbeitet werden.
-    </string>
+  <string name="are_you_sure_you_want_to_delete_selected_addressbooks">Sollen die ausgewählten Adressbücher wirklich gelöscht werden?</string>
+  <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">Adressbücher ohne Synchronisierung können nicht bearbeitet werden.</string>
   <!--My calendars-->
   <string name="title_my_calendars">Meine Kalender</string>
   <string name="title_edit_selected_calendars">Ausgewählte Kalender bearbeiten</string>
   <string name="title_calendar_properties">Kalendereigenschaften</string>
   <string name="title_delete_selected_calendars_dialog">Ausgewählte Kalender löschen?</string>
   <string name="calendars_selected">Ausgewählte Kalender</string>
-  <string name="are_you_sure_you_want_to_delete_selected_calendars">
-	  Sollen die ausgewählten Kalender wirklich gelöscht werden?
-    </string>
-  <string name="you_cannot_edit_calendars_that_have_not_been_synced">
-	  Nicht-synchronisierte Kalender können nicht bearbeitet werden.
-    </string>
+  <string name="are_you_sure_you_want_to_delete_selected_calendars">Sollen die ausgewählten Kalender wirklich gelöscht werden?</string>
+  <string name="you_cannot_edit_calendars_that_have_not_been_synced">Nicht-synchronisierte Kalender können nicht bearbeitet werden.</string>
   <!--PreferencesActivity-->
   <string name="title_flock_settings">Flock-Einstellungen</string>
   <string name="preference_group_sync">Synchronisierung</string>
   <string name="preference_title_sync_frequency">Synchronisierungshäufigkeit</string>
   <string name="preference_title_sync_on_content_change">Synchronisierung bei Veränderung</string>
-  <string name="preference_description_sync_on_content_change">
-	  Synchronisiere Kontakte und Kalender sobald diese verändert werden.
-    </string>
+  <string name="preference_description_sync_on_content_change">Synchronisiere Kontakte und Kalender sobald diese verändert werden.</string>
   <string name="preference_title_sync_now">Jetzt synchronisieren</string>
   <string name="sync_requested_will_begin_when_possible">Die Synchronisierung wird sobald wie möglich beginnen</string>
   <string name="preference_group_contacts">Kontakte</string>
@@ -204,8 +194,7 @@
   <string name="button_edit_payment_details">Zahlungsinformationen bearbeiten</string>
   <!--EditAutoRenewActivity-->
   <string name="usd_per_year">$%.2f/Jahr</string>
-  <string name="with_auto_renew_flock_automatically_charges_your_card_before">
-Wenn die automatische Verlängerung aktiviert ist, werden die Gebühren sieben Tage vor Ende der Laufzeit erhoben.</string>
+  <string name="with_auto_renew_flock_automatically_charges_your_card_before">Wenn die automatische Verlängerung aktiviert ist, werden die Gebühren sieben Tage vor Ende der Laufzeit erhoben.</string>
   <string name="button_save">Speichern</string>
   <string name="button_verify_and_save">Überprüfen und Speichern</string>
   <string name="card_verified_and_saved">Die Karte wurde überprüft und gespeichert!</string>
@@ -222,51 +211,30 @@ Wenn die automatische Verlängerung aktiviert ist, werden die Gebühren sieben T
   <string name="minutes_until_address_expires">Minuten bis die Adresse abläuft</string>
   <!--DeleteAccountActivity-->
   <string name="title_unregister_account">Account löschen</string>
-  <string name="if_you_chose_to_unregister_your_account_all_flock">
-	  Wenn der Account gelöscht wird, werden alle Flock-Kontakte und Kalender,
-	  sowie die Zahlungshistorie permanent gelöscht.
-    </string>
-  <string name="are_you_sure_you_want_to_unregister_your_account">
-	  Soll der Account wirklich gelöscht werden?
-    </string>
+  <string name="if_you_chose_to_unregister_your_account_all_flock">Wenn der Account gelöscht wird, werden alle Flock-Kontakte und Kalender, sowie die Zahlungshistorie permanent gelöscht.</string>
+  <string name="are_you_sure_you_want_to_unregister_your_account">Soll der Account wirklich gelöscht werden?</string>
   <string name="account_has_been_unregistered">Der Account wurde gelöscht.</string>
   <!--DeleteAllContactsActivity-->
   <string name="title_delete_all_contacts">Alle Kontakte löschen</string>
   <string name="all_contacts_have_been_deleted">Es wurden alle Kontakte gelöscht.</string>
-  <string name="if_you_chose_to_delete_your_flock_contacts">
-	  Wenn du alle Flock-Kontakte löschen möchtest, werden diese auch von allen 
-	  Geräten mit diesem Flock-Account gelöscht.
-    </string>
-  <string name="are_you_sure_you_want_to_delete_all_flock_contacts">
-	  Möchtest du wirklich alle Flock-Kontakte löschen?
-    </string>
+  <string name="if_you_chose_to_delete_your_flock_contacts">Wenn du alle Flock-Kontakte löschen möchtest, werden diese auch von allen Geräten mit diesem Flock-Account gelöscht.</string>
+  <string name="are_you_sure_you_want_to_delete_all_flock_contacts">Möchtest du wirklich alle Flock-Kontakte löschen?</string>
   <!--CorrectPasswordActivity-->
   <string name="title_correct_sync_password">Aktualisiere das Synchronisierungspasswort</string>
-  <string name="unable_to_login_to_sync_service_please_correct_your_password">
-	  Die Anmeldung ist fehlgeschlagen, bitte korrigiere dein Passwort.
-    </string>
+  <string name="unable_to_login_to_sync_service_please_correct_your_password">Die Anmeldung ist fehlgeschlagen, bitte korrigiere dein Passwort.</string>
   <string name="login_successful">Erfolgreiche Anmeldung!</string>
   <!--CorrectEncryptionPasswordActivity-->
   <string name="title_correct_encryption_password">Aktualisiere dein Verschlüsselungspasswort</string>
-  <string name="encryption_password_is_invalid_please_correct_your_encryption_password">
-	  Das Verschlüsselungspasswort ist ungültig, bitte korrigiere es.
-    </string>
+  <string name="encryption_password_is_invalid_please_correct_your_encryption_password">Das Verschlüsselungspasswort ist ungültig, bitte korrigiere es.</string>
   <string name="password_corrected">Das Passwort wurde aktualisiert!</string>
   <!--MigrationReleaseNotesActivity-->
   <string name="release_notes">Versionshinweise</string>
-  <string name="the_way_that_flock_syncs_data_has_changed_to_make_future_updates_run_more_smoothly">
-Die Art und Weise wie Flock Daten synchronisiert hat sich verändert, sodass zukünftige Updates einfacher
-möglich sind. Um dieses Update zu erleichern müssen alle Nutzer mit
-einem Client vor Version 0.8 die Synchronisation deaktivieren.
-</string>
-  <string name="after_updating_a_device_to_v08_simply_re_enable_sync">
-Nach der Aktualisierung auf die Version 0.8 wird die Migration im Anschluss an die Aktivierung der Synchronisation automatisch beendet werden.</string>
+  <string name="the_way_that_flock_syncs_data_has_changed_to_make_future_updates_run_more_smoothly">Die Art und Weise wie Flock Daten synchronisiert hat sich verändert, sodass zukünftige Updates einfacher möglich sind. Um dieses Update zu erleichern müssen alle Nutzer mit einem Client vor Version 0.8 die Synchronisation deaktivieren.</string>
+  <string name="after_updating_a_device_to_v08_simply_re_enable_sync">Nach der Aktualisierung auf die Version 0.8 wird die Migration im Anschluss an die Aktivierung der Synchronisation automatisch beendet werden.</string>
   <!--SendDebugLogActivity-->
   <string name="send_debug_log">Debug-Log senden</string>
   <string name="flock_debug_log">Debug Log von Flock</string>
-  <string name="something_strange_happened_send_us_your_debug_log">
-Etwas seltsames ist passiert - bitte sende uns deinen Debug-Log und wir werden das Problem beheben.
-</string>
+  <string name="something_strange_happened_send_us_your_debug_log">Etwas seltsames ist passiert - bitte sende uns deinen Debug-Log und wir werden das Problem beheben.</string>
   <string name="dont_ask_again">Nicht erneut fragen</string>
   <string name="send_log">Log senden</string>
   <!--MigrationService-->
