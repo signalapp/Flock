@@ -29,6 +29,8 @@ import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
@@ -39,7 +41,6 @@ import com.google.common.base.Optional;
 import ezvcard.VCard;
 import ezvcard.parameter.ImageType;
 import ezvcard.property.Photo;
-import ezvcard.util.IOUtils;
 
 import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
 import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
@@ -47,9 +48,8 @@ import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 import org.anhonesteffort.flock.sync.AbstractLocalComponentCollection;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -121,7 +121,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
         rawContactId
     );
 
-    return Uri.withAppendedPath(rawContactUri, ContactsContract.RawContacts.DisplayPhoto.CONTENT_DIRECTORY);
+    return Uri.withAppendedPath(rawContactUri, ContactsContract.Contacts.Photo.DISPLAY_PHOTO);
   }
 
   @Override
@@ -268,43 +268,43 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   {
     try {
 
-      AssetFileDescriptor fileDescriptor = client.openAssetFile(getUriForDisplayPhoto(rawContactId), "r");
-      InputStream         inputStream    = fileDescriptor.createInputStream();
+      AssetFileDescriptor   fileDescriptor = client.openAssetFile(getUriForDisplayPhoto(rawContactId), "r");
+      Bitmap                bitMap         = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor());
+      ByteArrayOutputStream outputStream   = new ByteArrayOutputStream();
+
+      bitMap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
 
       return Optional.of(
-          new Photo(IOUtils.toByteArray(inputStream), ImageType.JPEG)
+          new Photo(outputStream.toByteArray(), ImageType.PNG)
       );
 
     } catch (FileNotFoundException e) {
       return Optional.absent();
-    } catch (IOException e) {
-      throw new InvalidLocalComponentException("caught exception while adding picture",
-                                               CardDavConstants.CARDDAV_NAMESPACE, getPath(), rawContactId, e);
     }
   }
 
-  private Optional<Photo> getThumbnailPhoto(Long rawContactId) throws RemoteException {
+  private Optional<Photo> getDataRowsPhoto(Long rawContactId) throws RemoteException {
     String   SELECTION      = getColumnNameComponentDataLocalId()     + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
-    String[] SELECTION_ARGS = new String[]{
+    String[] SELECTION_ARGS = new String[] {
         rawContactId.toString(),
         ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE
     };
 
-    Optional<Photo> thumbnailPhoto = Optional.absent();
-    Cursor          cursor         = client.query(getUriForData(),
-                                                  ContactFactory.getProjectionForThumbnailPhoto(),
-                                                  SELECTION,
-                                                  SELECTION_ARGS,
-                                                  null);
+    Optional<Photo> photo  = Optional.absent();
+    Cursor          cursor = client.query(getUriForData(),
+                                          ContactFactory.getProjectionForPhoto(),
+                                          SELECTION,
+                                          SELECTION_ARGS,
+                                          null);
 
     if (cursor.moveToNext()) {
-      ContentValues photoValues    = ContactFactory.getValuesForThumbnailPhoto(cursor);
-                    thumbnailPhoto = ContactFactory.getPhotoForThumbnailValues(photoValues);
+      ContentValues photoValues = ContactFactory.getValuesForPhoto(cursor);
+                    photo       = ContactFactory.getPhotoForValues(photoValues);
     }
 
     cursor.close();
-    return thumbnailPhoto;
+    return photo;
   }
 
   private void addPhotos(Long rawContactId, VCard vCard)
@@ -312,7 +312,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   {
     Optional<Photo> photo = getDisplayPhoto(rawContactId);
     if (!photo.isPresent())
-      photo = getThumbnailPhoto(rawContactId);
+      photo = getDataRowsPhoto(rawContactId);
 
     if (photo.isPresent())
       vCard.addPhoto(photo.get());

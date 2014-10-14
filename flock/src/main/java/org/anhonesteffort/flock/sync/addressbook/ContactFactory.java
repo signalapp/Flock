@@ -543,13 +543,13 @@ public class ContactFactory {
     }
   }
 
-  protected static String[] getProjectionForThumbnailPhoto() {
+  protected static String[] getProjectionForPhoto() {
     return new String[] {
         ContactsContract.CommonDataKinds.Photo.PHOTO // 00 raw bytes of image
     };
   }
 
-  protected static ContentValues getValuesForThumbnailPhoto(Cursor cursor) {
+  protected static ContentValues getValuesForPhoto(Cursor cursor) {
     ContentValues values = new ContentValues(1);
 
     values.put(ContactsContract.CommonDataKinds.Photo.PHOTO, cursor.getBlob(0));
@@ -557,12 +557,14 @@ public class ContactFactory {
     return values;
   }
 
-  protected static Optional<Photo> getPhotoForThumbnailValues(ContentValues values) {
-    if (values.getAsByteArray(ContactsContract.CommonDataKinds.Photo.PHOTO) == null)
+  protected static Optional<Photo> getPhotoForValues(ContentValues values) {
+    byte[] thumbnailBytes = values.getAsByteArray(ContactsContract.CommonDataKinds.Photo.PHOTO);
+
+    if (thumbnailBytes == null || thumbnailBytes.length <= 0)
       return Optional.absent();
 
     return Optional.of(
-        new Photo(values.getAsByteArray(ContactsContract.CommonDataKinds.Photo.PHOTO), ImageType.JPEG)
+        new Photo(thumbnailBytes, ImageType.PNG)
     );
   }
 
@@ -570,6 +572,7 @@ public class ContactFactory {
     if (vCard.getPhotos().size() > 0) {
       ContentValues values = new ContentValues();
 
+      values.put("skip_processing", true); // 0.o see >> com.android.providers.contacts.DataRowHandlerForPhoto
       values.put(ContactsContract.Data.MIMETYPE,
                  ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
       values.put(ContactsContract.CommonDataKinds.Photo.PHOTO,
