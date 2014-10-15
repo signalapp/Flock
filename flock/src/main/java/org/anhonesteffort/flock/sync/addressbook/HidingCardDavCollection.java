@@ -140,7 +140,7 @@ public class HidingCardDavCollection extends CardDavCollection implements Hiding
         String parameterFlockHiddenPhoto = protectedPhoto.getParameter(PARAMETER_NAME_FLOCK_HIDDEN_PHOTO);
         if (parameterFlockHiddenPhoto != null && parameterFlockHiddenPhoto.equals("true")) {
           byte[] recoveredPhotoData = HidingUtil.decodeAndDecryptIfNecessary(masterCipher, protectedPhoto.getData());
-          Photo  recoveredPhoto     = new Photo(recoveredPhotoData, ImageType.JPEG);
+          Photo  recoveredPhoto     = new Photo(recoveredPhotoData, ImageType.PNG);
           recoveredVCard.addPhoto(recoveredPhoto);
         }
       }
@@ -249,7 +249,7 @@ public class HidingCardDavCollection extends CardDavCollection implements Hiding
     if (exposedVCard.getPhotos().size() > 0) {
       Photo  exposedPhoto       = exposedVCard.getPhotos().get(0);
       byte[] protectedPhotoData = HidingUtil.encryptEncodeAndPrefix(masterCipher, exposedPhoto.getData());
-      Photo  protectedPhoto     = new Photo(protectedPhotoData, ImageType.JPEG);
+      Photo  protectedPhoto     = new Photo(protectedPhotoData, ImageType.PNG);
       exposedVCard.removeProperties(Photo.class);
 
       protectedPhoto.addParameter(PARAMETER_NAME_FLOCK_HIDDEN_PHOTO, "true");
