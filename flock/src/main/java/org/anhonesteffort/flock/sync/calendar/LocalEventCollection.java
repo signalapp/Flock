@@ -180,8 +180,10 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
     if (cursor == null)
       throw new RemoteException("Content provider client gave us a null cursor!");
 
-    while (cursor.moveToNext())
-      newIds.add(cursor.getLong(0));
+    while (cursor.moveToNext()) {
+      if (!newIds.contains(cursor.getLong(0))) // android gets weird sometimes :(
+        newIds.add(cursor.getLong(0));
+    }
     cursor.close();
 
     return newIds;

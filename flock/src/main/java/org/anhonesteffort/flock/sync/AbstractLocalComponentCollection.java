@@ -107,8 +107,10 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
     if (cursor == null)
       throw new RemoteException("Content provider client gave us a null cursor!");
 
-    while (cursor.moveToNext())
-      newIds.add(cursor.getLong(0));
+    while (cursor.moveToNext()) {
+      if (!newIds.contains(cursor.getLong(0))) // android gets weird sometimes :(
+        newIds.add(cursor.getLong(0));
+    }
     cursor.close();
 
     return newIds;
@@ -126,8 +128,10 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
     if (cursor == null)
       throw new RemoteException("Content provider client gave us a null cursor!");
 
-    while (cursor.moveToNext())
-      idPairs.add(new Pair<Long, String>(cursor.getLong(0), cursor.getString(1)));
+    while (cursor.moveToNext()) {
+      if (!idPairs.contains(new Pair<Long, String>(cursor.getLong(0), cursor.getString(1)))) // android gets weird sometimes :(
+        idPairs.add(new Pair<Long, String>(cursor.getLong(0), cursor.getString(1)));
+    }
     cursor.close();
 
     return idPairs;
@@ -145,8 +149,10 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
     if (cursor == null)
       throw new RemoteException("Content provider client gave us a null cursor!");
 
-    while (cursor.moveToNext())
-      idPairs.add(new Pair<Long, String>(cursor.getLong(0), cursor.getString(1)));
+    while (cursor.moveToNext()) {
+      if (!idPairs.contains(new Pair<Long, String>(cursor.getLong(0), cursor.getString(1)))) // android gets weird sometimes :(
+        idPairs.add(new Pair<Long, String>(cursor.getLong(0), cursor.getString(1)));
+    }
     cursor.close();
 
     return idPairs;
@@ -167,16 +173,18 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
     }
 
     Cursor     cursor = client.query(getUriForComponents(), PROJECTION, selection, null, null);
-    List<Long> newIds = new LinkedList<Long>();
+    List<Long> componentIds = new LinkedList<Long>();
 
     if (cursor == null)
       throw new RemoteException("Content provider client gave us a null cursor!");
 
-    while (cursor.moveToNext())
-      newIds.add(cursor.getLong(0));
+    while (cursor.moveToNext()) {
+      if (!componentIds.contains(cursor.getLong(0))) // android gets weird sometimes :(
+        componentIds.add(cursor.getLong(0));
+    }
     cursor.close();
 
-    return newIds;
+    return componentIds;
   }
 
   public Optional<Long> getLocalIdForUid(String uid) throws RemoteException {

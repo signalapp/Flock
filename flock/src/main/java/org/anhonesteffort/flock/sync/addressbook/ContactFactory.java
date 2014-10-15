@@ -245,8 +245,6 @@ public class ContactFactory {
       return Optional.of(values);
     }
 
-    // TODO: handle case where only email address is present
-    Log.w(TAG, "structured name missing, returning absent");
     return Optional.absent();
   }
 
@@ -840,25 +838,26 @@ public class ContactFactory {
     return values;
   }
 
-  // TODO: if base64 decode fails just add the raw text
   protected static List<ContentValues> getValuesForNote(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
     for (Note note : vCard.getNotes()) {
+      ContentValues values       = new ContentValues();
+      String        noteContents = note.getValue();
+
+      values.put(ContactsContract.Data.MIMETYPE,
+                 ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE);
+
       try {
 
-        ContentValues values = new ContentValues();
-
-        values.put(ContactsContract.Data.MIMETYPE,
-                   ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE);
-        values.put(ContactsContract.CommonDataKinds.Note.NOTE,
-                   new String(Base64.decode(note.getValue())));
-
-        valuesList.add(values);
+        noteContents = new String(Base64.decode(noteContents));
 
       } catch (IOException e) {
-        Log.e(TAG, "error base64 decoding note, not putting in content provider", e);
+        Log.e(TAG, "error base64 decoding note, skipping decode", e);
       }
+
+      values.put(ContactsContract.CommonDataKinds.Note.NOTE, noteContents);
+      valuesList.add(values);
     }
 
     return valuesList;
@@ -905,7 +904,6 @@ public class ContactFactory {
     return values;
   }
 
-  // TODO: if base64 decode fails just add the raw text
   protected static List<ContentValues> getValuesForPostalAddresses(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
@@ -932,24 +930,26 @@ public class ContactFactory {
                    ContactsContract.CommonDataKinds.StructuredPostal.TYPE_OTHER);
 
       if (address.getLabel() != null) {
+        String formattedAddress = address.getLabel();
+
         try {
 
-          String formattedAddress = new String(Base64.decode(address.getLabel()));
-
-          values.put(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, formattedAddress);
-          values.put(ContactsContract.CommonDataKinds.StructuredPostal.STREET, address.getStreetAddress());
-          values.put(ContactsContract.CommonDataKinds.StructuredPostal.POBOX, address.getPoBox());
-          values.put(ContactsContract.CommonDataKinds.StructuredPostal.NEIGHBORHOOD, address.getExtendedAddress());
-          values.put(ContactsContract.CommonDataKinds.StructuredPostal.CITY, address.getLocality());
-          values.put(ContactsContract.CommonDataKinds.StructuredPostal.REGION, address.getRegion());
-          values.put(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE, address.getPostalCode());
-          values.put(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY, address.getCountry());
-
-          valuesList.add(values);
+          formattedAddress = new String(Base64.decode(formattedAddress));
 
         } catch (IOException e) {
-          Log.e(TAG, "formatted address is not base64 encoded, not adding anything for postal addresss.");
+          Log.e(TAG, "formatted address is not base64 encoded, skipping decode.");
         }
+
+        values.put(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, formattedAddress);
+        values.put(ContactsContract.CommonDataKinds.StructuredPostal.STREET,            address.getStreetAddress());
+        values.put(ContactsContract.CommonDataKinds.StructuredPostal.POBOX,             address.getPoBox());
+        values.put(ContactsContract.CommonDataKinds.StructuredPostal.NEIGHBORHOOD,      address.getExtendedAddress());
+        values.put(ContactsContract.CommonDataKinds.StructuredPostal.CITY,              address.getLocality());
+        values.put(ContactsContract.CommonDataKinds.StructuredPostal.REGION,            address.getRegion());
+        values.put(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE,          address.getPostalCode());
+        values.put(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY,           address.getCountry());
+
+        valuesList.add(values);
       }
     }
 

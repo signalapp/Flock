@@ -86,8 +86,10 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
     }
 
     // client is doing funky stuff...
-    else if (e instanceof RemoteException || e instanceof OperationApplicationException)
+    else if (e instanceof RemoteException || e instanceof OperationApplicationException) {
       result.stats.numParseExceptions++;
+      Log.e(TAG, e.toString(), e);
+    }
 
     /*
       NOTICE: MAC errors are only expected upon initial import of encrypted key material.
@@ -113,7 +115,7 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
       result.stats.numIoExceptions++;
     }
 
-    else {
+    else if (!(e instanceof InterruptedException)) {
       result.stats.numIoExceptions++;
       Log.e(TAG, "DID NOT CATCH THIS EXCEPTION CORRECTLY!!! >> " + e.toString(), e);
     }
@@ -151,6 +153,11 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
                             SyncResult            syncResult)
   {
     Log.d(TAG, "performing sync for authority >> " + authority);
+
+    syncResult.stats.numAuthExceptions =
+        syncResult.stats.numConflictDetectedExceptions =
+            syncResult.stats.numIoExceptions =
+                syncResult.stats.numParseExceptions = 0;
 
     if (!getSyncScheduler().getIsSyncEnabled(account)) {
       Log.w(TAG, "sync disabled for authority " + authority + ", not gonna sync");
