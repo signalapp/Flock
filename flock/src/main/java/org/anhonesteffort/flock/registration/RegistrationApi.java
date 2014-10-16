@@ -251,7 +251,7 @@ public class RegistrationApi {
         .putLong(KEY_CACHED_DAYS_REMAINING,        daysRemaining)
         .putBoolean(KEY_CACHED_AUTO_RENEW_ENABLED, autoRenewEnabled)
         .putBoolean(KEY_CACHED_LAST_CHARGE_FAILED, lastChargeFailed)
-        .commit();
+        .apply();
   }
 
   public static Optional<Pair<Long, Boolean[]>> getCachedSubscriptionDetails(Context context) {

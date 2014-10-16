@@ -119,19 +119,26 @@ public abstract class AbstractSyncScheduler extends ContentObserver {
     }
   }
 
-  public void restoreSyncIntervalFromSharedPreferences() {
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
-    setSyncInterval(settings.getInt(PreferencesActivity.KEY_PREF_SYNC_INTERVAL_MINUTES, 60));
+  private static SharedPreferences getSharedPreferences(Context context) {
+    return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+  }
+
+  public void restoreSyncIntervalFromUserSetting() {
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+    setSyncInterval(Integer.valueOf(
+        preferences.getString(PreferencesActivity.KEY_PREF_SYNC_INTERVAL_MINUTES, "60")
+    ));
   }
 
   public void setTimeLastSync(Long timeMilliseconds) {
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-    settings.edit().putLong(KEY_TIME_LAST_SYNC + getAuthority(), timeMilliseconds).commit();
+    getSharedPreferences(context).edit().putLong(
+        KEY_TIME_LAST_SYNC + getAuthority(), timeMilliseconds
+    ).apply();
   }
 
   public Optional<Long> getTimeLastSync() {
-    SharedPreferences settings         = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-    Long              timeMilliseconds = settings.getLong(KEY_TIME_LAST_SYNC + getAuthority(), -1);
+    Long timeMilliseconds = getSharedPreferences(context).getLong(KEY_TIME_LAST_SYNC + getAuthority(), -1);
 
     if (timeMilliseconds == -1)
       return Optional.absent();
@@ -141,12 +148,13 @@ public abstract class AbstractSyncScheduler extends ContentObserver {
 
   public void onAccountRemoved() {
     Log.d(getTAG(), "onAccountRemoved()");
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-    settings.edit().putBoolean(KEY_SYNC_OVERRIDDEN + getAuthority(), false).commit();
+    getSharedPreferences(context).edit().putBoolean(
+        KEY_SYNC_OVERRIDDEN + getAuthority(), false
+    ).apply();
   }
 
   private void handleInitSyncAdapter() {
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
+    SharedPreferences settings = getSharedPreferences(context);
 
     if (settings.getBoolean(KEY_SYNC_OVERRIDDEN + getAuthority(), false))
       return;
@@ -158,10 +166,9 @@ public abstract class AbstractSyncScheduler extends ContentObserver {
     }
 
     ContentResolver.setSyncAutomatically(account.get().getOsAccount(), getAuthority(), true);
-    settings.edit().putBoolean(KEY_SYNC_OVERRIDDEN + getAuthority(), true).commit();
+    settings.edit().putBoolean(KEY_SYNC_OVERRIDDEN + getAuthority(), true).apply();
 
     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
     setSyncInterval(Integer.valueOf(
         preferences.getString(PreferencesActivity.KEY_PREF_SYNC_INTERVAL_MINUTES, "60")
     ));
@@ -169,7 +176,7 @@ public abstract class AbstractSyncScheduler extends ContentObserver {
 
   @Override
   public void onChange(boolean selfChange, Uri changeUri) {
-    SharedPreferences    settings = PreferenceManager.getDefaultSharedPreferences(context);
+    SharedPreferences    settings = getSharedPreferences(context);
     Optional<DavAccount> account  = DavAccountHelper.getAccount(context);
 
     if (account.isPresent())

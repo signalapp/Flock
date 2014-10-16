@@ -90,7 +90,7 @@ public class CalendarsSyncService extends Service {
     private void setEventRemindersCorrected() {
       Log.d(TAG, "setEventRemindersCorrected()");
       SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-      preferences.edit().putBoolean(KEY_EVENT_REMINDERS_CORRECTED, true).commit();
+      preferences.edit().putBoolean(KEY_EVENT_REMINDERS_CORRECTED, true).apply();
     }
 
     private boolean getEventRemindersCorrected() {

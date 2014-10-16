@@ -80,6 +80,10 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     return KEY_PREFIX_COLLECTION_C_TAG.concat(getPath());
   }
 
+  private static SharedPreferences getSharedPreferences(Context context) {
+    return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+  }
+
   public static Uri getSyncAdapterUri(Uri base, Account account) {
     if (account != null)
       return base.buildUpon()
@@ -170,30 +174,30 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
   @Override
   public Optional<String> getDisplayName() {
-    SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_NAME,
-        Context.MODE_MULTI_PROCESS);
-
-    return Optional.fromNullable(preferences.getString(KEY_COLLECTION_DISPLAY_NAME, null));
+    return Optional.fromNullable(
+        getSharedPreferences(context).getString(KEY_COLLECTION_DISPLAY_NAME, null)
+    );
   }
 
   @Override
   public void setDisplayName(String displayName) {
-    SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_NAME,
-        Context.MODE_MULTI_PROCESS);
-
-    preferences.edit().putString(KEY_COLLECTION_DISPLAY_NAME, displayName).commit();
+    getSharedPreferences(context).edit().putString(
+        KEY_COLLECTION_DISPLAY_NAME, displayName
+    ).apply();
   }
 
   @Override
   public Optional<String> getCTag() {
-    SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-    return Optional.fromNullable(preferences.getString(getKeyForCTag(), null));
+    return Optional.fromNullable(
+        getSharedPreferences(context).getString(getKeyForCTag(), null)
+    );
   }
 
   @Override
   public void setCTag(String cTag) {
-    SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-    preferences.edit().putString(getKeyForCTag(), cTag).commit();
+    getSharedPreferences(context).edit().putString(
+        getKeyForCTag(), cTag
+    ).apply();
   }
 
   private void addStructuredNames(Long rawContactId, VCard vCard) throws RemoteException {

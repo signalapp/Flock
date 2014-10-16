@@ -49,7 +49,7 @@ public class MigrationHelperBroadcastReceiver extends BroadcastReceiver {
 
   public static void setMigrationUpdateHandled(Context context) {
     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-    preferences.edit().putBoolean(KEY_MIGRATION_UPDATED_HANDLED, true).commit();
+    preferences.edit().putBoolean(KEY_MIGRATION_UPDATED_HANDLED, true).apply();
   }
 
   private static boolean getMigrationUpdateHandled(Context context) {
@@ -61,7 +61,7 @@ public class MigrationHelperBroadcastReceiver extends BroadcastReceiver {
                                                boolean uiDisabled)
   {
     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-    preferences.edit().putBoolean(KEY_UI_DISABLED_FOR_MIGRATION, uiDisabled).commit();
+    preferences.edit().putBoolean(KEY_UI_DISABLED_FOR_MIGRATION, uiDisabled).apply();
   }
 
   public static boolean getUiDisabledForMigration(Context context) {

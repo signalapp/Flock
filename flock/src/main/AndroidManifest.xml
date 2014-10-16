@@ -151,8 +151,7 @@
                   android:label="KeySyncService" />
 
         <service android:name="org.anhonesteffort.flock.sync.key.KeySyncService"
-                 android:exported="true"
-                 android:process=":flock" >
+                 android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter"/>
             </intent-filter>
@@ -161,8 +160,7 @@
         </service>
 
         <service android:name="org.anhonesteffort.flock.sync.addressbook.AddressbookSyncService"
-                 android:exported="true"
-                 android:process=":flock" >
+                 android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter"/>
             </intent-filter>
@@ -173,8 +171,7 @@
         </service>
 
         <service android:name="org.anhonesteffort.flock.sync.calendar.CalendarsSyncService"
-                 android:exported="true"
-                 android:process=":flock" >
+                 android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter"/>
             </intent-filter>

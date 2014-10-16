@@ -56,18 +56,20 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
   public static void setAllowAccountRemoval(Context context, boolean isAllowed) {
     SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME,
-                                                              Context.MODE_MULTI_PROCESS);
-    settings.edit().putBoolean(KEY_ALLOW_ACCOUNT_REMOVAL, isAllowed).commit();
+                                                              Context.MODE_PRIVATE);
+    settings.edit().putBoolean(KEY_ALLOW_ACCOUNT_REMOVAL, isAllowed).apply();
   }
 
   @Override
   public Bundle getAccountRemovalAllowed(AccountAuthenticatorResponse response, Account account) {
-    SharedPreferences settings  = context.getSharedPreferences(PREFERENCES_NAME,
-                                                               Context.MODE_MULTI_PROCESS);
-    Boolean           isAllowed = settings.getBoolean(KEY_ALLOW_ACCOUNT_REMOVAL, false);
+    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME,
+                                                              Context.MODE_PRIVATE);
 
-    Bundle resultBundle = new Bundle();
+    Boolean isAllowed    = settings.getBoolean(KEY_ALLOW_ACCOUNT_REMOVAL, false);
+    Bundle  resultBundle = new Bundle();
+
     resultBundle.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, isAllowed);
+
     return resultBundle;
   }
 

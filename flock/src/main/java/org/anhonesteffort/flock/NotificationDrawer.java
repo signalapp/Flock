@@ -51,38 +51,39 @@ public class NotificationDrawer extends BroadcastReceiver {
   private static final String ACTION_STOP_ASKING_FOR_LOGS = "org.anhonesteffort.flock.ACTION_STOP_ASKING_FOR_LOGS";
   private static final String KEY_STOP_ASKING_FOR_LOGS    = "KEY_STOP_ASKING_FOR_LOGS";
 
+  private static SharedPreferences getSharedPreferences(Context context) {
+    return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+  }
+
   public static void disableAuthNotificationsForRunningAdapters(Context context, Account account) {
     AddressbookSyncScheduler addressbookSync = new AddressbookSyncScheduler(context);
     CalendarsSyncScheduler   calendarSync    = new CalendarsSyncScheduler(context);
     KeySyncScheduler         keySync         = new KeySyncScheduler(context);
-    SharedPreferences        settings        = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
+    SharedPreferences        settings        = getSharedPreferences(context);
 
     if (addressbookSync.syncInProgress(account)) {
-      settings.edit().putBoolean(KEY_VOID_AUTH_NOTIFICATIONS + addressbookSync.getAuthority(), true).commit();
+      settings.edit().putBoolean(KEY_VOID_AUTH_NOTIFICATIONS + addressbookSync.getAuthority(), true).apply();
       Log.w(TAG, "disabled auth notifications for " + addressbookSync.getAuthority());
     }
 
     if (calendarSync.syncInProgress(account)) {
-      settings.edit().putBoolean(KEY_VOID_AUTH_NOTIFICATIONS + calendarSync.getAuthority(), true).commit();
+      settings.edit().putBoolean(KEY_VOID_AUTH_NOTIFICATIONS + calendarSync.getAuthority(), true).apply();
       Log.w(TAG, "disabled auth notifications for " + calendarSync.getAuthority());
     }
 
     if (keySync.syncInProgress(account)) {
-      settings.edit().putBoolean(KEY_VOID_AUTH_NOTIFICATIONS + keySync.getAuthority(), true).commit();
+      settings.edit().putBoolean(KEY_VOID_AUTH_NOTIFICATIONS + keySync.getAuthority(), true).apply();
       Log.w(TAG, "disabled auth notifications for " + keySync.getAuthority());
     }
   }
 
   public static void enableAuthNotifications(Context context, String authority) {
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-    settings.edit().putBoolean(KEY_VOID_AUTH_NOTIFICATIONS + authority, false).commit();
+    getSharedPreferences(context).edit().putBoolean(KEY_VOID_AUTH_NOTIFICATIONS + authority, false).apply();
     Log.w(TAG, "enabled auth notification for " + authority);
   }
 
   public static boolean isAuthNotificationDisabled(Context context, String authority) {
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-
-    if (settings.getBoolean(KEY_VOID_AUTH_NOTIFICATIONS + authority, false)) {
+    if (getSharedPreferences(context).getBoolean(KEY_VOID_AUTH_NOTIFICATIONS + authority, false)) {
       Log.w(TAG, "auth notification is disabled for " + authority);
       return true;
     }
@@ -137,14 +138,12 @@ public class NotificationDrawer extends BroadcastReceiver {
   }
 
   private static boolean isStopAskingForLogsSet(Context context) {
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-    return settings.getBoolean(KEY_STOP_ASKING_FOR_LOGS, false);
+    return getSharedPreferences(context).getBoolean(KEY_STOP_ASKING_FOR_LOGS, false);
   }
 
   private static void setStopAskingForLogs(Context context) {
     Log.w(TAG, "will stop asking for debug logs :(");
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-    settings.edit().putBoolean(KEY_STOP_ASKING_FOR_LOGS, true).commit();
+    getSharedPreferences(context).edit().putBoolean(KEY_STOP_ASKING_FOR_LOGS, true).apply();
   }
 
   public static void handlePromptForDebugLogIfNotDisabled(Context context) {

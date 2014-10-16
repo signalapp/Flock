@@ -72,14 +72,14 @@ public class DavAccount {
 
   public Optional<String> getCardDavCollectionPath(Context context) {
     SharedPreferences preferences = context.getSharedPreferences(SYNC_ACCOUNT_TYPE,
-                                                                 Context.MODE_MULTI_PROCESS);
+                                                                 Context.MODE_PRIVATE);
     return Optional.fromNullable(preferences.getString(KEY_CARD_DAV_COLLECTION, null));
   }
 
   public void setCardDavCollection(Context context, String path) {
     SharedPreferences preferences = context.getSharedPreferences(SYNC_ACCOUNT_TYPE,
-                                                                 Context.MODE_MULTI_PROCESS);
-    preferences.edit().putString(KEY_CARD_DAV_COLLECTION, path).commit();
+                                                                 Context.MODE_PRIVATE);
+    preferences.edit().putString(KEY_CARD_DAV_COLLECTION, path).apply();
   }
 
   public Account getOsAccount() {

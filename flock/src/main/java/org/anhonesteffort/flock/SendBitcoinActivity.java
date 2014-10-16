@@ -325,7 +325,7 @@ public class SendBitcoinActivity extends Activity {
         String            btcReceiverId       = preferences.getString(KEY_ID_BTC_RECEIVER, null);
 
         if (btcReceiverId != null)
-          preferences.edit().remove(KEY_ID_BTC_RECEIVER).commit();
+          preferences.edit().remove(KEY_ID_BTC_RECEIVER).apply();
       }
 
       private Receiver handleCreateNewBtcReceiver(Double costUsd) throws StripeException {
@@ -357,7 +357,7 @@ public class SendBitcoinActivity extends Activity {
 
         if (btcReceiverId == null) {
           btcReceiver = handleCreateNewBtcReceiver(costUsd);
-          preferences.edit().putString(KEY_ID_BTC_RECEIVER, btcReceiver.getId()).commit();
+          preferences.edit().putString(KEY_ID_BTC_RECEIVER, btcReceiver.getId()).apply();
           return btcReceiver;
         }
 

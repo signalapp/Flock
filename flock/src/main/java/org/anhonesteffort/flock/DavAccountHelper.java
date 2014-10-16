@@ -55,7 +55,7 @@ public class DavAccountHelper {
   private static final String KEY_DAV_HOST     = "org.anhonesteffort.flock.auth.AccountAuthenticator.KEY_DAV_HOST";
 
   private static SharedPreferences getSharedPreferences(Context context) {
-    return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
+    return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
   }
 
   public static String correctUsername(Context context, String username) {
@@ -74,7 +74,7 @@ public class DavAccountHelper {
   }
 
   public static void setAccountUsername(Context context, String username) {
-    getSharedPreferences(context).edit().putString(KEY_DAV_USERNAME, username).commit();
+    getSharedPreferences(context).edit().putString(KEY_DAV_USERNAME, username).apply();
   }
 
   public static Optional<String> getAccountPassword(Context context) {
@@ -82,11 +82,11 @@ public class DavAccountHelper {
   }
 
   public static void setAccountPassword(Context context, String password) {
-    getSharedPreferences(context).edit().putString(KEY_DAV_PASSWORD, password).commit();
+    getSharedPreferences(context).edit().putString(KEY_DAV_PASSWORD, password).apply();
   }
 
   public static void invalidateAccountPassword(Context context) {
-    getSharedPreferences(context).edit().remove(KEY_DAV_PASSWORD).commit();
+    getSharedPreferences(context).edit().remove(KEY_DAV_PASSWORD).apply();
   }
 
   public static Optional<String> getAccountDavHREF(Context context) {
@@ -94,13 +94,13 @@ public class DavAccountHelper {
   }
 
   public static void setAccountDavHREF(Context context, String href) {
-    getSharedPreferences(context).edit().putString(KEY_DAV_HOST, href).commit();
+    getSharedPreferences(context).edit().putString(KEY_DAV_HOST, href).apply();
   }
 
   public static void invalidateAccount(Context context) {
-    getSharedPreferences(context).edit().remove(KEY_DAV_HOST).commit();
-    getSharedPreferences(context).edit().remove(KEY_DAV_USERNAME).commit();
-    getSharedPreferences(context).edit().remove(KEY_DAV_PASSWORD).commit();
+    getSharedPreferences(context).edit().remove(KEY_DAV_HOST).apply();
+    getSharedPreferences(context).edit().remove(KEY_DAV_USERNAME).apply();
+    getSharedPreferences(context).edit().remove(KEY_DAV_PASSWORD).apply();
   }
 
   public static boolean isUsingOurServers(DavAccount account) {

@@ -116,7 +116,7 @@ public class MigrationService extends Service {
     SharedPreferences settings =
         getBaseContext().getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
 
-    settings.edit().putInt(KEY_STATE, state).commit();
+    settings.edit().putInt(KEY_STATE, state).apply();
     handleUpdateNotificationUsingState();
   }
 
@@ -143,7 +143,7 @@ public class MigrationService extends Service {
     SharedPreferences settings =
         getBaseContext().getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
 
-    settings.edit().putLong(key, timeMilliseconds).commit();
+    settings.edit().putLong(key, timeMilliseconds).apply();
   }
 
   private long getTimeFirstSync(String key) {

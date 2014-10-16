@@ -143,7 +143,7 @@ public class DavKeyCollection extends AbstractDavComponentCollection<Calendar> {
     Log.w(TAG, "setWeStartedMigration() >> " + weStarted);
 
     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-    settings.edit().putBoolean(KEY_WE_STARTED_MIGRATION, weStarted).commit();
+    settings.edit().putBoolean(KEY_WE_STARTED_MIGRATION, weStarted).apply();
   }
 
   private static Calendar getMockCalendarForUid(String uid) {

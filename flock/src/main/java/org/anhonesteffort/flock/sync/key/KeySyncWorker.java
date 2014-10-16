@@ -85,7 +85,7 @@ public class KeySyncWorker {
   {
     Log.w(TAG, "handleMigrationComplete()");
 
-    new KeySyncScheduler(context).restoreSyncIntervalFromSharedPreferences();
+    new KeySyncScheduler(context).restoreSyncIntervalFromUserSetting();
 
     try {
 

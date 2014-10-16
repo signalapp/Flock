@@ -37,23 +37,23 @@ public class KeyHelperTest extends AndroidTestCase {
   }
 
   private static void saveBytes(Context context, String key, byte[] value) {
-    SharedPreferences        settings  = context.getSharedPreferences(HACK_PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
+    SharedPreferences        settings  = context.getSharedPreferences(HACK_PREFERENCES_NAME, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor    = settings.edit();
 
     editor.putString(key, Base64.encodeBytes(value));
-    editor.commit();
+    editor.apply();
   }
 
   private static void saveString(Context context, String key, String value) {
-    SharedPreferences        settings = context.getSharedPreferences(HACK_PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
+    SharedPreferences        settings = context.getSharedPreferences(HACK_PREFERENCES_NAME, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor   = settings.edit();
 
     editor.putString(key, value);
-    editor.commit();
+    editor.apply();
   }
 
   private static Optional<byte[]> retrieveBytes(Context context, String key) throws IOException {
-    SharedPreferences settings     = context.getSharedPreferences(HACK_PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
+    SharedPreferences settings     = context.getSharedPreferences(HACK_PREFERENCES_NAME, Context.MODE_PRIVATE);
     String            encodedValue = settings.getString(key, null);
 
     if (encodedValue == null)

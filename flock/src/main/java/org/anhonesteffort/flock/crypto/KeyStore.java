@@ -43,14 +43,17 @@ public class KeyStore {
   private static final String KEY_KEY_MATERIAL_SALT       = "KEY_KEY_MATERIAL_SALT";
   private static final String KEY_ENCRYPTED_KEY_MATERIAL  = "KEY_ENCRYPTED_KEY_MATERIAL";
 
+  private static SharedPreferences getSharedPreferences(Context context) {
+    return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+  }
+
   protected static boolean getUseCipherVersionZero(Context context) {
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-    return settings.getBoolean(KEY_USE_CIPHER_VERSION_ZERO, false);
+    return getSharedPreferences(context).getBoolean(KEY_USE_CIPHER_VERSION_ZERO, false);
   }
 
   public static void setUseCipherVersionZero(Context context, boolean useCipherVersionZero) {
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-    settings.edit().putBoolean(KEY_USE_CIPHER_VERSION_ZERO, useCipherVersionZero).commit();
+    getSharedPreferences(context).edit().putBoolean(KEY_USE_CIPHER_VERSION_ZERO,
+                                                    useCipherVersionZero).apply();
   }
 
   protected static void saveCipherKey(Context context, byte[] cipherKey) {
@@ -100,36 +103,32 @@ public class KeyStore {
 
   public static void invalidateKeyMaterial(Context context) {
     Log.w(TAG, "INVALIDATING ALL KEY MATERIAL...");
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME,
-                                                              Context.MODE_MULTI_PROCESS);
+    SharedPreferences settings = getSharedPreferences(context);
 
-    settings.edit().remove(KEY_CIPHER_KEY).commit();
-    settings.edit().remove(KEY_MAC_KEY).commit();
-    settings.edit().remove(KEY_KEY_MATERIAL_SALT).commit();
-    settings.edit().remove(KEY_MASTER_PASSPHRASE).commit();
+    settings.edit().remove(KEY_CIPHER_KEY).apply();
+    settings.edit().remove(KEY_MAC_KEY).apply();
+    settings.edit().remove(KEY_KEY_MATERIAL_SALT).apply();
+    settings.edit().remove(KEY_MASTER_PASSPHRASE).apply();
   }
 
   private static void saveBytes(Context context, String key, byte[] value) {
-    SharedPreferences        settings = context.getSharedPreferences(PREFERENCES_NAME,
-                                                              Context.MODE_MULTI_PROCESS);
+    SharedPreferences        settings = getSharedPreferences(context);
     SharedPreferences.Editor editor   = settings.edit();
 
     editor.putString(key, Base64.encodeBytes(value));
-    editor.commit();
+    editor.apply();
   }
 
   private static void saveString(Context context, String key, String value) {
-    SharedPreferences        settings = context.getSharedPreferences(PREFERENCES_NAME,
-                                                                     Context.MODE_MULTI_PROCESS);
+    SharedPreferences        settings = getSharedPreferences(context);
     SharedPreferences.Editor editor   = settings.edit();
 
     editor.putString(key, value);
-    editor.commit();
+    editor.apply();
   }
 
   private static Optional<byte[]> retrieveBytes(Context context, String key) throws IOException {
-    SharedPreferences settings     = context.getSharedPreferences(PREFERENCES_NAME,
-                                                                  Context.MODE_MULTI_PROCESS);
+    SharedPreferences settings     = getSharedPreferences(context);
     String            encodedValue = settings.getString(key, null);
 
     if (encodedValue == null)
@@ -139,9 +138,7 @@ public class KeyStore {
   }
 
   private static Optional<String> retrieveString(Context context, String key) {
-    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME,
-                                                              Context.MODE_MULTI_PROCESS);
-    return Optional.fromNullable(settings.getString(key, null));
+    return Optional.fromNullable(getSharedPreferences(context).getString(key, null));
   }
 
 }
