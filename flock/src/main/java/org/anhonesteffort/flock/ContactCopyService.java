@@ -132,7 +132,6 @@ public class ContactCopyService extends Service implements ContactCopiedListener
   private void handleCopyComplete() {
     Log.d(TAG, "handleCopyComplete()");
 
-    new AddressbookSyncScheduler(getBaseContext()).requestSync();
     stopForeground(false);
     stopSelf();
   }

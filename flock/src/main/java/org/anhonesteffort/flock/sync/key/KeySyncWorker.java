@@ -32,7 +32,7 @@ import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.KeyStore;
-import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
+import org.anhonesteffort.flock.sync.SyncWorkerUtil;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
@@ -97,9 +97,9 @@ public class KeySyncWorker {
       }
 
     } catch (GeneralSecurityException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
 
     try {
@@ -137,13 +137,13 @@ public class KeySyncWorker {
       }
 
     } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (GeneralSecurityException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
 
     handleEnableCalendarAndContactSync();
@@ -173,11 +173,11 @@ public class KeySyncWorker {
         handleStartOrResumeMigrationService();
 
     } catch (InvalidComponentException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -210,19 +210,19 @@ public class KeySyncWorker {
           handleMigrationInProgress(result, keyCollection.get());
 
       } catch (InvalidComponentException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (PropertyParseException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (DavException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (IOException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } finally {
         davKeyStore.closeHttpConnection();
       }
 
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 }

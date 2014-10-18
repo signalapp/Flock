@@ -22,10 +22,8 @@ package org.anhonesteffort.flock.sync.key;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SyncResult;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
@@ -33,9 +31,7 @@ import android.util.Log;
 
 import org.anhonesteffort.flock.CorrectEncryptionPasswordActivity;
 import org.anhonesteffort.flock.R;
-import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
-import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
@@ -43,7 +39,6 @@ import org.apache.jackrabbit.webdav.DavException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -83,9 +78,12 @@ public class KeySyncService extends Service {
     }
 
     @Override
-    protected void handlePreSyncOperations(DavAccount            account,
-                                           MasterCipher          masterCipher,
-                                           ContentProviderClient provider)
+    protected boolean localHasChanged() throws RemoteException {
+      return false;
+    }
+
+    @Override
+    protected void handlePreSyncOperations()
         throws PropertyParseException, InvalidMacException, DavException,
                RemoteException, GeneralSecurityException, IOException
     {
@@ -93,20 +91,15 @@ public class KeySyncService extends Service {
     }
 
     @Override
-    protected List<AbstractDavSyncWorker> getSyncWorkers(DavAccount            account,
-                                                         MasterCipher          masterCipher,
-                                                         ContentProviderClient client,
-                                                         SyncResult            syncResult)
+    protected List<AbstractDavSyncWorker> getSyncWorkers(boolean localChangesOnly)
         throws DavException, RemoteException, IOException
     {
-      new KeySyncWorker(getContext(), account).run(syncResult); // hack...
+      new KeySyncWorker(getContext(), davAccount).run(syncResult); // TODO: this is hack
       return new LinkedList<AbstractDavSyncWorker>();
     }
 
     @Override
-    protected void handlePostSyncOperations(DavAccount            account,
-                                            MasterCipher          masterCipher,
-                                            ContentProviderClient provider)
+    protected void handlePostSyncOperations()
         throws PropertyParseException, InvalidMacException, DavException,
                RemoteException, GeneralSecurityException, IOException
     {

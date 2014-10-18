@@ -190,6 +190,23 @@ public class LocalEventCollection extends AbstractLocalComponentCollection<Calen
   }
 
   @Override
+  public boolean hasChanges() throws RemoteException {
+    final String[] PROJECTION = new String[]{};
+    final String   SELECTION  = "(" + getColumnNameComponentUid()        + " IS NULL OR " +
+                                      getColumnNameDirty()               + "=1 OR "       +
+                                      getColumnNameDeleted()             + "=1 OR "       +
+                                      getColumnNameQueuedForMigration()  + "=1 OR "       +
+                                      CalendarContract.Events.SYNC_DATA2 + "> 0) AND "    +
+                                getColumnNameCollectionLocalId()  + "=" + localId;
+
+    Cursor  cursor     = client.query(getUriForComponents(), PROJECTION, SELECTION, null, null);
+    boolean hasChanges = cursor.moveToNext();
+
+    cursor.close();
+    return hasChanges;
+  }
+
+  @Override
   public void cleanComponent(Long localId) {
     Log.d(TAG, "cleanComponent() localId " + localId);
 

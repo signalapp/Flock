@@ -20,11 +20,9 @@
 package org.anhonesteffort.flock.sync.calendar;
 
 import android.app.Service;
-import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SyncResult;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -39,8 +37,6 @@ import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.PreferencesActivity;
-import org.anhonesteffort.flock.auth.DavAccount;
-import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
@@ -87,6 +83,24 @@ public class CalendarsSyncService extends Service {
       return new CalendarsSyncScheduler(getContext());
     }
 
+    @Override
+    protected boolean localHasChanged() throws RemoteException {
+      LocalCalendarStore localStore =
+          new LocalCalendarStore(provider, davAccount.getOsAccount());
+
+      for (LocalEventCollection localCollection : localStore.getCollections()) {
+        if (localCollection.hasChanges())
+          return true;
+      }
+
+      for (LocalEventCollection localCollection : localStore.getCopiedCollections()) {
+        if (localCollection.hasChanges())
+          return true;
+      }
+
+      return false;
+    }
+
     private void setEventRemindersCorrected() {
       Log.d(TAG, "setEventRemindersCorrected()");
       SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -98,12 +112,11 @@ public class CalendarsSyncService extends Service {
       return preferences.getBoolean(KEY_EVENT_REMINDERS_CORRECTED, false);
     }
 
-    private void handleCorrectEventReminders(DavAccount            account,
-                                             ContentProviderClient provider)
-        throws RemoteException
-    {
+    private void handleCorrectEventReminders() throws RemoteException {
       Log.d(TAG, "handleCorrectEventReminders()");
-      LocalCalendarStore localStore = new LocalCalendarStore(provider, account.getOsAccount());
+
+      LocalCalendarStore localStore =
+          new LocalCalendarStore(provider, davAccount.getOsAccount());
 
       for (LocalEventCollection collection : localStore.getCollections())
         collection.handleCorrectEventReminders();
@@ -111,15 +124,13 @@ public class CalendarsSyncService extends Service {
       setEventRemindersCorrected();
     }
 
-    private void handleImportNewCollections(DavAccount            account,
-                                            MasterCipher          masterCipher,
-                                            ContentProviderClient provider)
+    private void handleImportNewCollections()
         throws PropertyParseException, InvalidMacException, DavException,
                RemoteException, GeneralSecurityException, IOException
     {
       Log.d(TAG, "handleImportNewCollections()");
-      LocalCalendarStore localStore  = new LocalCalendarStore(provider, account.getOsAccount());
-      HidingCalDavStore  remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), account, masterCipher);
+      LocalCalendarStore localStore  = new LocalCalendarStore(provider, davAccount.getOsAccount());
+      HidingCalDavStore  remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), davAccount, masterCipher);
 
       try {
 
@@ -135,7 +146,8 @@ public class CalendarsSyncService extends Service {
                                        remoteCollection.getHiddenColor().get());
             }
             else if (remoteCollection.getHiddenDisplayName().isPresent())
-              localStore.addCollection(remoteCollection.getPath(), remoteCollection.getHiddenDisplayName().get());
+              localStore.addCollection(remoteCollection.getPath(),
+                                       remoteCollection.getHiddenDisplayName().get());
             else
               localStore.addCollection(remoteCollection.getPath());
           }
@@ -147,50 +159,52 @@ public class CalendarsSyncService extends Service {
     }
 
     @Override
-    protected void handlePreSyncOperations(DavAccount            account,
-                                           MasterCipher          masterCipher,
-                                           ContentProviderClient provider)
+    protected void handlePreSyncOperations()
         throws PropertyParseException, InvalidMacException, DavException,
                RemoteException, GeneralSecurityException, IOException
     {
       Log.d(TAG, "handlePreSyncOperations()");
 
       if (!getEventRemindersCorrected())
-        handleCorrectEventReminders(account, provider);
+        handleCorrectEventReminders();
 
-      if (DavAccountHelper.isUsingOurServers(account))
-        handleImportNewCollections(account, masterCipher, provider);
+      if (DavAccountHelper.isUsingOurServers(davAccount))
+        handleImportNewCollections();
     }
 
     @Override
-    public List<AbstractDavSyncWorker> getSyncWorkers(DavAccount            account,
-                                                      MasterCipher          masterCipher,
-                                                      ContentProviderClient provider,
-                                                      SyncResult            syncResult)
+    public List<AbstractDavSyncWorker> getSyncWorkers(boolean localChangesOnly)
         throws DavException, RemoteException, IOException
     {
       List<AbstractDavSyncWorker> workers     = new LinkedList<AbstractDavSyncWorker>();
-      LocalCalendarStore          localStore  = new LocalCalendarStore(provider, account.getOsAccount());
-      HidingCalDavStore           remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), account, masterCipher);
+      LocalCalendarStore          localStore  = new LocalCalendarStore(provider, davAccount.getOsAccount());
+      HidingCalDavStore           remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), davAccount, masterCipher);
 
       try {
 
         for (LocalEventCollection localCollection : localStore.getCollections()) {
-          Log.d(TAG, "found local collection: " + localCollection.getPath());
-          Optional<HidingCalDavCollection> remoteCollection = remoteStore.getCollection(localCollection.getPath());
+          Log.d(TAG, "found local collection " + localCollection.getPath());
+          if (!localChangesOnly || localCollection.hasChanges()) {
 
-          if (remoteCollection.isPresent()) {
-            remoteCollection.get().setClient(
-                DavAccountHelper.getAndroidDavClient(getContext(), account)
-            );
+            Optional<HidingCalDavCollection> remoteCollection =
+                remoteStore.getCollection(localCollection.getPath());
 
-            workers.add(
-                new CalendarSyncWorker(getContext(), syncResult, localCollection, remoteCollection.get())
-            );
-          } else {
-            Log.d(TAG, "local collection missing remotely, deleting locally");
-            localStore.removeCollection(localCollection.getPath());
+            if (remoteCollection.isPresent()) {
+              remoteCollection.get().setClient(
+                  DavAccountHelper.getAndroidDavClient(getContext(), davAccount)
+              );
+              workers.add(
+                  new CalendarSyncWorker(getContext(), syncResult, localCollection, remoteCollection.get())
+              );
+            }
+            else {
+              Log.d(TAG, "local collection missing remotely, deleting locally");
+              localStore.removeCollection(localCollection.getPath());
+            }
           }
+          else
+            Log.d(TAG, "local collection " + localCollection.getPath() +
+                       " does not have changes, skipping.");
         }
 
       } finally {
@@ -201,25 +215,23 @@ public class CalendarsSyncService extends Service {
     }
 
     @Override
-    protected void handlePostSyncOperations(DavAccount            account,
-                                            MasterCipher          masterCipher,
-                                            ContentProviderClient provider)
+    protected void handlePostSyncOperations()
         throws RemoteException, IOException,
                GeneralSecurityException, DavException, PropertyParseException
     {
       Log.d(TAG, "handlePostSyncOperations() -- finalizing imported calendars...");
 
-      LocalCalendarStore localStore  = new LocalCalendarStore(provider, account.getOsAccount());
-      HidingCalDavStore  remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), account, masterCipher);
+      LocalCalendarStore localStore  = new LocalCalendarStore(provider, davAccount.getOsAccount());
+      HidingCalDavStore  remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), davAccount, masterCipher);
 
       try {
 
-        Optional<String> calendarHome = remoteStore.getCalendarHomeSet();
-        if (!calendarHome.isPresent())
-          throw new PropertyParseException("No calendar-home-set property found for user.",
-                                           remoteStore.getHostHREF(), CalDavConstants.PROPERTY_NAME_CALENDAR_HOME_SET);
-
         for (LocalEventCollection copiedCalendar : localStore.getCopiedCollections()) {
+          Optional<String> calendarHome = remoteStore.getCalendarHomeSet();
+          if (!calendarHome.isPresent())
+            throw new PropertyParseException("No calendar-home-set property found for user.",
+                                             remoteStore.getHostHREF(), CalDavConstants.PROPERTY_NAME_CALENDAR_HOME_SET);
+
           String            remotePath  = calendarHome.get().concat(UUID.randomUUID().toString() + "/");
           Optional<String>  displayName = copiedCalendar.getDisplayName();
           Optional<Integer> color       = copiedCalendar.getColor();

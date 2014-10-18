@@ -26,8 +26,10 @@ import android.util.Log;
 import com.google.common.base.Optional;
 
 import org.anhonesteffort.flock.crypto.InvalidMacException;
+import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
+import org.apache.jackrabbit.webdav.DavServletResponse;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -35,6 +37,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.net.ssl.SSLException;
 
 /**
  * rhodey
@@ -44,6 +48,62 @@ public class SyncWorkerUtil {
   private static final String TAG = "org.anhonesteffort.flock.sync.SyncUtil";
 
   protected static final int MAX_COMPONENTS_PER_REPORT = 50;
+
+  public static void handleException(Context context, Exception e, SyncResult result) {
+    if (e instanceof DavException) {
+      DavException ex = (DavException) e;
+      Log.e(TAG, "error code: " + ex.getErrorCode() + ", status phrase: " + ex.getStatusPhrase(), e);
+
+      if (ex.getErrorCode() == DavServletResponse.SC_UNAUTHORIZED)
+        result.stats.numAuthExceptions++;
+      else if (ex.getErrorCode() == OwsWebDav.STATUS_PAYMENT_REQUIRED)
+        result.stats.numSkippedEntries++;
+      else if (ex.getErrorCode() != DavServletResponse.SC_PRECONDITION_FAILED)
+        result.stats.numConflictDetectedExceptions++;
+    }
+
+    else if (e instanceof InvalidComponentException) {
+      InvalidComponentException ex = (InvalidComponentException) e;
+      result.stats.numParseExceptions++;
+      Log.e(TAG, ex.toString(), ex);
+    }
+
+    // server is giving us funky stuff...
+    else if (e instanceof PropertyParseException) {
+      PropertyParseException ex = (PropertyParseException) e;
+      result.stats.numParseExceptions++;
+      Log.e(TAG, ex.toString(), ex);
+    }
+
+    // client is doing funky stuff...
+    else if (e instanceof RemoteException || e instanceof OperationApplicationException) {
+      result.stats.numParseExceptions++;
+      Log.e(TAG, e.toString(), e);
+    }
+
+    else if (e instanceof InvalidMacException) {
+      Log.e(TAG, "BAD MAC IN SYNC!!! 0.o ", e);
+      result.stats.numParseExceptions++;
+    }
+    else if (e instanceof GeneralSecurityException) {
+      Log.e(TAG, "crypto problems in sync 0.u ", e);
+      result.stats.numParseExceptions++;
+    }
+
+    else if (e instanceof SSLException) {
+      Log.e(TAG, "SSL PROBLEM IN SYNC!!! 0.o ", e);
+      result.stats.numIoExceptions++;
+    }
+    else if (e instanceof IOException) {
+      Log.e(TAG, "who knows...", e);
+      result.stats.numIoExceptions++;
+    }
+
+    else if (!(e instanceof InterruptedException)) {
+      result.stats.numIoExceptions++;
+      Log.e(TAG, "DID NOT CATCH THIS EXCEPTION CORRECTLY!!! >> " + e.toString(), e);
+    }
+  }
 
   protected static void handleMakeFlockCollection(AbstractLocalComponentCollection<?> localCollection,
                                                   HidingDavCollection<?>              remoteCollection)
@@ -67,9 +127,9 @@ public class SyncWorkerUtil {
       remoteCollection.fetchProperties();
 
     }  catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -87,9 +147,9 @@ public class SyncWorkerUtil {
       localCollection.commitPendingOperations();
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (OperationApplicationException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -106,9 +166,9 @@ public class SyncWorkerUtil {
       localCollection.commitPendingOperations();
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (OperationApplicationException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -187,9 +247,9 @@ public class SyncWorkerUtil {
     }
 
     for (InvalidRemoteComponentException e : multiStatusResult.getInvalidComponentExceptions())
-      AbstractDavSyncAdapter.handleException(context, e, syncResult);
+      SyncWorkerUtil.handleException(context, e, syncResult);
 
     for (InvalidMacException e : multiStatusResult.getInvalidMacExceptions())
-      AbstractDavSyncAdapter.handleException(context, e, syncResult);
+      SyncWorkerUtil.handleException(context, e, syncResult);
   }
 }

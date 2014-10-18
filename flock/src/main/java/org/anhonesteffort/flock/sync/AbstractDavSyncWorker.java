@@ -142,17 +142,17 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
                                          remoteCollection.getPath(), CalDavConstants.PROPERTY_NAME_CTAG);
 
     } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (OperationApplicationException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (GeneralSecurityException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch(IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -175,17 +175,17 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
       }
 
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (InvalidMacException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (GeneralSecurityException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -208,17 +208,17 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
       }
 
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (InvalidMacException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (GeneralSecurityException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -240,13 +240,13 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
          result.stats.numDeletes++;
 
        } catch (DavException e) {
-         AbstractDavSyncAdapter.handleException(context, e, result);
+         SyncWorkerUtil.handleException(context, e, result);
        } catch (IOException e) {
-         AbstractDavSyncAdapter.handleException(context, e, result);
+         SyncWorkerUtil.handleException(context, e, result);
        } catch (RemoteException e) {
-         AbstractDavSyncAdapter.handleException(context, e, result);
+         SyncWorkerUtil.handleException(context, e, result);
        } catch (OperationApplicationException e) {
-         AbstractDavSyncAdapter.handleException(context, e, result);
+         SyncWorkerUtil.handleException(context, e, result);
        }
      }
 
@@ -254,7 +254,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
        SyncWorkerUtil.handleRefreshCollectionProperties(context, result, remoteCollection);
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -283,19 +283,19 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
 
         } catch (InvalidComponentException e) {
 
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
           SyncWorkerUtil.handleServerRejectedLocalComponent(localCollection, componentId.first, context, result);
 
         } catch (GeneralSecurityException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (DavException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (IOException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (RemoteException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (OperationApplicationException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         }
       }
 
@@ -303,7 +303,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
         SyncWorkerUtil.handleRefreshCollectionProperties(context, result, remoteCollection);
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -336,12 +336,12 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
 
         } catch (InvalidComponentException e) {
 
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
           SyncWorkerUtil.handleServerRejectedLocalComponent(localCollection, componentId, context, result);
 
         } catch (DavException e) {
 
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
 
           if (e.getErrorCode() == DavServletResponse.SC_PRECONDITION_FAILED)
             SyncWorkerUtil.handleServerRejectedLocalComponent(localCollection, componentId, context, result);
@@ -350,15 +350,15 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
 
         } catch (IOException e) {
 
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
           SyncWorkerUtil.handleServerErrorOnPushNewLocalComponent(localCollection, componentId, context, result);
 
         } catch (GeneralSecurityException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (RemoteException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (OperationApplicationException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         }
       }
 
@@ -366,7 +366,7 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
         SyncWorkerUtil.handleRefreshCollectionProperties(context, result, remoteCollection);
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -388,17 +388,17 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
       }
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (OperationApplicationException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (InvalidMacException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (GeneralSecurityException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -422,17 +422,17 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
       }
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (OperationApplicationException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (InvalidMacException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (GeneralSecurityException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -479,20 +479,20 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
                                                           getNamespace(), remoteCollection.getPath());
 
             } catch (InvalidRemoteComponentException e) {
-              AbstractDavSyncAdapter.handleException(context, e, result);
+              SyncWorkerUtil.handleException(context, e, result);
             } catch (RemoteException e) {
-              AbstractDavSyncAdapter.handleException(context, e, result);
+              SyncWorkerUtil.handleException(context, e, result);
             } catch (OperationApplicationException e) {
-              AbstractDavSyncAdapter.handleException(context, e, result);
+              SyncWorkerUtil.handleException(context, e, result);
             }
           }
 
         } catch (GeneralSecurityException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (DavException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (IOException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         }
       }
 
@@ -511,20 +511,20 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
                                                       getNamespace(), remoteCollection.getPath());
 
         } catch (InvalidRemoteComponentException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (RemoteException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (OperationApplicationException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         }
       }
 
     } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -561,29 +561,29 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
                                                           getNamespace(), remoteCollection.getPath());
 
             } catch (InvalidRemoteComponentException e) {
-              AbstractDavSyncAdapter.handleException(context, e, result);
+              SyncWorkerUtil.handleException(context, e, result);
             } catch (RemoteException e) {
-              AbstractDavSyncAdapter.handleException(context, e, result);
+              SyncWorkerUtil.handleException(context, e, result);
             } catch (OperationApplicationException e) {
-              AbstractDavSyncAdapter.handleException(context, e, result);
+              SyncWorkerUtil.handleException(context, e, result);
             }
           }
 
         } catch (GeneralSecurityException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (DavException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (IOException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         }
       }
 
     } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -618,18 +618,18 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
           result.stats.numDeletes++;
 
         } catch (RemoteException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         } catch (OperationApplicationException e) {
-          AbstractDavSyncAdapter.handleException(context, e, result);
+          SyncWorkerUtil.handleException(context, e, result);
         }
       }
 
     } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 }

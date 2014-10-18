@@ -26,6 +26,7 @@ import android.os.RemoteException;
 
 import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.sync.SyncWorkerUtil;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 
 import net.fortuna.ical4j.model.Calendar;
@@ -35,7 +36,6 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.Calendars;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
-import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
@@ -119,17 +119,17 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
       }
 
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (InvalidMacException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (GeneralSecurityException e){
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
 
     try {
@@ -146,13 +146,13 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
       }
 
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (DavException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -175,17 +175,17 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         }
 
       } catch (IOException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (RemoteException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (PropertyParseException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (DavException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (InvalidMacException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (GeneralSecurityException e){
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       }
 
       try {
@@ -201,13 +201,13 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         }
 
       } catch (IOException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (RemoteException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (PropertyParseException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (DavException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       }
     }
   }
@@ -232,17 +232,17 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
       }
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (OperationApplicationException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (InvalidMacException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (GeneralSecurityException e){
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (IOException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
 
     try {
@@ -260,11 +260,11 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
       }
 
     } catch (RemoteException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (OperationApplicationException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     } catch (PropertyParseException e) {
-      AbstractDavSyncAdapter.handleException(context, e, result);
+      SyncWorkerUtil.handleException(context, e, result);
     }
   }
 
@@ -288,17 +288,17 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         }
 
       } catch (RemoteException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (OperationApplicationException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (PropertyParseException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (InvalidMacException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (GeneralSecurityException e){
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (IOException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       }
 
       try {
@@ -315,11 +315,11 @@ public class CalendarSyncWorker extends AbstractDavSyncWorker<Calendar> {
         }
 
       } catch (RemoteException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (OperationApplicationException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       } catch (PropertyParseException e) {
-        AbstractDavSyncAdapter.handleException(context, e, result);
+        SyncWorkerUtil.handleException(context, e, result);
       }
     }
   }

@@ -158,6 +158,21 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
     return idPairs;
   }
 
+  public boolean hasChanges() throws RemoteException {
+    final String[] PROJECTION = new String[]{};
+    final String   SELECTION  = "(" + getColumnNameComponentUid() + " IS NULL OR "   +
+                                      getColumnNameDirty()        + "=1 OR "         +
+                                      getColumnNameDeleted()      + "=1 OR "         +
+                                      getColumnNameQueuedForMigration() + "=1) AND " +
+                                getColumnNameCollectionLocalId()  + "=" + localId;
+
+    Cursor  cursor     = client.query(getUriForComponents(), PROJECTION, SELECTION, null, null);
+    boolean hasChanges = cursor.moveToNext();
+
+    cursor.close();
+    return hasChanges;
+  }
+
   public List<Long> getComponentIds() throws RemoteException {
     final String[] PROJECTION = new String[]{getColumnNameComponentLocalId(), getColumnNameComponentUid()};
           String   selection  = null;

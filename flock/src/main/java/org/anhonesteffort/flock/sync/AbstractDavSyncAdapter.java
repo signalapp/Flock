@@ -23,7 +23,6 @@ import android.accounts.Account;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
-import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -37,10 +36,8 @@ import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.MasterCipher;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -50,8 +47,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.SSLException;
-
 /**
  * Programmer: rhodey
  */
@@ -59,91 +54,37 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
 
   private static final String TAG = "org.anhonesteffort.flock.sync.AbstractDavSyncAdapter";
 
-  public static void handleException(Context context, Exception e, SyncResult result) {
-    if (e instanceof DavException) {
-      DavException ex = (DavException) e;
-      Log.e(TAG, "error code: " + ex.getErrorCode() + ", status phrase: " + ex.getStatusPhrase(), e);
-
-      if (ex.getErrorCode() == DavServletResponse.SC_UNAUTHORIZED)
-        result.stats.numAuthExceptions++;
-      else if (ex.getErrorCode() == OwsWebDav.STATUS_PAYMENT_REQUIRED)
-        result.stats.numSkippedEntries++;
-      else if (ex.getErrorCode() != DavServletResponse.SC_PRECONDITION_FAILED)
-        result.stats.numConflictDetectedExceptions++;
-    }
-
-    else if (e instanceof InvalidComponentException) {
-      InvalidComponentException ex = (InvalidComponentException) e;
-      result.stats.numParseExceptions++;
-      Log.e(TAG, ex.toString(), ex);
-    }
-
-    // server is giving us funky stuff...
-    else if (e instanceof PropertyParseException) {
-      PropertyParseException ex = (PropertyParseException) e;
-      result.stats.numParseExceptions++;
-      Log.e(TAG, ex.toString(), ex);
-    }
-
-    // client is doing funky stuff...
-    else if (e instanceof RemoteException || e instanceof OperationApplicationException) {
-      result.stats.numParseExceptions++;
-      Log.e(TAG, e.toString(), e);
-    }
-
-    /*
-      NOTICE: MAC errors are only expected upon initial import of encrypted key material.
-      A MAC error here means there is remote content on a remote collection which has the
-      encrypted key material property and valid encryption prefix but invalid ciphertext.
-      TODO: should probably delete this property or component?
-     */
-    else if (e instanceof InvalidMacException) {
-      Log.e(TAG, "BAD MAC IN SYNC!!! 0.o ", e);
-      result.stats.numParseExceptions++;
-    }
-    else if (e instanceof GeneralSecurityException) {
-      Log.e(TAG, "crypto problems in sync 0.u ", e);
-      result.stats.numParseExceptions++;
-    }
-
-    else if (e instanceof SSLException) {
-      Log.e(TAG, "SSL PROBLEM IN SYNC!!! 0.o ", e);
-      result.stats.numIoExceptions++;
-    }
-    else if (e instanceof IOException) {
-      Log.e(TAG, "who knows...", e);
-      result.stats.numIoExceptions++;
-    }
-
-    else if (!(e instanceof InterruptedException)) {
-      result.stats.numIoExceptions++;
-      Log.e(TAG, "DID NOT CATCH THIS EXCEPTION CORRECTLY!!! >> " + e.toString(), e);
-    }
-  }
+  protected ContentProviderClient provider;
+  protected SyncResult            syncResult;
+  protected DavAccount            davAccount;
+  protected MasterCipher          masterCipher;
 
   public AbstractDavSyncAdapter(Context context) {
     super(context, true);
   }
 
+  protected boolean syncIntervalHasPassed() {
+    long           syncIntervalMs = getSyncScheduler().getSyncIntervalMinutes() * 60 * 1000;
+    Optional<Long> timeLastSyncMs = getSyncScheduler().getTimeLastSync();
+    long           timeNowMs      = new Date().getTime();
+
+    return !timeLastSyncMs.isPresent() || (timeNowMs - syncIntervalMs) >= timeLastSyncMs.get();
+  }
+
   protected abstract AbstractSyncScheduler getSyncScheduler();
 
-  protected abstract void handlePreSyncOperations(DavAccount            account,
-                                                  MasterCipher          masterCipher,
-                                                  ContentProviderClient provider)
+  protected abstract boolean localHasChanged() throws RemoteException;
+
+  protected abstract void handlePreSyncOperations()
       throws PropertyParseException, InvalidMacException, DavException,
              RemoteException, GeneralSecurityException, IOException;
 
-  protected abstract List<AbstractDavSyncWorker> getSyncWorkers(DavAccount            account,
-                                                                MasterCipher          masterCipher,
-                                                                ContentProviderClient client,
-                                                                SyncResult            syncResult)
+  protected abstract List<AbstractDavSyncWorker> getSyncWorkers(boolean localChangesOnly)
       throws DavException, RemoteException, IOException;
 
-  protected abstract void handlePostSyncOperations(DavAccount            account,
-                                                   MasterCipher          masterCipher,
-                                                   ContentProviderClient provider)
+  protected abstract void handlePostSyncOperations()
       throws PropertyParseException, InvalidMacException, DavException,
-      RemoteException, GeneralSecurityException, IOException;
+             RemoteException, GeneralSecurityException, IOException;
 
   @Override
   public void onPerformSync(Account               account,
@@ -154,44 +95,53 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
   {
     Log.d(TAG, "performing sync for authority >> " + authority);
 
+    this.provider   = provider;
+    this.syncResult = syncResult;
+
     syncResult.stats.numAuthExceptions =
         syncResult.stats.numConflictDetectedExceptions =
             syncResult.stats.numIoExceptions =
                 syncResult.stats.numParseExceptions = 0;
 
     if (!getSyncScheduler().getIsSyncEnabled(account)) {
-      Log.w(TAG, "sync disabled for authority " + authority + ", not gonna sync");
+      Log.w(TAG, "sync disabled, not gonna sync " + authority);
       return;
     }
 
-    Optional<DavAccount> davAccount = DavAccountHelper.getAccount(getContext());
-    if (!davAccount.isPresent()) {
-      Log.d(TAG, "dav account is missing");
+    Optional<DavAccount> davAccountOptional = DavAccountHelper.getAccount(getContext());
+    if (!davAccountOptional.isPresent()) {
+      Log.d(TAG, "dav account is missing, not gonna sync " + authority);
       syncResult.stats.numAuthExceptions++;
       showNotifications(syncResult);
-
-      Log.d(TAG, "completed sync for authority >> " + authority);
       return ;
     }
+    davAccount = davAccountOptional.get();
 
     try {
 
-      Optional<MasterCipher> masterCipher = KeyHelper.getMasterCipher(getContext());
-      if (!masterCipher.isPresent()) {
-        Log.d(TAG, "master cipher is missing");
+      Optional<MasterCipher> masterCipherOptional = KeyHelper.getMasterCipher(getContext());
+      if (!masterCipherOptional.isPresent()) {
+        Log.d(TAG, "master cipher is missing, not gonna sync " + authority);
         syncResult.stats.numAuthExceptions++;
         showNotifications(syncResult);
+        return;
+      }
+      masterCipher = masterCipherOptional.get();
 
-        Log.d(TAG, "completed sync for authority >> " + authority);
+      boolean forceSync = extras.getBoolean(AbstractSyncScheduler.EXTRA_FORCE_SYNC, false);
+
+      if (!forceSync && !syncIntervalHasPassed() && !localHasChanged()) {
+        Log.d(TAG, "sync is not forced, interval has not passed, and local has not changed. " +
+                   "not gonna sync " + authority);
         return ;
       }
 
-      handlePreSyncOperations(davAccount.get(), masterCipher.get(), provider);
-
-      List<AbstractDavSyncWorker> workers = getSyncWorkers(davAccount.get(), masterCipher.get(), provider, syncResult);
+      handlePreSyncOperations();
+      List<AbstractDavSyncWorker> workers = getSyncWorkers(!forceSync && !syncIntervalHasPassed());
 
       if (workers.size() > 0) {
-        Log.d(TAG, "starting new thread executor service for " + workers.size() + " sync workers.");
+        Log.d(TAG, "starting thread executor service for " + workers.size() + " " +
+                   authority + " sync workers.");
         ExecutorService executor = Executors.newFixedThreadPool(workers.size());
 
         for (AbstractDavSyncWorker worker : workers)
@@ -204,23 +154,23 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
           worker.remoteCollection.closeHttpConnection();
       }
 
-      handlePostSyncOperations(davAccount.get(), masterCipher.get(), provider);
+      handlePostSyncOperations();
       getSyncScheduler().setTimeLastSync(new Date().getTime());
 
     } catch (PropertyParseException e) {
-      handleException(getContext(), e, syncResult);
+      SyncWorkerUtil.handleException(getContext(), e, syncResult);
     } catch (DavException e) {
-      handleException(getContext(), e, syncResult);
+      SyncWorkerUtil.handleException(getContext(), e, syncResult);
     } catch (RemoteException e) {
-      handleException(getContext(), e, syncResult);
+      SyncWorkerUtil.handleException(getContext(), e, syncResult);
     } catch (InvalidMacException e) {
-      handleException(getContext(), e, syncResult);
+      SyncWorkerUtil.handleException(getContext(), e, syncResult);
     } catch (GeneralSecurityException e) {
-      handleException(getContext(), e, syncResult);
+      SyncWorkerUtil.handleException(getContext(), e, syncResult);
     } catch (IOException e) {
-      handleException(getContext(), e, syncResult);
+      SyncWorkerUtil.handleException(getContext(), e, syncResult);
     } catch (InterruptedException e) {
-      handleException(getContext(), e, syncResult);
+      SyncWorkerUtil.handleException(getContext(), e, syncResult);
     }
 
     Log.d(TAG, "completed sync for authority >> " + authority);

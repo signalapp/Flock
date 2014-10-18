@@ -93,7 +93,6 @@ public class CalendarCopyService extends Service implements CalendarCopiedListen
   private void handleCopyComplete() {
     Log.d(TAG, "handleCopyComplete()");
 
-    new CalendarsSyncScheduler(getBaseContext()).requestSync();
     stopForeground(false);
     stopSelf();
   }

@@ -20,19 +20,15 @@
 package org.anhonesteffort.flock.sync.addressbook;
 
 import android.app.Service;
-import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SyncResult;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
 import com.google.common.base.Optional;
 import org.anhonesteffort.flock.DavAccountHelper;
-import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
-import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
@@ -40,7 +36,6 @@ import org.apache.jackrabbit.webdav.DavException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -79,9 +74,20 @@ public class AddressbookSyncService extends Service {
     }
 
     @Override
-    protected void handlePreSyncOperations(DavAccount            account,
-                                           MasterCipher          masterCipher,
-                                           ContentProviderClient provider)
+    protected boolean localHasChanged() throws RemoteException {
+      LocalAddressbookStore localStore =
+          new LocalAddressbookStore(getContext(), provider,davAccount);
+
+      for (LocalContactCollection localCollection : localStore.getCollections()) {
+        if (localCollection.hasChanges())
+          return true;
+      }
+
+      return false;
+    }
+
+    @Override
+    protected void handlePreSyncOperations()
         throws PropertyParseException, InvalidMacException, DavException,
                RemoteException, GeneralSecurityException, IOException
     {
@@ -89,34 +95,38 @@ public class AddressbookSyncService extends Service {
     }
 
     @Override
-    protected List<AbstractDavSyncWorker> getSyncWorkers(DavAccount            account,
-                                                         MasterCipher          masterCipher,
-                                                         ContentProviderClient provider,
-                                                         SyncResult            syncResult)
+    protected List<AbstractDavSyncWorker> getSyncWorkers(boolean localChangesOnly)
         throws DavException, RemoteException, IOException
     {
       List<AbstractDavSyncWorker> workers     = new LinkedList<AbstractDavSyncWorker>();
-      LocalAddressbookStore       localStore  = new LocalAddressbookStore(getContext(), provider, account);
-      HidingCardDavStore          remoteStore = DavAccountHelper.getHidingCardDavStore(getContext(), account, masterCipher);
+      LocalAddressbookStore       localStore  = new LocalAddressbookStore(getContext(), provider, davAccount);
+      HidingCardDavStore          remoteStore = DavAccountHelper.getHidingCardDavStore(getContext(), davAccount, masterCipher);
 
       try {
 
         for (LocalContactCollection localCollection : localStore.getCollections()) {
-          Log.d(TAG, "found local collection: " + localCollection.getPath());
+          Log.d(TAG, "found local collection " + localCollection.getPath());
+          if (!localChangesOnly || localCollection.hasChanges()) {
 
-          Optional<HidingCardDavCollection> remoteCollection = remoteStore.getCollection(localCollection.getPath());
-          if (remoteCollection.isPresent()) {
-            remoteCollection.get().setClient(
-                DavAccountHelper.getAndroidDavClient(getContext(), account)
-            );
+            Optional<HidingCardDavCollection> remoteCollection =
+                remoteStore.getCollection(localCollection.getPath());
 
-            workers.add(
-                new AddressbookSyncWorker(getContext(), syncResult, localCollection, remoteCollection.get())
-            );
-          } else {
-            Log.d(TAG, "local collection missing remotely, deleting locally");
-            localStore.removeCollection(localCollection.getPath());
+            if (remoteCollection.isPresent()) {
+              remoteCollection.get().setClient(
+                  DavAccountHelper.getAndroidDavClient(getContext(), davAccount)
+              );
+              workers.add(
+                  new AddressbookSyncWorker(getContext(), syncResult, localCollection, remoteCollection.get())
+              );
+            }
+            else {
+              Log.d(TAG, "local collection missing remotely, deleting locally");
+              localStore.removeCollection(localCollection.getPath());
+            }
           }
+          else
+            Log.d(TAG, "local collection " + localCollection.getPath() +
+                       " does not have changes, skipping.");
         }
 
       } finally {
@@ -127,9 +137,7 @@ public class AddressbookSyncService extends Service {
     }
 
     @Override
-    protected void handlePostSyncOperations(DavAccount            account,
-                                            MasterCipher          masterCipher,
-                                            ContentProviderClient provider)
+    protected void handlePostSyncOperations()
         throws PropertyParseException, InvalidMacException, DavException,
                RemoteException, GeneralSecurityException, IOException
     {

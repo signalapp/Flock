@@ -111,8 +111,6 @@ public class DeleteAllContactsActivity extends AccountAndKeyRequiredActivity {
   private void handleAllContactsDeleted() {
     Log.d(TAG, "handleAllContactsDeleted()");
 
-    new AddressbookSyncScheduler(getBaseContext()).requestSync();
-
     Toast.makeText(getBaseContext(),
                    R.string.all_contacts_have_been_deleted,
                    Toast.LENGTH_SHORT).show();

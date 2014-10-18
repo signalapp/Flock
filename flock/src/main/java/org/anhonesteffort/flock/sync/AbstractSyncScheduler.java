@@ -41,6 +41,7 @@ import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
  */
 public abstract class AbstractSyncScheduler extends ContentObserver {
 
+  public  static final String EXTRA_FORCE_SYNC    = "AbstractSyncScheduler.EXTRA_FORCE_SYNC";
   private static final String PREFERENCES_NAME    = "AbstractSyncScheduler.PREFERENCES_NAME";
   private static final String KEY_SYNC_OVERRIDDEN = "AbstractSyncScheduler.KEY_SYNC_OVERRIDDEN";
   private static final String KEY_TIME_LAST_SYNC  = "AbstractSyncScheduler.KEY_TIME_LAST_SYNC";
@@ -87,8 +88,9 @@ public abstract class AbstractSyncScheduler extends ContentObserver {
     ContentResolver.cancelSync(account, getAuthority());
   }
 
-  public void requestSync() {
-    Optional<DavAccount> account  = DavAccountHelper.getAccount(context);
+  private void requestSync(boolean force) {
+    Bundle               extras  = new Bundle();
+    Optional<DavAccount> account = DavAccountHelper.getAccount(context);
     if (!account.isPresent()) {
       Log.e(getTAG(), "account  not present, cannot request sync.");
       return;
@@ -96,7 +98,12 @@ public abstract class AbstractSyncScheduler extends ContentObserver {
 
     handleInitSyncAdapter();
 
-    ContentResolver.requestSync(account.get().getOsAccount(), getAuthority(), new Bundle());
+    extras.putBoolean(EXTRA_FORCE_SYNC, force);
+    ContentResolver.requestSync(account.get().getOsAccount(), getAuthority(), extras);
+  }
+
+  public void requestSync() {
+    requestSync(true);
   }
 
   public void setSyncInterval(int minutes) {
@@ -121,6 +128,14 @@ public abstract class AbstractSyncScheduler extends ContentObserver {
 
   private static SharedPreferences getSharedPreferences(Context context) {
     return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+  }
+
+  public int getSyncIntervalMinutes() {
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+    return Integer.valueOf(
+        preferences.getString(PreferencesActivity.KEY_PREF_SYNC_INTERVAL_MINUTES, "60")
+    );
   }
 
   public void restoreSyncIntervalFromUserSetting() {
@@ -182,10 +197,10 @@ public abstract class AbstractSyncScheduler extends ContentObserver {
     if (account.isPresent())
       handleInitSyncAdapter();
 
-    if (settings.getBoolean(PreferencesActivity.KEY_PREF_SYNC_ON_CONTENT_CHANGE, false) &&
+    if (settings.getBoolean(PreferencesActivity.KEY_PREF_SYNC_ON_CONTENT_CHANGE, true) &&
         account.isPresent())
     {
-      requestSync();
+      requestSync(false);
     }
   }
 
