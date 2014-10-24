@@ -236,6 +236,7 @@ public class ServerTestsFragment extends Fragment {
             result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CARDDAV_CURRENT_USER_PRINCIPAL);
 
         } catch (DavException e) {
+          Log.e(TAG, "carddav current user principal", e);
 
           if (e.getErrorCode() == DavServletResponse.SC_UNAUTHORIZED)
             result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_UNAUTHORIZED);
@@ -261,8 +262,8 @@ public class ServerTestsFragment extends Fragment {
             result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CURRENT_USER_PRINCIPAL);
 
         } catch (DavException e) {
+          Log.e(TAG, "calddav current user principal", e);
 
-          Log.d(TAG, e.toString());
           if (e.getErrorCode() == DavServletResponse.SC_UNAUTHORIZED)
             result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_UNAUTHORIZED);
           else
@@ -287,10 +288,10 @@ public class ServerTestsFragment extends Fragment {
             result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CARDDAV_ADDRESSBOOK_HOMESET);
 
         } catch (DavException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "carddav addressbook homeset", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CARDDAV_ADDRESSBOOK_HOMESET);
         } catch (PropertyParseException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "carddav addressbook homeset", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CARDDAV_ADDRESSBOOK_HOMESET);
         } catch (SSLException e) {
           ErrorToaster.handleBundleError(e, result);
@@ -311,10 +312,10 @@ public class ServerTestsFragment extends Fragment {
             result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CALENDAR_HOMESET);
 
         } catch (DavException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "caldav calendar homeset", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CALENDAR_HOMESET);
         } catch (PropertyParseException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "caldav calendar homeset", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CALENDAR_HOMESET);
         } catch (SSLException e) {
           ErrorToaster.handleBundleError(e, result);
@@ -353,10 +354,10 @@ public class ServerTestsFragment extends Fragment {
             result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
 
         } catch (DavException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "caldav create delete collection", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CREATE_DELETE_COLLECTION);
         } catch (PropertyParseException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "caldav create delete collection", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CREATE_DELETE_COLLECTION);
         } catch (SSLException e) {
           ErrorToaster.handleBundleError(e, result);
@@ -422,10 +423,10 @@ public class ServerTestsFragment extends Fragment {
           result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
 
         } catch (DavException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "caldav create edit collection properties", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CREATE_EDIT_COLLECTION_PROPERTIES);
         } catch (PropertyParseException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "caldav create edit collection properties", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CREATE_EDIT_COLLECTION_PROPERTIES);
         } catch (SSLException e) {
           ErrorToaster.handleBundleError(e, result);
@@ -495,13 +496,13 @@ public class ServerTestsFragment extends Fragment {
             result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
 
         } catch (DavException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "carddav create delete contacts", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CARDDAV_CREATE_DELETE_CONTACTS);
         } catch (PropertyParseException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "carddav create delete contacts", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CARDDAV_CREATE_DELETE_CONTACTS);
         } catch (InvalidComponentException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "carddav create delete contacts", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CARDDAV_CREATE_DELETE_CONTACTS);
         } catch (SSLException e) {
           ErrorToaster.handleBundleError(e, result);
@@ -579,16 +580,16 @@ public class ServerTestsFragment extends Fragment {
           result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
 
         } catch (DavException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "caldav create delete events", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CREATE_DELETE_EVENTS);
         } catch (PropertyParseException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "caldav create delete events", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CREATE_DELETE_EVENTS);
         } catch (InvalidComponentException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "caldav create delete events", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CREATE_DELETE_EVENTS);
         } catch (ConstraintViolationException e) {
-          Log.d(TAG, e.toString());
+          Log.e(TAG, "caldav create delete events", e);
           result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CREATE_DELETE_EVENTS);
         } catch (SSLException e) {
           ErrorToaster.handleBundleError(e, result);
