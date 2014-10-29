@@ -32,8 +32,8 @@ import android.util.Log;
 import org.anhonesteffort.flock.CorrectEncryptionPasswordActivity;
 import org.anhonesteffort.flock.R;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
-import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
-import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
+import org.anhonesteffort.flock.sync.AbstractSyncAdapter;
+import org.anhonesteffort.flock.sync.SyncWorker;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -66,7 +66,7 @@ public class KeySyncService extends Service {
     return sSyncAdapter.getSyncAdapterBinder();
   }
 
-  private static class KeySyncAdapter extends AbstractDavSyncAdapter {
+  private static class KeySyncAdapter extends AbstractSyncAdapter {
 
     public KeySyncAdapter(Context context) {
       super(context);
@@ -91,11 +91,13 @@ public class KeySyncService extends Service {
     }
 
     @Override
-    protected List<AbstractDavSyncWorker> getSyncWorkers(boolean localChangesOnly)
+    protected List<SyncWorker> getSyncWorkers(boolean localChangesOnly)
         throws DavException, RemoteException, IOException
     {
-      new KeySyncWorker(getContext(), davAccount).run(syncResult); // TODO: this is hack
-      return new LinkedList<AbstractDavSyncWorker>();
+      List<SyncWorker> workers = new LinkedList<SyncWorker>();
+      workers.add(new KeySyncWorker(getContext(), davAccount, syncResult));
+
+      return workers;
     }
 
     @Override

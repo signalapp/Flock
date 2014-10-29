@@ -186,20 +186,9 @@
   <!--ManageSubscriptionActivity-->
   <string name="title_manage_subscription">Abonemments verwalten</string>
   <string name="days_remain">Verbleibende Tage</string>
-  <string name="subscription_history">Verlauf</string>
-  <string name="auto_renew_disabled">Automatische Verlängerung ist deaktiviert</string>
-  <string name="processing_payment">Zahlung wird verarbeitet</string>
-  <string name="auto_renew_enabled">Automatische Verlängerung ist aktiviert</string>
-  <string name="auto_renew_error">Fehler bei der automatischen Verlängerung</string>
-  <string name="button_edit_payment_details">Zahlungsinformationen bearbeiten</string>
   <!--EditAutoRenewActivity-->
   <string name="usd_per_year">$%.2f/Jahr</string>
-  <string name="with_auto_renew_flock_automatically_charges_your_card_before">Wenn die automatische Verlängerung aktiviert ist, werden die Gebühren sieben Tage vor Ende der Laufzeit erhoben.</string>
-  <string name="button_save">Speichern</string>
-  <string name="button_verify_and_save">Überprüfen und Speichern</string>
   <string name="card_verified_and_saved">Die Karte wurde überprüft und gespeichert!</string>
-  <string name="autorenew_saved">Einstellungen zur automatischen Verlängerung gespeichert!</string>
-  <string name="enable_autorenew">Abonnement automatisch verlängern</string>
   <string name="hint_card_cvc">CVC</string>
   <string name="hint_card_expiration">MM/YY</string>
   <string name="hint_card_number">5555 5555 5555 5555</string>

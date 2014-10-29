@@ -23,6 +23,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import org.anhonesteffort.flock.sync.account.AccountSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
 import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
@@ -37,6 +38,7 @@ public class SyncBooter extends BroadcastReceiver {
     new KeySyncScheduler(context).registerSelfForBroadcasts();
     new AddressbookSyncScheduler(context).registerSelfForBroadcasts();
     new CalendarsSyncScheduler(context).registerSelfForBroadcasts();
+    new AccountSyncScheduler(context).registerSelfForBroadcasts();
   }
 
 }

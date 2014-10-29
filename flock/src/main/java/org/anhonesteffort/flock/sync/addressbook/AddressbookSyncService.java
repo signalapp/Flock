@@ -29,8 +29,8 @@ import android.util.Log;
 import com.google.common.base.Optional;
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
-import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
-import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
+import org.anhonesteffort.flock.sync.AbstractSyncAdapter;
+import org.anhonesteffort.flock.sync.SyncWorker;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -62,7 +62,7 @@ public class AddressbookSyncService extends Service {
     return sSyncAdapter.getSyncAdapterBinder();
   }
 
-  private static class ContactsSyncAdapter extends AbstractDavSyncAdapter {
+  private static class ContactsSyncAdapter extends AbstractSyncAdapter {
 
     public ContactsSyncAdapter(Context context) {
       super(context);
@@ -95,12 +95,12 @@ public class AddressbookSyncService extends Service {
     }
 
     @Override
-    protected List<AbstractDavSyncWorker> getSyncWorkers(boolean localChangesOnly)
+    protected List<SyncWorker> getSyncWorkers(boolean localChangesOnly)
         throws DavException, RemoteException, IOException
     {
-      List<AbstractDavSyncWorker> workers     = new LinkedList<AbstractDavSyncWorker>();
-      LocalAddressbookStore       localStore  = new LocalAddressbookStore(getContext(), provider, davAccount);
-      HidingCardDavStore          remoteStore = DavAccountHelper.getHidingCardDavStore(getContext(), davAccount, masterCipher);
+      List<SyncWorker>      workers     = new LinkedList<SyncWorker>();
+      LocalAddressbookStore localStore  = new LocalAddressbookStore(getContext(), provider, davAccount);
+      HidingCardDavStore    remoteStore = DavAccountHelper.getHidingCardDavStore(getContext(), davAccount, masterCipher);
 
       try {
 

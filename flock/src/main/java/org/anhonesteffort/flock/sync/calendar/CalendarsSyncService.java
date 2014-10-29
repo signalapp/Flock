@@ -31,13 +31,13 @@ import android.util.Log;
 import com.google.common.base.Optional;
 
 import org.anhonesteffort.flock.crypto.InvalidMacException;
-import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;
+import org.anhonesteffort.flock.sync.AbstractSyncAdapter;
+import org.anhonesteffort.flock.sync.SyncWorker;
 import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.PreferencesActivity;
-import org.anhonesteffort.flock.sync.AbstractDavSyncAdapter;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -72,7 +72,7 @@ public class CalendarsSyncService extends Service {
     return sSyncAdapter.getSyncAdapterBinder();
   }
 
-  private static class CalendarsSyncAdapter extends AbstractDavSyncAdapter {
+  private static class CalendarsSyncAdapter extends AbstractSyncAdapter {
 
     public CalendarsSyncAdapter(Context context) {
       super(context);
@@ -173,12 +173,12 @@ public class CalendarsSyncService extends Service {
     }
 
     @Override
-    public List<AbstractDavSyncWorker> getSyncWorkers(boolean localChangesOnly)
+    public List<SyncWorker> getSyncWorkers(boolean localChangesOnly)
         throws DavException, RemoteException, IOException
     {
-      List<AbstractDavSyncWorker> workers     = new LinkedList<AbstractDavSyncWorker>();
-      LocalCalendarStore          localStore  = new LocalCalendarStore(provider, davAccount.getOsAccount());
-      HidingCalDavStore           remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), davAccount, masterCipher);
+      List<SyncWorker>   workers     = new LinkedList<SyncWorker>();
+      LocalCalendarStore localStore  = new LocalCalendarStore(provider, davAccount.getOsAccount());
+      HidingCalDavStore  remoteStore = DavAccountHelper.getHidingCalDavStore(getContext(), davAccount, masterCipher);
 
       try {
 

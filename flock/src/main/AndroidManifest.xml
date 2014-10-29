@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.anhonesteffort.flock"
-          android:versionCode="18"
-          android:versionName="0.9.0" >
+          android:versionCode="23"
+          android:versionName="0.9.1" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -24,6 +24,8 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+    <uses-permission android:name="com.android.vending.BILLING"/>
 
     <application
         android:allowBackup="true"
@@ -110,7 +112,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="org.anhonesteffort.flock.ManageSubscriptionActivity" >
+        <activity android:name="org.anhonesteffort.flock.ManageSubscriptionActivity"
+                  android:screenOrientation="portrait"
+                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize">
             <intent-filter>
                 <action android:name="org.anhonesteffort.flock.ManageSubscriptionActivity"/>
                 <category android:name="android.intent.category.DEFAULT" />
@@ -125,9 +129,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <activity android:name="org.anhonesteffort.flock.EditAutoRenewActivity"
-                  android:screenOrientation="portrait"/>
 
         <activity android:name="org.anhonesteffort.flock.SendBitcoinActivity" />
 
@@ -157,6 +158,20 @@
             </intent-filter>
             <meta-data android:name="android.content.SyncAdapter"
                        android:resource="@xml/keys_syncadapter" />
+        </service>
+
+        <provider android:name="org.anhonesteffort.flock.sync.account.AccountProviderStub"
+                  android:authorities="org.anhonesteffort.flock.sync.account"
+                  android:syncable="true"
+                  android:label="AccountSyncService" />
+
+        <service android:name="org.anhonesteffort.flock.sync.account.AccountSyncService"
+                 android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                       android:resource="@xml/account_syncadapter" />
         </service>
 
         <service android:name="org.anhonesteffort.flock.sync.addressbook.AddressbookSyncService"

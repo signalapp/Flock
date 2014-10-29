@@ -24,29 +24,29 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <LinearLayout android:orientation="vertical"
-                  android:layout_width="match_parent"
-                  android:layout_height="0dp"
-                  android:layout_weight="1">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"
+            android:paddingTop="16dp"
             android:paddingBottom="8dp"
             android:orientation="vertical"
             android:background="#58ff8800">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_width="wrap_content"
+                android:layout_height="140dp"
                 android:src="@drawable/big_flock_icon"/>
 
             <TextView android:id="@+id/cost_per_year"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:gravity="center_horizontal"
-                      android:layout_marginBottom="8dp"
                       android:fontFamily="sans-serif-light"
                       android:textAppearance="?android:textAppearanceMedium"
                       android:textSize="32sp"
@@ -59,15 +59,27 @@
                       android:layout_marginRight="16dip"
                       android:textAppearance="?android:textAppearanceMedium"
                       android:textSize="17sp"
-                      android:text="@string/with_auto_renew_flock_automatically_charges_your_card_before"/>
+                      android:text="@string/when_subscribed_your_card_will_be_charged_once_per_year"/>
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/card_subscription_status"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center_horizontal"
+            android:fontFamily="sans-serif-light"
+            android:textSize="26sp"
+            android:textColor="@color/success_green"
+            android:text="@string/subscription_is_active"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="16dip"
+            android:layout_marginTop="8dp"
             android:layout_marginLeft="16dip"
             android:layout_marginRight="16dip">
 
@@ -109,15 +121,7 @@
                           android:hint="@string/hint_card_cvc" />
 
             </LinearLayout>
-
-            <CheckBox android:id="@+id/checkbox_enable_auto_renew"
-                      android:layout_width="wrap_content"
-                      android:layout_height="48dp"
-                      android:textAppearance="?android:textAppearanceLarge"
-                      android:text="@string/enable_autorenew"/>
-
-            </LinearLayout>
-
+        </LinearLayout>
     </LinearLayout>
 
     <View android:background="?android:attr/dividerHorizontal"
@@ -129,12 +133,20 @@
                   android:layout_height="wrap_content"
                   android:orientation="horizontal">
 
-        <Button android:id="@+id/button_verify_and_save"
-                style="?android:attr/buttonBarButtonStyle"
-                android:background="@drawable/selectable_item_background"
-                android:layout_width="match_parent"
+        <Button android:id="@+id/button_card_cancel"
+                android:visibility="gone"
+                android:background="@color/error_red"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/button_verify_and_save" />
+                android:layout_weight="1"
+                android:text="@string/cancel_subscription" />
+
+        <Button android:id="@+id/button_card_action"
+                android:background="@drawable/selectable_item_background"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/start_subscription" />
 
     </LinearLayout>
 

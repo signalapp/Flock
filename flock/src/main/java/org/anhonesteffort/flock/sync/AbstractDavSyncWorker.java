@@ -46,7 +46,7 @@ import java.util.List;
 /**
  * Programmer: rhodey
  */
-public abstract class AbstractDavSyncWorker<T> implements Runnable {
+public abstract class AbstractDavSyncWorker<T> implements SyncWorker {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.AbstractDavSyncWorker";
 
@@ -154,6 +154,11 @@ public abstract class AbstractDavSyncWorker<T> implements Runnable {
     } catch(IOException e) {
       SyncWorkerUtil.handleException(context, e, result);
     }
+  }
+
+  @Override
+  public void cleanup() {
+    remoteCollection.closeHttpConnection();
   }
 
   protected abstract Optional<String> getComponentUid(T component);
