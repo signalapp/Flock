@@ -25,6 +25,8 @@ Interested in helping to translate Flock? Contribute here:
 
 https://www.transifex.com/projects/p/flock/
 
+[![Transifex](https://www.transifex.com/projects/p/flock/resource/master/chart/image_png)](https://www.transifex.com/projects/p/flock/)
+
 ## Contributing code
 Instructions on how to build Flock, as well as on how to setup an IDE to modify it can be found in the [BUILDING.md](BUILDING.md) file.
 
