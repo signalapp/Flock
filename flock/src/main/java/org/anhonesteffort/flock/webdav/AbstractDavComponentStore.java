@@ -181,7 +181,12 @@ public abstract class AbstractDavComponentStore <C extends DavComponentCollectio
 
     } catch (DavException e) {
 
-      if (e.getErrorCode() == DavServletResponse.SC_MOVED_PERMANENTLY) {
+      if (e.getErrorCode() == DavServletResponse.SC_MOVED_PERMANENTLY ||
+          e.getErrorCode() == DavServletResponse.SC_MOVED_TEMPORARILY ||
+          e.getErrorCode() == DavServletResponse.SC_SEE_OTHER         ||
+          e.getErrorCode() == DavServletResponse.SC_USE_PROXY         ||
+          e.getErrorCode() == DavServletResponse.SC_TEMPORARY_REDIRECT)
+      {
         Header locationHeader = propFindMethod.getResponseHeader("location"); // TODO: find constant for this...
         if (locationHeader.getValue() != null) {
           currentUserPrincipal = getCurrentUserPrincipal(locationHeader.getValue());
