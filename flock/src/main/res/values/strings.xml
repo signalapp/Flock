@@ -81,7 +81,7 @@
 
 
     <!-- SetupActivity, select service provider -->
-    <string name="title_chose_sync_service">Chose sync service</string>
+    <string name="title_chose_sync_service">Choose sync service</string>
     <string name="flock_sync">Flock Sync</string>
     <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">
         Flock Sync is a service run by Open Whisper Systems available for $%.2f/year.
