@@ -1,0 +1,280 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+  ~ Copyright (C) 2014 Open Whisper Systems
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+  <string name="app_name">Flock</string>
+  <string name="at_flock_sync">\@flock</string>
+  <string name="support_email_address">rhodey@anhonesteffort.org</string>
+  <string name="begin">시작</string>
+  <string name="next">다음</string>
+  <string name="skip">나중에</string>
+  <string name="previous">이전</string>
+  <string name="ok">확인</string>
+  <string name="cancel">취소</string>
+  <string name="thanks">감사합니다!</string>
+  <string name="days">일</string>
+  <string name="addressbook">주소록</string>
+  <string name="display_name_missing">표시할 이름을 입력해주세요</string>
+  <!--Notifications-->
+  <string name="notification_contact_import">연락처 가져오기</string>
+  <string name="notification_importing_contacts">연락처 가져오는 중.</string>
+  <string name="notification_importing_contacts_from">%1$s에서 연락처를 가져오는 중</string>
+  <string name="notification_import_complete_copied_contacts">%1$d의 연락처를 가져오기 완료.</string>
+  <string name="notification_import_complete_copied_contacts_failed">%1$d 의 연락처를 가져왔습니다, %2$d 는 실패했습니다.</string>
+  <string name="notification_calendar_import">달력 가져오기</string>
+  <string name="notification_importing_calendars">달력 가져오기 가져오는 중.</string>
+  <string name="notification_importing_events_from">%1$s에서 일정을 가져오는 중</string>
+  <string name="notification_import_complete_copied_events">%1$d의 일정을 가져왔습니다.</string>
+  <string name="notification_import_complete_copied_events_failed">%1$d의 일정을 가져왔습니다, %2$d 는 실패했습니다.</string>
+  <string name="notification_flock_login_error">Flock 로그인 에러</string>
+  <string name="notification_tap_to_correct_password">눌러서 암호 고치기.</string>
+  <string name="notification_flock_encryption_error">Flock 암호화 에러</string>
+  <string name="notification_tap_to_correct_encryption_password">눌러서 암호화 암호 고치기</string>
+  <string name="notification_flock_subscription_expired">Flock 구독 만료</string>
+  <string name="notification_tap_to_update_subscription">눌러서 재구독 하기.</string>
+  <!--status header stuff-->
+  <string name="status_header_status_good">정상 작동 중!</string>
+  <string name="status_header_status_account_login_failed">계정 로그인 실패</string>
+  <string name="status_header_status_encryption_password_incorrect">암호화 암호가 맞지 않습니다</string>
+  <string name="status_header_status_sync_disabled">안드로이드 동기화가 비활성화 상태입니다!</string>
+  <string name="status_header_status_auto_renew_error">자동-재구독 에러</string>
+  <string name="status_header_status_our_sync_service_error">동기화를 일시적으로  이용할 수 없습니다...</string>
+  <string name="status_header_status_their_sync_service_error">WebDAV 서버 에러</string>
+  <string name="status_header_status_registration_service_error">계정 등록 서비스를 일시적으로 이용할 수 없습니다...</string>
+  <string name="status_header_status_migration_in_progress">정보 이동 중</string>
+  <string name="please_wait_this_will_take_a_few_minutes">잠시 기다려 주세요, 몇 분 정도 걸릴 것입니다..</string>
+  <string name="status_header_sync_time">%1$s 에 마지막으로 동기화</string>
+  <string name="status_header_sync_in_progress">동기화 중...</string>
+  <!--SetupActivity, intro-->
+  <string name="welcome_to_flock">Flock에 오신걸 환영해요!</string>
+  <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock은 사용자의 연락처와 달력을 일정을 암호화하여 개인정보를 보호함과 동시에, 다양한 기기에 동기화하여 사용할 수 있게 합니다.</string>
+  <!--SetupActivity, select service provider-->
+  <string name="title_chose_sync_service">동기화 서비스 선택</string>
+  <string name="flock_sync">Flock 동기화</string>
+  <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">
+Flock 동기화는 Open Whisper Systems이 $%.2f/year에 운영하는 서비스입니다.
+별다른 결제없이 30일 동안 무료로 평가해보세요 .
+
+<![CDATA[
+<br/><br/>
+<a href=\"https://whispersystems.org/flock/legal.html\">Privacy and Terms of Service</a>
+]]></string>
+  <string name="host_my_own">직접 호스팅하기</string>
+  <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">직접 WebDAV-compliant 서버를 설정하고 운영하신다면, 동기화서비스로 Flock을 사용하기 전에 서버는 몇 가지의 테스트를 거쳐야 합니다.</string>
+  <!--SetupActivity, other server test-->
+  <string name="title_server_tests">서버 테스트</string>
+  <string name="tests_not_yet_started">테스트가 아직 시작하지 않았습니다...</string>
+  <string name="tests_interrupted">테스트가 도중 중단되었습니다...</string>
+  <string name="stop_tests">테스트 중단</string>
+  <string name="restart_tests">테스트 다시 시작</string>
+  <string name="tests_completed_successfully">테스트가 성공적으로 완료되었습니다!</string>
+  <string name="test_dav_current_user_principal">DAV: current-user-principal</string>
+  <string name="test_error_carddav_current_user_principal">서버가 CardDAV well-known URI 혹은 DAV를 지원하지 않습니다: current-user-principal.</string>
+  <string name="test_error_caldav_current_user_principal">서버가 CardDAV well-known URI 혹은 DAV를 지원하지 않습니다: current-user-principal.</string>
+  <string name="test_carddav_addressbook_homeset">CardDAV: addressbook-homeset</string>
+  <string name="test_error_carddav_addressbook_homeset">서버가 CardDAV: addressbook-homeset를 지원하지 않습니다.</string>
+  <string name="test_caldav_calendar_homeset">CalDAV: calendar-homeset</string>
+  <string name="test_error_caldav_calendar_homeset">서버가 CalDAV: calendar-homeset를 지원하지 않습니다.</string>
+  <string name="test_caldav_create_and_delete_collections">DAV: collection만들기/지우기</string>
+  <string name="test_error_caldav_create_and_delete_collections">서버가 calendar collection을 만들고 지우는 기능을 지원하지 않습니다.</string>
+  <string name="test_caldav_create_and_edit_collection_properties">DAV: collection 설정 수정하기</string>
+  <string name="test_error_caldav_create_and_edit_collection_properties">서버가 DAV collection의 설정을 수정하는 기능을 지원하지 않습니다.</string>
+  <string name="test_carddav_create_and_delete_contacts">CardDAV: contacts 만들기와 지우기</string>
+  <string name="test_error_carddav_create_and_delete_contacts">서버가 contacts를 만들고 지우는 기능을 지원하지 않습니다.</string>
+  <string name="test_caldav_create_and_delete_events">CalDAV: events 만들기와 지우기</string>
+  <string name="test_error_caldav_create_and_delete_events">서버가 events을 만들고 지우는 기능을 지원하지 않습니다.</string>
+  <!--SetupActivity, setup account-->
+  <string name="title_import_account">계정 가져오기</string>
+  <string name="title_register_account">계정 등록하기</string>
+  <string name="title_setup_account">계정 설정하기</string>
+  <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">사용자의 이름과 개인정보를 암호화 할 강력한 암호를 입력해주세요.</string>
+  <string name="do_you_have_a_flock_account">Flock 계정이 있으십니까?</string>
+  <string name="yes_log_me_in">네, </string>
+  <string name="no_register_me">아니오, 등록합니다.</string>
+  <string name="text_setup_account_with_other">WebDav 호스트의 URL과 키를 입력해주세요. 또, 정보 암호화를 위한 암호를 입력해주세요.</string>
+  <string name="hint_username">사용자이름</string>
+  <string name="hint_password">암호</string>
+  <string name="hint_current_password">암호</string>
+  <string name="hint_repeat_password">암호 확인</string>
+  <string name="hint_href_webdav_host">https://example.com</string>
+  <string name="hint_encryption_password">암호화 암호</string>
+  <string name="hint_repeat_encryption_password">암호화 암호 확인</string>
+  <string name="registering_account">계정 등록중...</string>
+  <string name="account_register_failed">계정 등록이 실패했습니다.</string>
+  <string name="importing_contacts_and_calendars">연락처와 일정을 가져오는 중...</string>
+  <string name="account_import_completed_with_errors">계정 가져오기가 몇 개의 에러와 함께 완료되었습니다.</string>
+  <string name="account_import_failed">계정 가져오기가 실패했습니다.</string>
+  <string name="importing_encryption_secrets">암호화할 정보 가져오는 중..</string>
+  <!--SetupActivity, import-->
+  <string name="button_import">가져오기</string>
+  <string name="local_storage">로컬 스토리지</string>
+  <!--SetupActivity, import contacts-->
+  <string name="select_accounts_to_import_contacts_from">연락처를 가져올 계정을 선택해주세요</string>
+  <string name="contacts">연락처</string>
+  <string name="title_import_contacts">연락처 가져오기</string>
+  <string name="started_background_import_of_contacts">%1$d 의 연락처 동기화가 시작되었습니다</string>
+  <!--SetupActivity, import calendars-->
+  <string name="select_calendars_to_import">달력을 가져올 계정을 선택해주세요</string>
+  <string name="title_import_calendars">달력 가져오기</string>
+  <string name="started_background_import_of_calendars">%1$d 의 달력 동기화가 시작되었습니다</string>
+  <!--SetupActivity, select remote addressbook and calendars-->
+  <string name="select_a_single_remote_addressbook_in_which_to_store">Flock 계정을 저장할 single remote addressbook을 선택해주세요</string>
+  <string name="select_the_calendars_you_would_like_to_sync_with_this_device">이 기기와 동기화할 달력을 선택해주세요.</string>
+  <string name="setup_complete">설정이 완료되었습니다!</string>
+  <!--My calendars and my addressbooks...-->
+  <string name="hint_display_name">표시할 이름</string>
+  <string name="heading_display_name">표시할 이름</string>
+  <string name="heading_sync">동기화</string>
+  <string name="display_name_cannot_be_empty">표시할 이름을 입력해주세요.</string>
+  <!--My addressbooks-->
+  <string name="title_my_addressbooks">나의 주소록</string>
+  <string name="title_edit_selected_addressbooks">주소록 수정</string>
+  <string name="title_addressbook_properties">주소록 설정</string>
+  <string name="addressbooks_selected">주소록이 선택됨</string>
+  <string name="are_you_sure_you_want_to_delete_selected_addressbooks">선택한 주소록을 지우시겠습니까?</string>
+  <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">동기화가 되지 않은 주소록을 수정할 수 없습니다.</string>
+  <!--My calendars-->
+  <string name="title_my_calendars">나의 달력</string>
+  <string name="title_edit_selected_calendars">선택한 달력 수정</string>
+  <string name="title_calendar_properties">달력 설정</string>
+  <string name="title_delete_selected_calendars_dialog">선택한 달력을 지우시겠습니까?</string>
+  <string name="calendars_selected">달력이 선택됨</string>
+  <string name="are_you_sure_you_want_to_delete_selected_calendars">선택한 달력을 지우시겠습니까?</string>
+  <string name="you_cannot_edit_calendars_that_have_not_been_synced">동기화가 되지 않은 달력을 수정할 수 없습니다.</string>
+  <!--PreferencesActivity-->
+  <string name="title_flock_settings">Flock 설정</string>
+  <string name="preference_group_sync">동기화</string>
+  <string name="preference_title_sync_frequency">동기화 빈도</string>
+  <string name="preference_title_sync_on_content_change">충전 중 동기화</string>
+  <string name="preference_description_sync_on_content_change">충전 중에 연락처와 달력을 동기화합니다</string>
+  <string name="preference_title_sync_now">지금 동기화</string>
+  <string name="sync_requested_will_begin_when_possible">동기화가 요청되었습니다, 연결이 가능할 때 시작됩니다</string>
+  <string name="preference_group_contacts">연락처</string>
+  <string name="preference_group_calendars">달력</string>
+  <string name="preference_title_default_calendar_color">기본 달력 색상</string>
+  <string name="minutes">분</string>
+  <string name="new_calendars_will_be">새 달력 색상은 %1$s 입니다.</string>
+  <string name="preference_group_account">계정</string>
+  <!--ChangeEncryptionPasswordActivity-->
+  <string name="title_change_encryption_password">암호화 암호 바꾸기</string>
+  <string name="button_save_password">암호 저장</string>
+  <string name="hint_new_password">새로운 암호</string>
+  <string name="hint_new_password_repeat">암호 확인</string>
+  <string name="encryption_password_saved">암호화 암호가 저장되었습니다!</string>
+  <string name="updating_encryption_secrets">암호화 설정 업데이트 중..</string>
+  <string name="password_change_failed">암호화 암호를 바꿈이 실패했습니다.</string>
+  <!--ManageSubscriptionActivity-->
+  <string name="title_manage_subscription">구독 설정</string>
+  <string name="days_remain">일이 남았습니다</string>
+  <string name="subscription_history">구독 이력</string>
+  <string name="auto_renew_disabled">자동-재구독 하지 않습니다</string>
+  <string name="processing_payment">구독 정보 설정</string>
+  <string name="auto_renew_enabled">자동-재구독 합니다</string>
+  <string name="auto_renew_error">자동-재구독 에러</string>
+  <string name="button_edit_payment_details">구독 설정 수정</string>
+  <!--EditAutoRenewActivity-->
+  <string name="usd_per_year">$%.2f/year</string>
+  <string name="with_auto_renew_flock_automatically_charges_your_card_before">자동-재구독 하시면, Flock은 구독만료 되기전 7일 전에 자동이체를 요청합니다.</string>
+  <string name="button_save">저장</string>
+  <string name="button_verify_and_save">확인</string>
+  <string name="card_verified_and_saved">카드정보 확인!</string>
+  <string name="autorenew_saved">자동--재구독 합니다!</string>
+  <string name="enable_autorenew">자동-재구독 하기</string>
+  <string name="hint_card_cvc">CVC</string>
+  <string name="hint_card_expiration">MM/YY</string>
+  <string name="hint_card_number">5555 5555 5555 5555</string>
+  <!--SendBitcoinActivity-->
+  <string name="title_send_bitcoin">비트코인 보내기</string>
+  <string name="mBTC_to">mBTC to</string>
+  <string name="address_copied_to_clipboard">주소가 클립보드에 복사었습니다.</string>
+  <string name="bitcoin_received">비트코인을 받았습니다!</string>
+  <string name="minutes_until_address_expires">주소가 만료될 시간</string>
+  <!--DeleteAccountActivity-->
+  <string name="title_unregister_account">계정 탈퇴</string>
+  <string name="if_you_chose_to_unregister_your_account_all_flock">계정을 탈퇴하시면, Flock 의 연락처, 일정, 구독이력은 삭제됩니다.</string>
+  <string name="are_you_sure_you_want_to_unregister_your_account">정말 탈퇴하시겠습니까?</string>
+  <string name="account_has_been_unregistered">계정 탈퇴 완료되었습니다.</string>
+  <!--DeleteAllContactsActivity-->
+  <string name="title_delete_all_contacts">연락처 삭제</string>
+  <string name="all_contacts_have_been_deleted">연락처가 삭제되었습니다.</string>
+  <string name="if_you_chose_to_delete_your_flock_contacts">Flock 연락처를 삭제하시면 Flock 계정을 사용하는 모든 기기에서 삭제됩니다.</string>
+  <string name="are_you_sure_you_want_to_delete_all_flock_contacts">정말 Flock 연락처를 삭제하시겠습니까?</string>
+  <!--CorrectPasswordActivity-->
+  <string name="title_correct_sync_password">암호 고치기</string>
+  <string name="unable_to_login_to_sync_service_please_correct_your_password">로그인 할 수 없습니다, 암호를 고쳐주세요.</string>
+  <string name="login_successful">로그인 완료!</string>
+  <!--CorrectEncryptionPasswordActivity-->
+  <string name="title_correct_encryption_password">암호화 암호 고치기</string>
+  <string name="encryption_password_is_invalid_please_correct_your_encryption_password">암호화 암호가 인식되지 않습니다, 고쳐주세요.</string>
+  <string name="password_corrected">암호가 고쳐졌습니다!</string>
+  <!--MigrationReleaseNotesActivity-->
+  <string name="release_notes">업데이트 기록</string>
+  <string name="the_way_that_flock_syncs_data_has_changed_to_make_future_updates_run_more_smoothly">Fock 동기화 운영방식이 전반적으로 업그레이드 되었습니다. v0.8 이전 버전의 Flock 을 사용하시면, 동기화를 잠시 비활성화 시켜주세요.</string>
+  <string name="after_updating_a_device_to_v08_simply_re_enable_sync">v0.8으로 기기를 업데이트 하신 다음에, 동기화를 다시 활성화하시면 정보가 자동으로 이전될 것입니다.</string>
+  <!--SendDebugLogActivity-->
+  <string name="send_debug_log">디버그 로그 보내기</string>
+  <string name="flock_debug_log">Flock 디버그 로그</string>
+  <string name="something_strange_happened_send_us_your_debug_log">에러가 발생했으면, 디버그 로그를 보내주세요.</string>
+  <string name="dont_ask_again">다사ㅣ 묻지 않기</string>
+  <string name="send_log">로그 보내기</string>
+  <!--MigrationService-->
+  <string name="migrating_to_new_version">새로운 버전으로 정보 이동 중</string>
+  <string name="preparing_to_upgrade_sync_protocol">동기화 운영방식 업그레드 준비 중</string>
+  <string name="please_enable_sync">동기화를 활성화 해주세요</string>
+  <string name="please_enable_anrdoid_sync_to_complete_migration">정보 이전을 완료하시려면 안드로이드 동기화를 활성화 해주세요.</string>
+  <string name="checking_sync_for_new_contacts_and_calendar">새로운 연락처와 일정을 확인할 동기화 중</string>
+  <string name="generating_new_encryption_secrets">새 암호화 정보 업데이트 중...</string>
+  <string name="replacing_addressbooks_and_calendars">주소록과 달력 업데이트 중...</string>
+  <string name="replacing_old_contacts_and_events">연락처와 일정 업데이트 중...</string>
+  <string name="finalizing_migration">업데이트 완료 중...</string>
+  <string name="migration_complete">업데이트 완료</string>
+  <string name="please_update_flock_on_all_your_devices">여러 기기의 Flock을 모두 업데이트 해주세요.</string>
+  <string name="migration_in_progress_please_wait">업데이트 중, 잠시 기다려 주세요...</string>
+  <!--ErrorToaster messages-->
+  <string name="error_login_unauthorized">로그인 실패. 인식 불가능한 이름 혹은 암호</string>
+  <string name="error_registration_api_server_error">저희 계정등록서버 접속이 잠시 문제가 있습니다, 죄송합니다.</string>
+  <string name="error_registration_api_client_error">Client registration API 에러, 디버그 로그를 보내주세요.</string>
+  <string name="error_our_dav_server_error">저희 동기화서버 접속이 잠시 문제가 있습니다, 죄송합니다.</string>
+  <string name="error_their_dav_server_error">호스팅한 서버의 동기화에 문제가 있습니다, 디버그 로그를 확인해주세요.</string>
+  <string name="error_dav_client_error">로컬 스토리지 에러, 디버그 로그를 보내주세요.</string>
+  <string name="error_connection_error">접속 에러, 인터넷 연결상태를 확인해주세요.</string>
+  <string name="error_our_certificate_validation">비보안상태의 연결상태, 디버그 로그를 보내주세요.</string>
+  <string name="error_their_certificate_validation">Certificate validation error, 디버그 로그를 확인해주세요.</string>
+  <string name="error_unknown_io_error">Unknown IO error, 디버그 로그를 보내주세요.</string>
+  <string name="error_invalid_encryption_password">인식불가능한 암호화 암호</string>
+  <string name="error_invalid_mac_error">Decryption error, 디버그 로그를 보내주세요.</string>
+  <string name="error_unknown_crypto_error">Unknown cryptography error, 디버그 로그를 보내주세요.</string>
+  <string name="error_url_cannot_be_empty">URL을 입력해주세요</string>
+  <string name="error_username_empty">사용자이름을 입력해주세요.</string>
+  <string name="error_spaces_in_username">사용자이름은 공백이 있을 수 없습니다.</string>
+  <string name="error_username_illegal">사용자이름은 \'@\'이 포함된 5글자 이상이어야 합니다.</string>
+  <string name="error_passwords_do_not_match">암호가 서로 맞지 않습니다.</string>
+  <string name="error_password_too_short">암호가 너무 짧습니다!</string>
+  <string name="error_username_already_registered">중복된 사용자 이름이 있습니다, 다른 이름을 시도해주세요.</string>
+  <string name="error_card_number_could_not_be_verified">카드번호가 확인될 수 없습니다</string>
+  <string name="error_card_expiration_could_not_be_verified">카드만료날짜가 확인될 수 없습니다</string>
+  <string name="error_card_security_code_could_not_be_verified">CVC 코드가 확인될 수 없습니다.</string>
+  <string name="error_your_card_could_not_be_verified">카드가 확인될 수 없습니다.</string>
+  <string name="error_stripe_api_error">Unknown payment processing error, 재시도 혹은 디버그 로그를 보내주세요.</string>
+  <string name="error_android_account_manager_error">Unexpected Android AccountManager error!</string>
+  <!--misc errors-->
+  <string name="error_multiple_accounts_not_allowed">Flock 사용자는 두 개 이상의 계정을 가질 수 없습니다.</string>
+  <string name="error_no_account_is_registered">이 기기와 연결된 계정이 없습니다.</string>
+  <string name="error_password_unavailable_please_login">암호 에러, 로그인 해주세요.</string>
+</resources>
