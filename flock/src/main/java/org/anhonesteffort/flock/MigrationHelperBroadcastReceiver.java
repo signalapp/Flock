@@ -29,7 +29,7 @@ import android.util.Log;
 
 import com.google.common.base.Optional;
 
-import org.anhonesteffort.flock.auth.DavAccount;
+import org.anhonesteffort.flock.sync.account.AccountSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncWorker;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
@@ -72,6 +72,7 @@ public class MigrationHelperBroadcastReceiver extends BroadcastReceiver {
   private void handleActionMyPackageReplaced(Context context) {
     Log.d(TAG, "handleActionMyPackageReplaced");
 
+    new AccountSyncScheduler(context).requestSync(); // hack to migrate stripe plan on update :[
     if (MigrationHelperBroadcastReceiver.getMigrationUpdateHandled(context)) {
       Log.d(TAG, "migration already handled for this update, nothing to do.");
       return;

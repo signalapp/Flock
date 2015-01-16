@@ -32,6 +32,7 @@ import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.KeyStore;
+import org.anhonesteffort.flock.sync.SyncWorker;
 import org.anhonesteffort.flock.sync.SyncWorkerUtil;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
@@ -45,7 +46,7 @@ import java.security.GeneralSecurityException;
 /**
  * Programmer: rhodey
  */
-public class KeySyncWorker {
+public class KeySyncWorker implements SyncWorker {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.key.KeySyncWorker";
 
@@ -53,10 +54,12 @@ public class KeySyncWorker {
 
   private final Context    context;
   private final DavAccount account;
+  private final SyncResult result;
 
-  public KeySyncWorker(Context context, DavAccount account) {
+  public KeySyncWorker(Context context, DavAccount account, SyncResult result) {
     this.context = context;
     this.account = account;
+    this.result  = result;
 
     Thread.currentThread().setContextClassLoader(context.getClassLoader());
   }
@@ -181,7 +184,8 @@ public class KeySyncWorker {
     }
   }
 
-  public void run(SyncResult result) {
+  @Override
+  public void run() {
     Log.d(TAG, "now syncing");
     try {
 
@@ -225,4 +229,10 @@ public class KeySyncWorker {
       SyncWorkerUtil.handleException(context, e, result);
     }
   }
+
+  @Override
+  public void cleanup() {
+
+  }
+
 }

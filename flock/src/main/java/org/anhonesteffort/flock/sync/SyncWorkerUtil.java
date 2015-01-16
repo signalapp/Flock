@@ -23,13 +23,18 @@ import android.content.SyncResult;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Optional;
+import com.stripe.exception.CardException;
 
 import org.anhonesteffort.flock.crypto.InvalidMacException;
+import org.anhonesteffort.flock.registration.RegistrationApiClientException;
+import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -76,9 +81,33 @@ public class SyncWorkerUtil {
     }
 
     // client is doing funky stuff...
-    else if (e instanceof RemoteException || e instanceof OperationApplicationException) {
+    else if (e instanceof RemoteException               ||
+             e instanceof OperationApplicationException ||
+             e instanceof JSONException)
+    {
+      result.stats.numIoExceptions++;
+      Log.e(TAG, e.toString(), e);
+    }
+
+    // other funky client stuff...
+    else if (e instanceof JsonProcessingException ||
+             e instanceof CardException)
+    {
       result.stats.numParseExceptions++;
       Log.e(TAG, e.toString(), e);
+    }
+
+    else if (e instanceof RegistrationApiException) {
+      if (e instanceof RegistrationApiClientException) {
+        RegistrationApiClientException ex = (RegistrationApiClientException) e;
+        result.stats.numParseExceptions++;
+        Log.e(TAG, ex.toString(), ex);
+      }
+      else {
+        RegistrationApiException ex = (RegistrationApiException) e;
+        result.stats.numIoExceptions++;
+        Log.e(TAG, ex.toString(), ex);
+      }
     }
 
     else if (e instanceof InvalidMacException) {

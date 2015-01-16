@@ -36,6 +36,7 @@ import com.chiralcode.colorpicker.ColorPickerPreference;
 import com.google.common.base.Optional;
 
 import org.anhonesteffort.flock.auth.DavAccount;
+import org.anhonesteffort.flock.sync.account.AccountSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
 import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
@@ -137,6 +138,8 @@ public class PreferencesActivity extends PreferenceActivity
   private void initContentObservers() {
     new AddressbookSyncScheduler(getBaseContext()).registerSelfForBroadcasts();
     new CalendarsSyncScheduler(getBaseContext()).registerSelfForBroadcasts();
+    new KeySyncScheduler(getBaseContext()).registerSelfForBroadcasts();
+    new AccountSyncScheduler(getBaseContext()).registerSelfForBroadcasts();
   }
 
   private void initSyncNowButton() {
@@ -149,6 +152,7 @@ public class PreferencesActivity extends PreferenceActivity
         new KeySyncScheduler(getBaseContext()).requestSync();
         new CalendarsSyncScheduler(getBaseContext()).requestSync();
         new AddressbookSyncScheduler(getBaseContext()).requestSync();
+        new AccountSyncScheduler(getBaseContext()).requestSync();
 
         Toast.makeText(getBaseContext(),
                        R.string.sync_requested_will_begin_when_possible,
@@ -232,7 +236,7 @@ public class PreferencesActivity extends PreferenceActivity
     Preference         manageSubscription =                      findPreference(KEY_PREF_SUBSCRIPTION);
     Preference         deleteAccount      =                      findPreference(KEY_PREF_DELETE_ACCOUNT);
 
-    if (manageSubscription != null) {
+    if (manageSubscription != null && deleteAccount != null) {
       accountCategory.removePreference(manageSubscription);
       accountCategory.removePreference(deleteAccount);
     }
@@ -244,6 +248,7 @@ public class PreferencesActivity extends PreferenceActivity
       new KeySyncScheduler(getBaseContext()).setSyncInterval(Integer.valueOf((String) newValue));
       new AddressbookSyncScheduler(getBaseContext()).setSyncInterval(Integer.valueOf((String) newValue));
       new CalendarsSyncScheduler(getBaseContext()).setSyncInterval(Integer.valueOf((String) newValue));
+      new AccountSyncScheduler(getBaseContext()).setSyncInterval(Integer.valueOf((String) newValue));
 
       updateSyncIntervalSummary(Optional.of((String) newValue));
     }

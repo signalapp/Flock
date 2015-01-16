@@ -33,40 +33,48 @@ import java.util.List;
  */
 public class OwsRegistration {
 
-  protected static final int STATUS_OK                      = 200;
-  protected static final int STATUS_REDIRECT                = 300;
-  protected static final int STATUS_MALFORMED_REQUEST       = 400;
-  protected static final int STATUS_UNAUTHORIZED            = 401;
-  protected static final int STATUS_PAYMENT_REQUIRED        = 402;
-  protected static final int STATUS_RESOURCE_ALREADY_EXISTS = 403;
-  protected static final int STATUS_RESOURCE_NOT_FOUND      = 404;
-  protected static final int STATUS_SERVER_ERROR            = 500;
-  protected static final int STATUS_SERVICE_UNAVAILABLE     = 503;
+  public static final int STATUS_OK                      = 200;
+  public static final int STATUS_REDIRECT                = 300;
+  public static final int STATUS_MALFORMED_REQUEST       = 400;
+  public static final int STATUS_UNAUTHORIZED            = 401;
+  public static final int STATUS_PAYMENT_REQUIRED        = 402;
+  public static final int STATUS_RESOURCE_ALREADY_EXISTS = 403;
+  public static final int STATUS_RESOURCE_NOT_FOUND      = 404;
+  public static final int STATUS_RATE_LIMITED            = 420;
+  public static final int STATUS_SERVER_ERROR            = 500;
+  public static final int STATUS_SERVICE_UNAVAILABLE     = 503;
 
   protected static final String ACCOUNT_COLLECTION      = "accounts";
   protected static final String ACCOUNT_CARD_CONTROLLER = "card";
+  protected static final String ACCOUNT_PLAN_CONTROLLER = "plan";
   protected static final String PRICING_CONTROLLER      = "pricing";
 
   protected static final String PARAM_ACCOUNT_ID        = "id";
   protected static final String PARAM_ACCOUNT_VERSION   = "version";
   protected static final String PARAM_ACCOUNT_PASSWORD  = "password";
   protected static final String PARAM_STRIPE_CARD_TOKEN = "stripe_card_token";
-  protected static final String PARAM_AUTO_RENEW        = "auto_renew";
+  protected static final String PARAM_PLAN_TYPE         = "plan_type";
+  protected static final String PARAM_PLAN_ID           = "plan_id";
+  protected static final String PARAM_PURCHASE_TOKEN    = "purchase_token";
 
   protected static final String REGISTRATION_API_HOST   = "flock-accounts.whispersystems.org";
   protected static final int    REGISTRATION_API_PORT   = 443;
   protected static final String HREF_REGISTRATION_API   = "https://" + REGISTRATION_API_HOST + ":" + REGISTRATION_API_PORT;
-  protected static final String HREF_ACCOUNT_COLLECTION = HREF_REGISTRATION_API + "/" + ACCOUNT_COLLECTION + "/";
-  protected static final String HREF_PRICING            = HREF_REGISTRATION_API + "/" + PRICING_CONTROLLER + "/";
+  protected static final String HREF_ACCOUNT_COLLECTION = HREF_REGISTRATION_API + "/v2/" + ACCOUNT_COLLECTION;
+  protected static final String HREF_PRICING            = HREF_REGISTRATION_API + "/"    + PRICING_CONTROLLER;
 
   public static final String STRIPE_PUBLIC_KEY = "pk_live_EiIuIaXaPPMgjllTlweiDYgJ";
 
   protected static String getHrefForAccount(String accountId) {
-    return HREF_ACCOUNT_COLLECTION + accountId;
+    return HREF_REGISTRATION_API + "/v2/" + ACCOUNT_COLLECTION + "/" + accountId;
   }
 
   protected static String getHrefForCard(String accountId) {
-    return HREF_ACCOUNT_COLLECTION + accountId + "/" + ACCOUNT_CARD_CONTROLLER;
+    return HREF_REGISTRATION_API + "/" + ACCOUNT_COLLECTION + "/" + accountId + "/" + ACCOUNT_CARD_CONTROLLER;
+  }
+
+  protected static String getHrefForPlan(String accountId) {
+    return HREF_REGISTRATION_API + "/v2/" + ACCOUNT_COLLECTION + "/" + accountId + "/" + ACCOUNT_PLAN_CONTROLLER;
   }
 
   protected static String getHrefWithParameters(String href, List<NameValuePair> params) {

@@ -50,16 +50,16 @@ import java.util.concurrent.TimeUnit;
 /**
  * Programmer: rhodey
  */
-public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter {
+public abstract class AbstractSyncAdapter extends AbstractThreadedSyncAdapter {
 
-  private static final String TAG = "org.anhonesteffort.flock.sync.AbstractDavSyncAdapter";
+  private static final String TAG = "org.anhonesteffort.flock.sync.AbstractSyncAdapter";
 
   protected ContentProviderClient provider;
   protected SyncResult            syncResult;
   protected DavAccount            davAccount;
   protected MasterCipher          masterCipher;
 
-  public AbstractDavSyncAdapter(Context context) {
+  public AbstractSyncAdapter(Context context) {
     super(context, true);
   }
 
@@ -79,7 +79,7 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
       throws PropertyParseException, InvalidMacException, DavException,
              RemoteException, GeneralSecurityException, IOException;
 
-  protected abstract List<AbstractDavSyncWorker> getSyncWorkers(boolean localChangesOnly)
+  protected abstract List<SyncWorker> getSyncWorkers(boolean localChangesOnly)
       throws DavException, RemoteException, IOException;
 
   protected abstract void handlePostSyncOperations()
@@ -137,21 +137,21 @@ public abstract class AbstractDavSyncAdapter extends AbstractThreadedSyncAdapter
       }
 
       handlePreSyncOperations();
-      List<AbstractDavSyncWorker> workers = getSyncWorkers(!forceSync && !syncIntervalHasPassed());
+      List<SyncWorker> workers = getSyncWorkers(!forceSync && !syncIntervalHasPassed());
 
       if (workers.size() > 0) {
         Log.d(TAG, "starting thread executor service for " + workers.size() + " " +
                    authority + " sync workers.");
         ExecutorService executor = Executors.newFixedThreadPool(workers.size());
 
-        for (AbstractDavSyncWorker worker : workers)
+        for (SyncWorker worker : workers)
           executor.execute(worker);
 
         executor.shutdown();
         executor.awaitTermination(60, TimeUnit.MINUTES);
 
-        for (AbstractDavSyncWorker worker : workers)
-          worker.remoteCollection.closeHttpConnection();
+        for (SyncWorker worker : workers)
+          worker.cleanup();
       }
 
       handlePostSyncOperations();

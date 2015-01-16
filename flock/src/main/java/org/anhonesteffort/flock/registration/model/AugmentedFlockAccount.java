@@ -34,9 +34,9 @@ public class AugmentedFlockAccount extends FlockAccount {
   protected List<FlockSubscription> subscriptions;
 
   public AugmentedFlockAccount(FlockAccount account, List<FlockSubscription> subscriptions) {
-    super(account.getId(),              account.getSalt(),       account.getPasswordSha512(),
-         account.getStripeCustomerId(), account.getCreateDate(), account.getLastStripeChargeFailed(),
-         account.getAutoRenewEnabled());
+    super(account.getId(),                    account.getVersion(),          account.getSalt(),
+         account.getPasswordSha512(),         account.getStripeCustomerId(), account.getCreateDate(),
+         account.getLastStripeChargeFailed(), account.getAutoRenewEnabled(), account.subscriptionPlan);
 
     this.subscriptions = subscriptions;
   }

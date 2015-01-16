@@ -33,6 +33,8 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="thanks">thanks!</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <string name="days">days</string>
     <string name="addressbook">addressbook</string>
@@ -239,22 +241,24 @@
     <!-- ManageSubscriptionActivity -->
     <string name="title_manage_subscription">Manage subscription</string>
     <string name="days_remain">days remain</string>
-    <string name="subscription_history">Subscription history</string>
-    <string name="auto_renew_disabled">auto-renew disabled</string>
-    <string name="processing_payment">processing payment</string>
-    <string name="auto_renew_enabled">auto-renew enabled</string>
-    <string name="auto_renew_error">auto-renew error</string>
-    <string name="button_edit_payment_details">Edit payment details</string>
+    <string name="google_play">Google Play</string>
+    <string name="credit_card">Credit card</string>
+    <string name="when_subscribed_your_card_will_be_charged_once_per_year">When subscribed your card will be charged once per year and you may cancel at any time.</string>
+    <string name="subscription_is_active">Subscription is active</string>
+    <string name="payment_failed">Payment failed</string>
+    <string name="start_subscription">Start subscription</string>
+    <string name="cancel_subscription">Cancel subscription</string>
+    <string name="are_you_sure_you_want_to_cancel_your_flock_subscription">Are you sure you want to cancel your Flock subscription?</string>
+    <string name="your_subscription_is_active_well_charge_you_again_in_days">Your subscription is active, we\'ll charge you again in %1$d days.</string>
+    <string name="google_play_error_please_update_google_play_services">Google Play error, please update Google Play Services.</string>
+    <string name="purchase_failed_check_your_google_wallet">purchase failed, check your Google Wallet</string>
 
 
     <!-- EditAutoRenewActivity -->
     <string name="usd_per_year">$%.2f/year</string>
-    <string name="with_auto_renew_flock_automatically_charges_your_card_before">With auto-renew, Flock automatically charges your card seven days before your subscription runs out.</string>
-    <string name="button_save">Save</string>
-    <string name="button_verify_and_save">Verify and save</string>
+    <string name="save_card">Save card</string>
     <string name="card_verified_and_saved">Card verified and saved!</string>
-    <string name="autorenew_saved">Auto-renew saved!</string>
-    <string name="enable_autorenew">enable auto-renew</string>
+    <string name="subscription_canceled">Subscription canceled</string>
     <string name="hint_card_cvc">CVC</string>
     <string name="hint_card_expiration">MM/YY</string>
     <string name="hint_card_number">5555 5555 5555 5555</string>
