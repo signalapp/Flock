@@ -26,13 +26,13 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.stripe.exception.APIConnectionException;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.registration.AuthorizationException;
-import org.anhonesteffort.flock.registration.RegistrationApiClientException;
+import org.anhonesteffort.flock.registration.PaymentRequiredException;
+import org.anhonesteffort.flock.registration.RegistrationApiParseException;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
 import org.anhonesteffort.flock.sync.OwsWebDav;
@@ -100,8 +100,10 @@ public class ErrorToaster {
 
     if (e instanceof AuthorizationException)
       bundle.putInt(KEY_STATUS_CODE, CODE_UNAUTHORIZED);
-    else if (e instanceof RegistrationApiClientException)
+    else if (e instanceof RegistrationApiParseException)
       bundle.putInt(KEY_STATUS_CODE, CODE_REGISTRATION_API_CLIENT_ERROR);
+    else if (e instanceof PaymentRequiredException)
+      bundle.putInt(KEY_STATUS_CODE, CODE_STRIPE_REJECTED_CARD);
     else if (e instanceof RegistrationApiException)
       bundle.putInt(KEY_STATUS_CODE, CODE_REGISTRATION_API_SERVER_ERROR);
 
@@ -166,7 +168,7 @@ public class ErrorToaster {
       else if (((CardException) e).getCode().equals(CODE_INVALID_CVC))
         bundle.putInt(KEY_STATUS_CODE, CODE_CARD_CVC_INVALID);
       else
-      bundle.putInt(KEY_STATUS_CODE, CODE_STRIPE_REJECTED_CARD);
+        bundle.putInt(KEY_STATUS_CODE, CODE_STRIPE_REJECTED_CARD);
     }
     else if (e instanceof APIConnectionException)
       bundle.putInt(KEY_STATUS_CODE, CODE_STRIPE_CONNECTION_ERROR);

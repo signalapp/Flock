@@ -1,0 +1,24 @@
+{
+  "id"                        : "ACCOUNT00",
+  "version"                   : 1,
+  "salt"                      : "salt",
+  "password_sha512"           : "OJb6HMgLjR16KN5vh5Jk1IgczieFnUtMQ2Hcx997eIfXzoeaMhseBOYH7B0B0NLS8VuPZpsK+0VLI1h7OMo7TA==",
+  "stripe_customer_id"        : "stripe00",
+  "create_date"               : 1391853600000,
+  "last_stripe_charge_failed" : false,
+  "auto_renew_enabled"        : false,
+  "subscription_plan" : {
+    "account_id" : "ACCOUNT00",
+    "plan_type"  : 0,
+    "plan_id"    : "nope"
+  },
+  "subscriptions": [
+    {
+      "account_id"  : "ACCOUNT00",
+      "payment_id"  : "payment00",
+      "create_date" : 1391853600000,
+      "days_credit" : 365,
+      "cost_usd"    : 1.337
+    }
+  ]
+}

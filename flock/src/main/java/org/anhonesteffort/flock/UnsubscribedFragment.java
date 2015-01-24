@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.registration.model.SubscriptionPlan;
 import org.anhonesteffort.flock.sync.account.AccountStore;
 import org.anhonesteffort.flock.sync.account.AccountSyncWorker;
@@ -173,10 +174,19 @@ public class UnsubscribedFragment extends Fragment {
       protected Bundle doInBackground(String... params) {
         Bundle result = new Bundle();
 
-        new AccountSyncWorker(subscriptionActivity,
-                                   subscriptionActivity.davAccount,
-                                   null,
-                                   new SyncResult()).run();
+        try {
+
+          new AccountSyncWorker(
+              subscriptionActivity,
+              subscriptionActivity.davAccount,
+              null,
+              new SyncResult()
+          ).run();
+
+        } catch (RegistrationApiException e) {
+          ErrorToaster.handleBundleError(e, result);
+          return result;
+        }
 
         result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
         return result;

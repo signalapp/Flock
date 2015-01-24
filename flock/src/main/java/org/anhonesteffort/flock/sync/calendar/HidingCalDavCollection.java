@@ -50,7 +50,7 @@ import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.HidingDavCollection;
 import org.anhonesteffort.flock.sync.HidingDavCollectionMixin;
-import org.anhonesteffort.flock.sync.HidingUtil;
+import org.anhonesteffort.flock.crypto.HidingUtil;
 import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;

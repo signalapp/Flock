@@ -55,9 +55,13 @@ dependencies {
     compile group: 'com.google.code.gson',       name: 'gson',                version: '2.2.4'
     compile group: 'com.stripe',                 name: 'stripe-java-btc',     version: '1.12.0-btc-beta'
     compile group: 'com.google.zxing',           name: 'core',                version: '3.1.0'
-    compile(group: 'org.whispersystems',         name: 'libpastelog',         version: '1.0.1') {
+    compile(group: 'org.whispersystems',         name: 'libpastelog',         version: '1.0.4') {
         exclude group: 'com.android.support', module: 'support-v4'
     }
+
+    androidTestCompile group: 'com.squareup',        name: 'fest-android',     version: '1.0.8'
+    androidTestCompile group: 'com.google.dexmaker', name: 'dexmaker',         version: '1.1'
+    androidTestCompile group: 'com.google.dexmaker', name: 'dexmaker-mockito', version: '1.1'
 }
 
 dependencyVerification {
@@ -84,7 +88,7 @@ dependencyVerification {
             'com.fasterxml.jackson.core:jackson-annotations:0c8c3811322cc84c09a93f34436fe784a1259dd5376a90aec5a73493456f757d',
             'org.slf4j:slf4j-api:fe30825245d2336c859dc38d60c0fc5f3668dbf29cd586828d2b5667ec355b91',
             'com.fasterxml.jackson.core:jackson-core:61f84f93e3f901134d7498b50119ee01074f10d59560e45ccd3e1d48cfec493b',
-            'org.whispersystems:libpastelog:fdc5bea9c48d9b7bb6fbe775717f84537d3334cead157eefc57c8e7ec7e90c81'
+            'org.whispersystems:libpastelog:3ccf00fe1597eb8ca1e5de99b17fc225387a1b80b5bbc00ec1bc4d4f3ea9cdde'
     ]
 }
 

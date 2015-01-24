@@ -36,6 +36,7 @@ import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.MasterCipher;
+import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -80,7 +81,7 @@ public abstract class AbstractSyncAdapter extends AbstractThreadedSyncAdapter {
              RemoteException, GeneralSecurityException, IOException;
 
   protected abstract List<SyncWorker> getSyncWorkers(boolean localChangesOnly)
-      throws DavException, RemoteException, IOException;
+      throws DavException, RemoteException, RegistrationApiException, IOException;
 
   protected abstract void handlePostSyncOperations()
       throws PropertyParseException, InvalidMacException, DavException,
@@ -163,6 +164,8 @@ public abstract class AbstractSyncAdapter extends AbstractThreadedSyncAdapter {
       SyncWorkerUtil.handleException(getContext(), e, syncResult);
     } catch (RemoteException e) {
       SyncWorkerUtil.handleException(getContext(), e, syncResult);
+    } catch (RegistrationApiException e) {
+      SyncWorkerUtil.handleException(getContext(), e, syncResult);
     } catch (InvalidMacException e) {
       SyncWorkerUtil.handleException(getContext(), e, syncResult);
     } catch (GeneralSecurityException e) {
@@ -185,8 +188,6 @@ public abstract class AbstractSyncAdapter extends AbstractThreadedSyncAdapter {
     }
     if (result.stats.numSkippedEntries > 0)
       NotificationDrawer.showSubscriptionExpiredNotification(getContext());
-    if (result.stats.numParseExceptions > 0)
-      NotificationDrawer.handlePromptForDebugLogIfNotDisabled(getContext());
 
     if (NotificationDrawer.isAuthNotificationDisabled(getContext(), getSyncScheduler().getAuthority()))
       NotificationDrawer.enableAuthNotifications(getContext(), getSyncScheduler().getAuthority());

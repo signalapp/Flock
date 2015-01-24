@@ -26,12 +26,10 @@ import android.os.Bundle;
 
 import com.google.common.base.Optional;
 
-import java.util.Date;
 
 /**
  * Programmer: rhodey
  */
-// TODO: this is kind of hacked together-- can to better.
 public class DavAccount {
 
   public  static final String SYNC_ACCOUNT_TYPE       = "openwhispersystems.org";
@@ -71,14 +69,16 @@ public class DavAccount {
   }
 
   public Optional<String> getCardDavCollectionPath(Context context) {
-    SharedPreferences preferences = context.getSharedPreferences(SYNC_ACCOUNT_TYPE,
-                                                                 Context.MODE_PRIVATE);
+    SharedPreferences preferences =
+        context.getSharedPreferences(SYNC_ACCOUNT_TYPE, Context.MODE_PRIVATE);
+
     return Optional.fromNullable(preferences.getString(KEY_CARD_DAV_COLLECTION, null));
   }
 
   public void setCardDavCollection(Context context, String path) {
-    SharedPreferences preferences = context.getSharedPreferences(SYNC_ACCOUNT_TYPE,
-                                                                 Context.MODE_PRIVATE);
+    SharedPreferences preferences =
+        context.getSharedPreferences(SYNC_ACCOUNT_TYPE, Context.MODE_PRIVATE);
+
     preferences.edit().putString(KEY_CARD_DAV_COLLECTION, path).apply();
   }
 
@@ -89,8 +89,8 @@ public class DavAccount {
   public Bundle toBundle() {
     Bundle bundle = new Bundle();
 
-    bundle.putString(KEY_USER_ID, userId);
-    bundle.putString(KEY_AUTH_TOKEN, authToken);
+    bundle.putString(KEY_USER_ID,       userId);
+    bundle.putString(KEY_AUTH_TOKEN,    authToken);
     bundle.putString(KEY_DAV_HOST_HREF, davHostHREF);
 
     return bundle;

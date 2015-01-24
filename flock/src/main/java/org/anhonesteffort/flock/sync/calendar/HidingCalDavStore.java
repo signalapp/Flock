@@ -26,7 +26,7 @@ import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 
 import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.HidingDavStore;
-import org.anhonesteffort.flock.sync.HidingUtil;
+import org.anhonesteffort.flock.crypto.HidingUtil;
 import org.anhonesteffort.flock.webdav.DavClient;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.anhonesteffort.flock.webdav.caldav.CalDavCollection;

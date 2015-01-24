@@ -457,11 +457,10 @@ public class SubscriptionGoogleFragment extends Fragment {
 
       @Override
       protected Bundle doInBackground(Void... params) {
-        Bundle          result          = new Bundle();
-        RegistrationApi registrationApi = new RegistrationApi(subscriptionActivity);
-
+        Bundle result = new Bundle();
 
         try {
+          RegistrationApi registrationApi = new RegistrationApi(subscriptionActivity);
 
           registrationApi.cancelSubscription(subscriptionActivity.davAccount);
           AccountStore.setSubscriptionPlan(subscriptionActivity, SubscriptionPlan.PLAN_NONE);

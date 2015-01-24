@@ -273,10 +273,11 @@ public class StatusHeaderView extends LinearLayout {
 
       @Override
       protected Bundle doInBackground(String... params) {
-        Bundle          result          = new Bundle();
-        RegistrationApi registrationApi = new RegistrationApi(getContext());
+        Bundle result = new Bundle();
 
         try {
+
+          RegistrationApi registrationApi = new RegistrationApi(getContext());
 
           if (registrationApi.getAccount(account.get()).getLastStripeChargeFailed())
             lastChargeFailed = registrationApi.getCard(account.get()).isPresent();

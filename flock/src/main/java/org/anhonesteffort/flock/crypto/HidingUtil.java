@@ -17,10 +17,8 @@
  * /
  */
 
-package org.anhonesteffort.flock.sync;
+package org.anhonesteffort.flock.crypto;
 
-import org.anhonesteffort.flock.crypto.InvalidMacException;
-import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.util.Util;
 
 import java.io.IOException;
@@ -28,7 +26,9 @@ import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
 /**
- * Programmer: rhodey
+ * rhodey
+ *
+ * NOTE: THIS WAS A MISTAKE, I BROUGHT THIS UPON US AND NOW WE HAVE TO LIVE WITH IT D;
  */
 public class HidingUtil {
 

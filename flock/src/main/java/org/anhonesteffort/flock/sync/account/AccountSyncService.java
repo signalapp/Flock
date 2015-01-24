@@ -29,6 +29,7 @@ import com.android.vending.billing.IInAppBillingService;
 
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
+import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.sync.AbstractSyncAdapter;
 import org.anhonesteffort.flock.sync.SyncWorker;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
@@ -51,14 +52,13 @@ public class AccountSyncService extends Service {
   @Override
   public void onCreate() {
     synchronized (sSyncAdapterLock) {
-      if (sSyncAdapter == null) {
+      if (sSyncAdapter == null)
         sSyncAdapter = new AccountSyncAdapter(getApplicationContext());
-
-        Intent serviceIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
-        serviceIntent.setPackage("com.android.vending");
-        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-      }
     }
+
+    Intent serviceIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
+    serviceIntent.setPackage("com.android.vending");
+    bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
   }
 
   @Override
@@ -92,7 +92,7 @@ public class AccountSyncService extends Service {
 
     @Override
     protected List<SyncWorker> getSyncWorkers(boolean localChangesOnly)
-        throws DavException, RemoteException, IOException
+        throws DavException, RemoteException, RegistrationApiException, IOException
     {
       List<SyncWorker> workers = new LinkedList<>();
 
@@ -115,9 +115,8 @@ public class AccountSyncService extends Service {
   public void onDestroy() {
     super.onDestroy();
 
-    if (billingService != null) {
-      unbindService(serviceConnection);
-    }
+    unbindService(serviceConnection);
+    billingService = null;
   }
 
   private ServiceConnection serviceConnection = new ServiceConnection() {

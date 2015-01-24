@@ -100,11 +100,11 @@ public class ChangeEncryptionPasswordService extends Service {
 
   private void handleChangeOwsAuthToken(Bundle result, String passphrase) {
     Log.d(TAG, "handleChangeOwsAuthToken()");
-    RegistrationApi registrationApi = new RegistrationApi(getBaseContext());
 
     try {
 
-      String newAuthToken = KeyUtil.getAuthTokenForPassphrase(passphrase);
+      RegistrationApi registrationApi = new RegistrationApi(getBaseContext());
+      String          newAuthToken    = KeyUtil.getAuthTokenForPassphrase(passphrase);
 
       registrationApi.setAccountPassword(account, newAuthToken);
       DavAccountHelper.setAccountPassword(getBaseContext(), newAuthToken);

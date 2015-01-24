@@ -373,7 +373,7 @@ public class SubscriptionStripeFragment extends Fragment {
       }
 
       private void handlePutStripeTokenToServer(String stripeTokenId)
-          throws IOException, RegistrationApiException, CardException
+          throws IOException, RegistrationApiException
       {
         RegistrationApi registrationApi = new RegistrationApi(subscriptionActivity);
         registrationApi.setStripeCard(subscriptionActivity.davAccount, stripeTokenId);
@@ -476,12 +476,11 @@ public class SubscriptionStripeFragment extends Fragment {
 
       @Override
       protected Bundle doInBackground(Void... params) {
-        Bundle          result          = new Bundle();
-        RegistrationApi registrationApi = new RegistrationApi(subscriptionActivity);
-
+        Bundle result = new Bundle();
 
         try {
 
+          RegistrationApi registrationApi = new RegistrationApi(subscriptionActivity);
           registrationApi.cancelSubscription(subscriptionActivity.davAccount);
 
           AccountStore.setLastChargeFailed(subscriptionActivity, false);

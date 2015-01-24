@@ -27,13 +27,11 @@ import com.android.vending.billing.IInAppBillingService;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Optional;
-import com.stripe.exception.CardException;
 
 import org.anhonesteffort.flock.SubscriptionGoogleFragment;
 import org.anhonesteffort.flock.auth.DavAccount;
-import org.anhonesteffort.flock.registration.OwsRegistration;
+import org.anhonesteffort.flock.registration.PaymentRequiredException;
 import org.anhonesteffort.flock.registration.RegistrationApi;
-import org.anhonesteffort.flock.registration.RegistrationApiClientException;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.registration.ResourceAlreadyExistsException;
 import org.anhonesteffort.flock.registration.model.AugmentedFlockAccount;
@@ -67,6 +65,7 @@ public class AccountSyncWorker implements SyncWorker {
                            DavAccount           account,
                            IInAppBillingService billingService,
                            SyncResult           syncResult)
+      throws RegistrationApiException
   {
     this.context        = context;
     this.account        = account;
@@ -183,14 +182,8 @@ public class AccountSyncWorker implements SyncWorker {
 
     } catch (RegistrationApiException e) {
 
-      if (e instanceof RegistrationApiClientException) {
-        RegistrationApiClientException ex = (RegistrationApiClientException) e;
-
-        if (ex.getStatus() == OwsRegistration.STATUS_PAYMENT_REQUIRED)
-          Log.w(TAG, "thought we were putting new google plan but server says it is bad", e);
-        else
-          SyncWorkerUtil.handleException(context, e, result);
-      }
+      if (e instanceof PaymentRequiredException)
+        Log.w(TAG, "thought we were putting new google plan but server says it is bad", e);
       else
         SyncWorkerUtil.handleException(context, e, result);
 
@@ -276,7 +269,7 @@ public class AccountSyncWorker implements SyncWorker {
 
       registration.migrateBillingToStripeSubscriptionModel(account);
 
-    } catch (CardException e) {
+    } catch (PaymentRequiredException e) {
       Log.e(TAG, "tried to migrate account to stripe plan and got CardException", e);
       SyncWorkerUtil.handleException(context, e, result);
     } catch (RegistrationApiException e) {

@@ -20,7 +20,6 @@
 package org.anhonesteffort.flock.sync;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.webdav.DavClient;

@@ -25,10 +25,9 @@ import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Optional;
-import com.stripe.exception.CardException;
 
 import org.anhonesteffort.flock.crypto.InvalidMacException;
-import org.anhonesteffort.flock.registration.RegistrationApiClientException;
+import org.anhonesteffort.flock.registration.RegistrationApiParseException;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
@@ -90,16 +89,14 @@ public class SyncWorkerUtil {
     }
 
     // other funky client stuff...
-    else if (e instanceof JsonProcessingException ||
-             e instanceof CardException)
-    {
+    else if (e instanceof JsonProcessingException) {
       result.stats.numParseExceptions++;
       Log.e(TAG, e.toString(), e);
     }
 
     else if (e instanceof RegistrationApiException) {
-      if (e instanceof RegistrationApiClientException) {
-        RegistrationApiClientException ex = (RegistrationApiClientException) e;
+      if (e instanceof RegistrationApiParseException) {
+        RegistrationApiParseException ex = (RegistrationApiParseException) e;
         result.stats.numParseExceptions++;
         Log.e(TAG, ex.toString(), ex);
       }

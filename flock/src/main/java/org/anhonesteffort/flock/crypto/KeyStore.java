@@ -47,7 +47,7 @@ public class KeyStore {
     return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
   }
 
-  protected static boolean getUseCipherVersionZero(Context context) {
+  public static boolean getUseCipherVersionZero(Context context) {
     return getSharedPreferences(context).getBoolean(KEY_USE_CIPHER_VERSION_ZERO, false);
   }
 
@@ -56,30 +56,30 @@ public class KeyStore {
                                                     useCipherVersionZero).apply();
   }
 
-  protected static void saveCipherKey(Context context, byte[] cipherKey) {
+  public static void saveCipherKey(Context context, byte[] cipherKey) {
     Log.d(TAG, "SAVING CIPHER KEY MATERIAL...");
     saveBytes(context, KEY_CIPHER_KEY, cipherKey);
   }
 
-  protected static Optional<byte[]> getCipherKey(Context context) throws IOException {
+  public static Optional<byte[]> getCipherKey(Context context) throws IOException {
     return retrieveBytes(context, KEY_CIPHER_KEY);
   }
 
-  protected static void saveMacKey(Context context, byte[] cipherKey) {
+  public static void saveMacKey(Context context, byte[] cipherKey) {
     Log.d(TAG, "SAVING MAC KEY MATERIAL...");
     saveBytes(context, KEY_MAC_KEY, cipherKey);
   }
 
-  protected static Optional<byte[]> getMacKey(Context context) throws IOException {
+  public static Optional<byte[]> getMacKey(Context context) throws IOException {
     return retrieveBytes(context, KEY_MAC_KEY);
   }
 
-  protected static void saveKeyMaterialSalt(Context context, byte[] salt) {
+  public static void saveKeyMaterialSalt(Context context, byte[] salt) {
     Log.d(TAG, "SAVING SALT FOR KEY MATERIAL...");
     saveBytes(context, KEY_KEY_MATERIAL_SALT, salt);
   }
 
-  protected static Optional<byte[]> getKeyMaterialSalt(Context context) throws IOException {
+  public static Optional<byte[]> getKeyMaterialSalt(Context context) throws IOException {
     return retrieveBytes(context, KEY_KEY_MATERIAL_SALT);
   }
 
