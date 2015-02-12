@@ -41,8 +41,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.chiralcode.colorpicker.ColorPicker;
-import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.calendar.LocalCalendarStore;
 import org.anhonesteffort.flock.sync.calendar.LocalEventCollection;
 

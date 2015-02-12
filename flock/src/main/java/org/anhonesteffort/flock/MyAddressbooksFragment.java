@@ -36,7 +36,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.HidingCardDavCollection;

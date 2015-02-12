@@ -37,11 +37,11 @@ import android.provider.ContactsContract;
 import android.util.Log;
 import android.util.Pair;
 
-import com.google.common.base.Optional;
 import ezvcard.VCard;
 import ezvcard.parameter.ImageType;
 import ezvcard.property.Photo;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
 import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;

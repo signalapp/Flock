@@ -136,11 +136,9 @@ public class SelectServiceProviderFragment extends Fragment {
         if (!radioButtonOws.isChecked()) {
           radioButtonOws.setChecked(true);
           radioButtonOther.setChecked(false);
-          serviceDescription.setText(
-              Html.fromHtml(
-                  getString(R.string.flock_sync_is_a_service_run_by_open_whisper_systems_available, costPerYearUsd)
-              )
-          );
+          String descriptionText =  getString(R.string.flock_sync_is_a_service_run_by_open_whisper_systems_available, costPerYearUsd);
+          descriptionText        += "<br/><br/>" + getString(R.string.privacy_and_terms_of_service);
+          serviceDescription.setText(Html.fromHtml(descriptionText));
           serviceDescription.setMovementMethod(LinkMovementMethod.getInstance());
         }
       }
@@ -167,11 +165,9 @@ public class SelectServiceProviderFragment extends Fragment {
         if (isChecked) {
           radioButtonOws.setChecked(true);
           radioButtonOther.setChecked(false);
-          serviceDescription.setText(
-              Html.fromHtml(
-                  getString(R.string.flock_sync_is_a_service_run_by_open_whisper_systems_available, costPerYearUsd)
-              )
-          );
+          String descriptionText =  getString(R.string.flock_sync_is_a_service_run_by_open_whisper_systems_available, costPerYearUsd);
+          descriptionText        += "<br/><br/>" + getString(R.string.privacy_and_terms_of_service);
+          serviceDescription.setText(Html.fromHtml(descriptionText));
           serviceDescription.setMovementMethod(LinkMovementMethod.getInstance());
         }
       }
@@ -196,11 +192,9 @@ public class SelectServiceProviderFragment extends Fragment {
     final TextView serviceDescription = (TextView) fragmentView.findViewById(R.id.sync_service_description);
     final Double   costPerYearUsd     = (double)   getResources().getInteger(R.integer.cost_per_year_usd);
 
-    serviceDescription.setText(
-        Html.fromHtml(
-            getString(R.string.flock_sync_is_a_service_run_by_open_whisper_systems_available, costPerYearUsd)
-        )
-    );
+    String descriptionText =  getString(R.string.flock_sync_is_a_service_run_by_open_whisper_systems_available, costPerYearUsd);
+    descriptionText        += "<br/><br/>" + getString(R.string.privacy_and_terms_of_service);
+    serviceDescription.setText(Html.fromHtml(descriptionText));
     serviceDescription.setMovementMethod(LinkMovementMethod.getInstance());
   }
 }

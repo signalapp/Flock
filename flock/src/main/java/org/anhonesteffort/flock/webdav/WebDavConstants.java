@@ -27,6 +27,21 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
  */
 public class WebDavConstants {
 
+  public static final int SC_OK         = 200;
+  public static final int SC_NO_CONTENT = 204;
+
+  public static final int SC_MOVED_PERMANENTLY  = 301;
+  public static final int SC_MOVED_TEMPORARILY  = 302;
+  public static final int SC_SEE_OTHER          = 303;
+  public static final int SC_USE_PROXY          = 305;
+  public static final int SC_TEMPORARY_REDIRECT = 307;
+
+  public static final int SC_UNAUTHORIZED             = 401;
+  public static final int SC_FORBIDDEN                = 403;
+  public static final int SC_NOT_FOUND                = 404;
+  public static final int SC_PRECONDITION_FAILED      = 412;
+  public static final int SC_REQUEST_ENTITY_TOO_LARGE = 413;
+
   public static final String PROPERTY_RESOURCE_ID            = "resource-id";
   public static final String PROPERTY_CURRENT_USER_PRINCIPAL = "current-user-principal";
   public static final String PROPERTY_SUPPORTED_REPORT_SET   = "supported-report-set";

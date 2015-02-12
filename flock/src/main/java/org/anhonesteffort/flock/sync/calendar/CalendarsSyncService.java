@@ -28,14 +28,12 @@ import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.sync.AbstractSyncAdapter;
 import org.anhonesteffort.flock.sync.SyncWorker;
 import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
-
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.PreferencesActivity;
 import org.anhonesteffort.flock.webdav.PropertyParseException;

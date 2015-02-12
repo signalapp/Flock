@@ -33,7 +33,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.base.Optional;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
 import ezvcard.property.StructuredName;
@@ -45,11 +44,13 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.Calendars;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
+import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.anhonesteffort.flock.webdav.caldav.CalDavCollection;
 import org.anhonesteffort.flock.webdav.caldav.CalDavStore;
 import org.anhonesteffort.flock.webdav.carddav.CardDavCollection;
@@ -238,7 +239,7 @@ public class ServerTestsFragment extends Fragment {
         } catch (DavException e) {
           Log.e(TAG, "carddav current user principal", e);
 
-          if (e.getErrorCode() == DavServletResponse.SC_UNAUTHORIZED)
+          if (e.getErrorCode() == WebDavConstants.SC_UNAUTHORIZED)
             result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_UNAUTHORIZED);
           else
             result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CARDDAV_CURRENT_USER_PRINCIPAL);
@@ -264,7 +265,7 @@ public class ServerTestsFragment extends Fragment {
         } catch (DavException e) {
           Log.e(TAG, "calddav current user principal", e);
 
-          if (e.getErrorCode() == DavServletResponse.SC_UNAUTHORIZED)
+          if (e.getErrorCode() == WebDavConstants.SC_UNAUTHORIZED)
             result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_UNAUTHORIZED);
           else
             result.putInt(ErrorToaster.KEY_STATUS_CODE, CODE_ERROR_CALDAV_CURRENT_USER_PRINCIPAL);

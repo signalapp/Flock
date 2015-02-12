@@ -28,7 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.sync.HidingDavCollection;
 import org.anhonesteffort.flock.sync.LocalComponentStore;

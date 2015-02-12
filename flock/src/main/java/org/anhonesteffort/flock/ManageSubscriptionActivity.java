@@ -35,8 +35,8 @@ import android.view.MenuItem;
 import android.view.Window;
 
 import com.android.vending.billing.IInAppBillingService;
-import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.registration.model.SubscriptionPlan;
 import org.anhonesteffort.flock.sync.account.AccountStore;

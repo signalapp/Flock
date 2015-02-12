@@ -24,7 +24,7 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.util.Log;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.MigrationHelperBroadcastReceiver;
 import org.anhonesteffort.flock.MigrationService;

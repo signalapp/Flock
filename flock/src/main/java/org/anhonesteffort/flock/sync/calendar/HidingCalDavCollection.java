@@ -21,8 +21,7 @@ package org.anhonesteffort.flock.sync.calendar;
 
 import android.util.Log;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.DecryptedMultiStatusResult;
 import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
 import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;

@@ -29,7 +29,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 
 import java.util.List;
 

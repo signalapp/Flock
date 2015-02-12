@@ -19,23 +19,18 @@
 
 package org.anhonesteffort.flock.webdav.carddav;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.webdav.WebDavConstants;
-
 import org.anhonesteffort.flock.webdav.AbstractDavComponentStore;
 import org.anhonesteffort.flock.webdav.DavClient;
 import org.anhonesteffort.flock.webdav.DavComponentStore;
 import org.anhonesteffort.flock.webdav.ExtendedMkCol;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
-import org.apache.commons.httpclient.Header;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.Status;
-import org.apache.jackrabbit.webdav.client.methods.DeleteMethod;
 import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
 import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
 import org.apache.jackrabbit.webdav.property.DavProperty;
@@ -110,11 +105,11 @@ public class CardDavStore extends AbstractDavComponentStore<CardDavCollection>
       MultiStatusResponse[] msResponses = multiStatus.getResponses();
 
       for (MultiStatusResponse msResponse : msResponses) {
-        DavPropertySet foundProperties = msResponse.getProperties(DavServletResponse.SC_OK);
+        DavPropertySet foundProperties = msResponse.getProperties(WebDavConstants.SC_OK);
         DavProperty    homeSetProperty = foundProperties.get(CardDavConstants.PROPERTY_NAME_ADDRESSBOOK_HOME_SET);
 
         for (Status status : msResponse.getStatus()) {
-          if (status.getStatusCode() == DavServletResponse.SC_OK) {
+          if (status.getStatusCode() == WebDavConstants.SC_OK) {
 
             if (homeSetProperty != null && homeSetProperty.getValue() instanceof ArrayList) {
               for (Object child : (ArrayList<?>) homeSetProperty.getValue()) {
@@ -199,11 +194,11 @@ public class CardDavStore extends AbstractDavComponentStore<CardDavCollection>
     List<CardDavCollection> collections = new LinkedList<CardDavCollection>();
 
     for (MultiStatusResponse msResponse : msResponses) {
-      DavPropertySet foundProperties = msResponse.getProperties(DavServletResponse.SC_OK);
+      DavPropertySet foundProperties = msResponse.getProperties(WebDavConstants.SC_OK);
       String         collectionUri   = msResponse.getHref();
 
       for (Status status : msResponse.getStatus()) {
-        if (status.getStatusCode() == DavServletResponse.SC_OK) {
+        if (status.getStatusCode() == WebDavConstants.SC_OK) {
 
           boolean        isAddressbookCollection = false;
           DavPropertySet collectionProperties    = new DavPropertySet();
@@ -260,7 +255,7 @@ public class CardDavStore extends AbstractDavComponentStore<CardDavCollection>
 
     } catch (DavException e) {
 
-      if (e.getErrorCode() == DavServletResponse.SC_NOT_FOUND)
+      if (e.getErrorCode() == WebDavConstants.SC_NOT_FOUND)
         return Optional.absent();
 
       throw e;

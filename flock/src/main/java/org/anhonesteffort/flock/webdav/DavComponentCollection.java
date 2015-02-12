@@ -19,7 +19,7 @@
 
 package org.anhonesteffort.flock.webdav;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;

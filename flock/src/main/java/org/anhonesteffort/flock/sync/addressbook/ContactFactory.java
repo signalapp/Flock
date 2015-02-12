@@ -25,7 +25,6 @@ import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.util.Log;
 
-import com.google.common.base.Optional;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
 import ezvcard.parameter.AddressType;
@@ -49,6 +48,7 @@ import ezvcard.property.Telephone;
 import ezvcard.property.Uid;
 import ezvcard.property.Url;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
 import org.anhonesteffort.flock.util.Base64;
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;

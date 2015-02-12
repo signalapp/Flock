@@ -41,7 +41,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.base.Optional;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -51,6 +50,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Receiver;
 import de.passsy.holocircularprogressbar.HoloCircularProgressBar;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.registration.OwsRegistration;
 import org.anhonesteffort.flock.registration.model.FlockAccount;

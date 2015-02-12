@@ -34,7 +34,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.crypto.KeyStore;
 import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
 import org.anhonesteffort.flock.util.PasswordUtil;

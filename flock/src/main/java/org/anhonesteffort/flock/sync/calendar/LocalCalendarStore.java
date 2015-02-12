@@ -29,7 +29,7 @@ import android.os.RemoteException;
 import android.provider.CalendarContract;
 import android.util.Log;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.sync.LocalComponentStore;
 

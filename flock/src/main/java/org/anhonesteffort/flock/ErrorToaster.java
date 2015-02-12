@@ -38,8 +38,8 @@ import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
 import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
+import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -110,7 +110,7 @@ public class ErrorToaster {
     else if (e instanceof DavException) {
       DavException ex = (DavException) e;
 
-      if (ex.getErrorCode() == DavServletResponse.SC_UNAUTHORIZED)
+      if (ex.getErrorCode() == WebDavConstants.SC_UNAUTHORIZED)
         bundle.putInt(KEY_STATUS_CODE, CODE_UNAUTHORIZED);
       else if (ex.getErrorCode() == OwsWebDav.STATUS_PAYMENT_REQUIRED)
         bundle.putInt(KEY_STATUS_CODE, CODE_SUBSCRIPTION_EXPIRED);

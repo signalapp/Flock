@@ -19,9 +19,9 @@
 
 package org.anhonesteffort.flock.webdav.carddav;
 
-import com.google.common.base.Optional;
 import ezvcard.VCard;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.webdav.DavComponentCollection;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;

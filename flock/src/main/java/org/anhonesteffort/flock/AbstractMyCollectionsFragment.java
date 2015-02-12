@@ -35,7 +35,7 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 
 import java.util.LinkedList;
 import java.util.List;

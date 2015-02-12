@@ -30,8 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.registration.model.SubscriptionPlan;
 import org.anhonesteffort.flock.sync.account.AccountStore;

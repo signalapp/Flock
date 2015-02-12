@@ -24,7 +24,7 @@ import android.os.RemoteException;
 import android.view.View;
 import android.widget.CompoundButton;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.HidingCalDavCollection;

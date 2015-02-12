@@ -26,8 +26,8 @@ import android.util.Log;
 import com.android.vending.billing.IInAppBillingService;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.SubscriptionGoogleFragment;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.registration.PaymentRequiredException;
@@ -61,6 +61,8 @@ public class AccountSyncWorker implements SyncWorker {
   private final SyncResult           result;
   private final RegistrationApi      registration;
 
+  private boolean billingServiceHasErrors = false;
+
   public AccountSyncWorker(Context              context,
                            DavAccount           account,
                            IInAppBillingService billingService,
@@ -80,6 +82,7 @@ public class AccountSyncWorker implements SyncWorker {
 
     if (billingService == null) {
       Log.e(TAG, "billing service is null");
+      billingServiceHasErrors = true;
       return subscriptions;
     }
 
@@ -88,6 +91,12 @@ public class AccountSyncWorker implements SyncWorker {
       Bundle ownedItems = billingService
           .getPurchases(3, SubscriptionGoogleFragment.class.getPackage().getName(),
               SubscriptionGoogleFragment.PRODUCT_TYPE_SUBSCRIPTION, null);
+
+      if (ownedItems.getInt("RESPONSE_CODE") != 0) {
+        Log.e(TAG, "owned items response code is " + ownedItems.getInt("RESPONSE_CODE"));
+        billingServiceHasErrors = true;
+        return subscriptions;
+      }
 
       ArrayList<String> purchaseDataList =
           ownedItems.getStringArrayList("INAPP_PURCHASE_DATA_LIST");
@@ -154,7 +163,7 @@ public class AccountSyncWorker implements SyncWorker {
       }
     }
 
-    if (!havePlanWithPlayServices && billingService != null)
+    if (!havePlanWithPlayServices && !billingServiceHasErrors)
       handleCancelSubscriptionWithServerIfNotRenewing();
   }
 

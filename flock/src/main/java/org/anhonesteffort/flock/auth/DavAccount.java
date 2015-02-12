@@ -24,7 +24,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 
 
 /**

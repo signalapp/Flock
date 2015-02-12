@@ -25,7 +25,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.MasterCipher;

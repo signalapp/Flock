@@ -19,7 +19,7 @@
 
 package org.anhonesteffort.flock.webdav;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 
 /**
  * Programmer: rhodey

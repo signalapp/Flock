@@ -35,8 +35,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.util.PasswordUtil;
 import org.apache.commons.lang.StringUtils;
 

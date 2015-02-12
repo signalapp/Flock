@@ -31,7 +31,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.util.Pair;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 
 import java.util.ArrayList;
 import java.util.HashMap;

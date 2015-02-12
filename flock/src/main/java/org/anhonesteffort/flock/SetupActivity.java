@@ -34,7 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.wizardpager.wizard.ui.StepPagerStrip;
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
 
 /**

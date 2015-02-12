@@ -27,8 +27,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.account.AccountSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncWorker;

@@ -26,7 +26,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.sync.AbstractSyncAdapter;

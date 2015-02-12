@@ -23,8 +23,8 @@ import android.preference.PreferenceManager;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.registration.model.AugmentedFlockAccount;
 import org.anhonesteffort.flock.registration.model.FlockCardInformation;
 import org.anhonesteffort.flock.registration.model.SubscriptionPlan;

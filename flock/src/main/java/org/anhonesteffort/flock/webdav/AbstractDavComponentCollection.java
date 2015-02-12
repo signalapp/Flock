@@ -19,8 +19,7 @@
 
 package org.anhonesteffort.flock.webdav;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
@@ -283,7 +282,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
         MultiStatus           multiStatus = propFindMethod.getResponseBodyAsMultiStatus();
         MultiStatusResponse[] responses   = multiStatus.getResponses();
 
-        DavPropertySet foundProperties = responses[0].getProperties(DavServletResponse.SC_OK);
+        DavPropertySet foundProperties = responses[0].getProperties(WebDavConstants.SC_OK);
         if (foundProperties != null)
           properties = foundProperties;
       }
@@ -339,7 +338,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
         MultiStatusResponse[] responses   = multiStatus.getResponses();
 
         for (MultiStatusResponse msResponse : responses) {
-          DavPropertySet   foundProperties = msResponse.getProperties(DavServletResponse.SC_OK);
+          DavPropertySet   foundProperties = msResponse.getProperties(WebDavConstants.SC_OK);
           Optional<String> componentUid    = getUidFromComponentPath(msResponse.getHref());
 
           if (componentUid.isPresent() && foundProperties.get(DavPropertyName.PROPERTY_GETETAG) != null) {
@@ -386,7 +385,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
 
         if (reportMethod.getStatusCode() == DavServletResponse.SC_MULTI_STATUS)
           return getComponentsFromMultiStatus(reportMethod.getResponseBodyAsMultiStatus().getResponses());
-        else if (reportMethod.getStatusCode() == DavServletResponse.SC_NOT_FOUND)
+        else if (reportMethod.getStatusCode() == WebDavConstants.SC_NOT_FOUND)
           return new MultiStatusResult<T>(new LinkedList<ComponentETagPair<T>>(), new LinkedList<InvalidComponentException>());
         else
           throw new DavException(reportMethod.getStatusCode(), reportMethod.getStatusText());
@@ -449,7 +448,7 @@ public abstract class AbstractDavComponentCollection<T> implements DavComponentC
     try {
 
       client.execute(deleteMethod);
-      if (!deleteMethod.succeeded() && deleteMethod.getStatusCode() != DavServletResponse.SC_OK)
+      if (!deleteMethod.succeeded() && deleteMethod.getStatusCode() != WebDavConstants.SC_OK)
         throw new DavException(deleteMethod.getStatusCode(), deleteMethod.getStatusText());
 
     } finally {

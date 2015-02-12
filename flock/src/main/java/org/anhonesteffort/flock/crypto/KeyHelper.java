@@ -22,7 +22,7 @@ package org.anhonesteffort.flock.crypto;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.util.Base64;
 import org.anhonesteffort.flock.util.Util;
 

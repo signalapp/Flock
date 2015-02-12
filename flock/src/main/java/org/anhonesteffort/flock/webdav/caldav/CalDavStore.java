@@ -19,10 +19,9 @@
 
 package org.anhonesteffort.flock.webdav.caldav;
 
-import com.google.common.base.Optional;
-
 import org.anhonesteffort.flock.webdav.WebDavConstants;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.webdav.AbstractDavComponentStore;
 import org.anhonesteffort.flock.webdav.DavClient;
 import org.anhonesteffort.flock.webdav.DavComponentStore;
@@ -109,11 +108,11 @@ public class CalDavStore extends AbstractDavComponentStore<CalDavCollection>
       MultiStatusResponse[] msResponses = multiStatus.getResponses();
 
       for (MultiStatusResponse msResponse : msResponses) {
-        DavPropertySet foundProperties = msResponse.getProperties(DavServletResponse.SC_OK);
+        DavPropertySet foundProperties = msResponse.getProperties(WebDavConstants.SC_OK);
         DavProperty    homeSetProperty = foundProperties.get(CalDavConstants.PROPERTY_NAME_CALENDAR_HOME_SET);
 
         for (Status status : msResponse.getStatus()) {
-          if (status.getStatusCode() == DavServletResponse.SC_OK) {
+          if (status.getStatusCode() == WebDavConstants.SC_OK) {
 
             if (homeSetProperty != null && homeSetProperty.getValue() instanceof ArrayList) {
               for (Object child : (ArrayList<?>) homeSetProperty.getValue()) {
@@ -199,11 +198,11 @@ public class CalDavStore extends AbstractDavComponentStore<CalDavCollection>
     List<CalDavCollection> collections = new LinkedList<CalDavCollection>();
 
     for (MultiStatusResponse msResponse : msResponses) {
-      DavPropertySet foundProperties = msResponse.getProperties(DavServletResponse.SC_OK);
+      DavPropertySet foundProperties = msResponse.getProperties(WebDavConstants.SC_OK);
       String         collectionUri   = msResponse.getHref();
 
       for (Status status : msResponse.getStatus()) {
-        if (status.getStatusCode() == DavServletResponse.SC_OK) {
+        if (status.getStatusCode() == WebDavConstants.SC_OK) {
 
           boolean        isCalendarCollection = false;
           DavPropertySet collectionProperties = new DavPropertySet();
@@ -263,7 +262,7 @@ public class CalDavStore extends AbstractDavComponentStore<CalDavCollection>
 
     } catch (DavException e) {
 
-      if (e.getErrorCode() == DavServletResponse.SC_NOT_FOUND)
+      if (e.getErrorCode() == WebDavConstants.SC_NOT_FOUND)
         return Optional.absent();
 
       throw e;

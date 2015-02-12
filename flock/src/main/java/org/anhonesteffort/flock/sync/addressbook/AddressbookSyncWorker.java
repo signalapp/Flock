@@ -23,11 +23,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
 
-import com.google.common.base.Optional;
-
 import ezvcard.VCard;
 import ezvcard.property.Uid;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.webdav.carddav.CardDavConstants;
 import org.anhonesteffort.flock.sync.AbstractDavSyncWorker;

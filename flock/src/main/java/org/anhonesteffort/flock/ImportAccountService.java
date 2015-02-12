@@ -5,14 +5,12 @@ import android.app.Service;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.auth.AccountAuthenticator;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.KeyStore;
-import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.sync.key.DavKeyCollection;
 import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.sync.key.KeySyncScheduler;

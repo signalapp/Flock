@@ -85,15 +85,8 @@
     <!-- SetupActivity, select service provider -->
     <string name="title_chose_sync_service">Choose sync service</string>
     <string name="flock_sync">Flock Sync</string>
-    <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">
-        Flock Sync is a service run by Open Whisper Systems available for $%.2f/year.
-        Evaluate at no charge for 30 days, no payment information required.
-
-        <![CDATA[
-          <br/><br/>
-          <a href="https://whispersystems.org/flock/legal.html">Privacy and Terms of Service</a>
-        ]]>
-    </string>
+    <string name="privacy_and_terms_of_service"><![CDATA[<a href="https://whispersystems.org/flock/legal.html">Privacy and Terms of Service</a>]]></string>
+    <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">Flock Sync is a service run by Open Whisper Systems available for $%.2f/year. Evaluate at no charge for 30 days, no payment information required.</string>
     <string name="host_my_own">Host my own</string>
     <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">You may chose to run and configure your own WebDAV-compliant server as a sync service. Before use with Flock the server must pass a series of tests.</string>
 

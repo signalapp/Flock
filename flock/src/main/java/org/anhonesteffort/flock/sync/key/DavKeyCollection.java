@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.common.base.Optional;
-
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -15,16 +13,17 @@ import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.OwsWebDav;
 import org.anhonesteffort.flock.webdav.AbstractDavComponentCollection;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.MultiStatusResult;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
+import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.anhonesteffort.flock.webdav.caldav.CalDavCollection;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 import org.anhonesteffort.flock.webdav.caldav.CalDavStore;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
@@ -179,7 +178,7 @@ public class DavKeyCollection extends AbstractDavComponentCollection<Calendar> {
       setWeStartedMigration(context, true);
 
     } catch (DavException e) {
-      if (e.getErrorCode() == DavServletResponse.SC_PRECONDITION_FAILED)
+      if (e.getErrorCode() == WebDavConstants.SC_PRECONDITION_FAILED)
         return false;
 
       throw e;
@@ -215,7 +214,7 @@ public class DavKeyCollection extends AbstractDavComponentCollection<Calendar> {
       setWeStartedMigration(context, false);
 
     } catch (DavException e) {
-      if (e.getErrorCode() != DavServletResponse.SC_PRECONDITION_FAILED)
+      if (e.getErrorCode() != WebDavConstants.SC_PRECONDITION_FAILED)
         throw e;
     }
   }

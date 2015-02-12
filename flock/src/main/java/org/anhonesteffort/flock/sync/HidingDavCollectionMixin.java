@@ -19,8 +19,7 @@
 
 package org.anhonesteffort.flock.sync;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.crypto.HidingUtil;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.MasterCipher;

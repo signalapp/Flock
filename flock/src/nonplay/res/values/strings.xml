@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (C) 2015 Open Whisper Systems
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+
+    <string name="privacy_and_terms_of_service"><![CDATA[<a href="http://anhonesteffort.org/flock/legal.html">Privacy and Terms of Service</a>]]></string>
+    <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock syncs your contacts and calendars between multiple devices while protecting your privacy with strong encryption. <![CDATA[<a href="http://anhonesteffort.org/flock/legal.html">Privacy and Terms of Service</a>]]></string>
+
+    <!-- SupplyChain update notification -->
+    <string name="update_available">Update available</string>
+    <string name="touch_to_install_update">Touch to install Flock update</string>
+
+</resources>

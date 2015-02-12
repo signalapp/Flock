@@ -24,8 +24,7 @@ import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.os.RemoteException;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.SyncWorkerUtil;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 

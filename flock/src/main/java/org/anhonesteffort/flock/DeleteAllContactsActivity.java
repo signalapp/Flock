@@ -33,10 +33,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.crypto.KeyStore;
-import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.LocalAddressbookStore;
 import org.anhonesteffort.flock.sync.addressbook.LocalContactCollection;
 

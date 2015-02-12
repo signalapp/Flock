@@ -22,9 +22,12 @@ package org.anhonesteffort.flock;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 /**
  * Programmer: rhodey
@@ -49,7 +52,9 @@ public class IntroductionFragment extends Fragment {
                            Bundle savedInstanceState)
   {
     View view = inflater.inflate(R.layout.fragment_intro, container, false);
+
     initButtons();
+    initDescription(view);
 
     return view;
   }
@@ -63,5 +68,12 @@ public class IntroductionFragment extends Fragment {
       }
 
     });
+  }
+
+  private void initDescription(View fragmentView) {
+    final TextView appDescription = (TextView) fragmentView.findViewById(R.id.flock_description);
+
+    appDescription.setText(Html.fromHtml(getString(R.string.flock_syncs_your_contacts_and_calendars_between_multiple_devices)));
+    appDescription.setMovementMethod(LinkMovementMethod.getInstance());
   }
 }

@@ -24,7 +24,7 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.AndroidDavClient;
@@ -33,10 +33,10 @@ import org.anhonesteffort.flock.sync.addressbook.HidingCardDavStore;
 import org.anhonesteffort.flock.sync.calendar.HidingCalDavStore;
 import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
+import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.anhonesteffort.flock.webdav.caldav.CalDavStore;
 import org.anhonesteffort.flock.webdav.carddav.CardDavStore;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -244,7 +244,7 @@ public class DavAccountHelper {
 
       if (e.getErrorCode() == OwsWebDav.STATUS_PAYMENT_REQUIRED)
         return true;
-      else if (e.getErrorCode() == DavServletResponse.SC_UNAUTHORIZED)
+      else if (e.getErrorCode() == WebDavConstants.SC_UNAUTHORIZED)
         return false;
       else
         throw e;

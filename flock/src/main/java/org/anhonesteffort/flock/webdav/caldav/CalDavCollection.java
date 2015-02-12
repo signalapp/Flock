@@ -19,8 +19,6 @@
 
 package org.anhonesteffort.flock.webdav.caldav;
 
-import com.google.common.base.Optional;
-
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
@@ -30,11 +28,13 @@ import net.fortuna.ical4j.model.ConstraintViolationException;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.util.Calendars;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.webdav.AbstractDavComponentCollection;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.MultiStatusResult;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
+import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
@@ -252,7 +252,7 @@ public class CalDavCollection extends AbstractDavComponentCollection<Calendar> i
     for (MultiStatusResponse response : msResponses) {
       Calendar       calendar    = null;
       String         eTag        = null;
-      DavPropertySet propertySet = response.getProperties(DavServletResponse.SC_OK);
+      DavPropertySet propertySet = response.getProperties(WebDavConstants.SC_OK);
 
       if (propertySet.get(CalDavConstants.PROPERTY_NAME_CALENDAR_DATA) != null) {
         String calendarData = (String) propertySet.get(CalDavConstants.PROPERTY_NAME_CALENDAR_DATA).getValue();
@@ -375,15 +375,15 @@ public class CalDavCollection extends AbstractDavComponentCollection<Calendar> i
         client.execute(putMethod);
         int status = putMethod.getStatusCode();
 
-        if (status == DavServletResponse.SC_REQUEST_ENTITY_TOO_LARGE ||
-            status == DavServletResponse.SC_FORBIDDEN)
+        if (status == WebDavConstants.SC_REQUEST_ENTITY_TOO_LARGE ||
+            status == WebDavConstants.SC_FORBIDDEN)
         {
           throw new InvalidComponentException("Put method returned bad status " + status,
                                               CalDavConstants.CALDAV_NAMESPACE, getPath(), calendarUid);
         }
 
-        if (status < DavServletResponse.SC_OK ||
-            status > DavServletResponse.SC_NO_CONTENT)
+        if (status < WebDavConstants.SC_OK ||
+            status > WebDavConstants.SC_NO_CONTENT)
         {
           throw new DavException(status, putMethod.getStatusText());
         }

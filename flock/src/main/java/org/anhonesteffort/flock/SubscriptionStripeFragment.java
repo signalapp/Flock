@@ -36,11 +36,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Optional;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Token;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.registration.OwsRegistration;
 import org.anhonesteffort.flock.registration.RegistrationApi;
 import org.anhonesteffort.flock.registration.RegistrationApiException;

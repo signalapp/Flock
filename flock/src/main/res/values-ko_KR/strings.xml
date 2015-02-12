@@ -67,14 +67,7 @@
   <!--SetupActivity, select service provider-->
   <string name="title_chose_sync_service">동기화 서비스 선택</string>
   <string name="flock_sync">Flock 동기화</string>
-  <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">
-Flock 동기화는 Open Whisper Systems이 $%.2f/year에 운영하는 서비스입니다.
-별다른 결제없이 30일 동안 무료로 평가해보세요 .
-
-<![CDATA[
-<br/><br/>
-<a href=\"https://whispersystems.org/flock/legal.html\">Privacy and Terms of Service</a>
-]]></string>
+  <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">Flock 동기화는 Open Whisper Systems이 $%.2f/year에 운영하는 서비스입니다. 별다른 결제없이 30일 동안 무료로 평가해보세요.</string>
   <string name="host_my_own">직접 호스팅하기</string>
   <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">직접 WebDAV-compliant 서버를 설정하고 운영하신다면, 동기화서비스로 Flock을 사용하기 전에 서버는 몇 가지의 테스트를 거쳐야 합니다.</string>
   <!--SetupActivity, other server test-->

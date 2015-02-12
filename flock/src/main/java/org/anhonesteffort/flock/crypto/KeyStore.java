@@ -23,7 +23,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.util.Base64;
 
 import java.io.IOException;

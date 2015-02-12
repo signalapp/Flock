@@ -21,9 +21,6 @@ package org.anhonesteffort.flock.webdav.caldav;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.xml.Namespace;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Programmer: rhodey
  */

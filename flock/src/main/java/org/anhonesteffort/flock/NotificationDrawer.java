@@ -27,8 +27,7 @@ import android.content.SharedPreferences;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;

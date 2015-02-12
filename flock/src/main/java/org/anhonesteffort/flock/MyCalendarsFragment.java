@@ -40,7 +40,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.chiralcode.colorpicker.ColorPicker;
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.HidingCalDavCollection;
 import org.anhonesteffort.flock.sync.calendar.HidingCalDavStore;

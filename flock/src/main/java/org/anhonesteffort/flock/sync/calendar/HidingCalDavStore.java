@@ -19,11 +19,10 @@
 
 package org.anhonesteffort.flock.sync.calendar;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.HidingDavCollectionMixin;
+import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
-
 import org.anhonesteffort.flock.crypto.MasterCipher;
 import org.anhonesteffort.flock.sync.HidingDavStore;
 import org.anhonesteffort.flock.crypto.HidingUtil;
@@ -32,7 +31,6 @@ import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.anhonesteffort.flock.webdav.caldav.CalDavCollection;
 import org.anhonesteffort.flock.webdav.caldav.CalDavStore;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
@@ -107,7 +105,7 @@ public class HidingCalDavStore implements HidingDavStore<HidingCalDavCollection>
 
     } catch (DavException e) {
 
-      if (e.getErrorCode() == DavServletResponse.SC_NOT_FOUND)
+      if (e.getErrorCode() == WebDavConstants.SC_NOT_FOUND)
         return Optional.absent();
 
       throw e;

@@ -1,30 +1,22 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
-        classpath files('libs/gradle-witness.jar')
-    }
-}
-
 apply plugin: 'com.android.application'
 apply plugin: 'witness'
 
-repositories {
-    mavenCentral()
-
-    maven { url 'https://raw.github.com/whispersystems/maven/master/stripe-btc/releases' }
-    maven { url 'https://raw.github.com/whispersystems/maven/master/gson/releases/'      }
-}
-
 android {
+
     compileSdkVersion 21
     buildToolsVersion '21.1.2'
 
     defaultConfig {
+        applicationId "org.anhonesteffort.flock"
+        versionCode 25
+        versionName "0.9.3"
         minSdkVersion 16
-        targetSdkVersion 19
+        targetSdkVersion 21
+    }
+
+    productFlavors {
+        play { }
+        nonplay { }
     }
 
     packagingOptions {
@@ -42,13 +34,14 @@ android {
     }
 }
 
+repositories {
+    mavenLocal()
+}
+
 dependencies {
-    compile group: 'com.google.guava',           name: 'guava',               version: '16.0'
-    compile group: 'com.android.support',        name: 'support-v4',          version: '19.0.1'
+    compile group: 'com.android.support',        name: 'support-v4',          version: '21.0.3'
     compile group: 'org.apache.jackrabbit',      name: 'jackrabbit-webdav',   version: '2.3.7'
     compile group: 'commons-httpclient',         name: 'commons-httpclient',  version: '3.1'
-    compile group: 'javax.servlet',              name: 'servlet-api',         version: '2.5'
-    compile group: 'org.slf4j',                  name: 'slf4j-simple',        version: '1.7.5'
     compile group: 'com.googlecode.ez-vcard',    name: 'ez-vcard',            version: '0.9.0'
     compile group: 'org.mnode.ical4j',           name: 'ical4j',              version: '1.0.5.2'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind',    version: '2.3.0'
@@ -62,22 +55,26 @@ dependencies {
     androidTestCompile group: 'com.squareup',        name: 'fest-android',     version: '1.0.8'
     androidTestCompile group: 'com.google.dexmaker', name: 'dexmaker',         version: '1.1'
     androidTestCompile group: 'com.google.dexmaker', name: 'dexmaker-mockito', version: '1.1'
+
+    nonplayCompile (group: 'org.whispersystems.supplychain', name:'libsupplychain', version:'1.0') {
+        exclude group: 'com.android.support', module: 'support-v4'
+    }
 }
 
 dependencyVerification {
     verify = [
-            'com.google.guava:guava:fa917f4f3f6a76375134ba89a40d3a1ce807945a91bbdbe39c31f76e03030868',
-            'com.android.support:support-v4:a4268abd6370c3fd3f94d2a7f9e6e755f5ddd62450cf8bbc62ba789e1274d585',
+            'com.android.support:support-v4:703572d3015a088cc5604b7e38885af3d307c829d0c5ceaf8654ff41c71cd160',
             'org.apache.jackrabbit:jackrabbit-webdav:9a11e030921bc21de7d6dcf168571a3d2671f72c351498a0daefaf79e0edc888',
             'commons-httpclient:commons-httpclient:dbd4953d013e10e7c1cc3701a3e6ccd8c950c892f08d804fabfac21705930443',
-            'javax.servlet:servlet-api:c658ea360a70faeeadb66fb3c90a702e4142a0ab7768f9ae9828678e0d9ad4dc',
-            'org.slf4j:slf4j-simple:6d06eedca4768119b2c6ac5adf97e7b5ad57a03d6578d69e734fa083c957dc06',
             'com.googlecode.ez-vcard:ez-vcard:2e09cc227f8f269be5fbdc17b999b9514e239281754a0b4d4c221e29ba2d0876',
             'org.mnode.ical4j:ical4j:dedb09e8975f0703b3ae5ad60205fedda7512f91d837070be99732001a08b138',
             'com.fasterxml.jackson.core:jackson-databind:9b789c2de23ff5a1ae1fc8193ea79e34f16d74c64c51491fbe76ca277349e694',
             'com.google.code.gson:gson:c0328cd07ca9e363a5acd00c1cf4afe8cf554bd6d373834981ba05cebec687fb',
             'com.stripe:stripe-java-btc:daaabd181eb6bc4868d739e023226d344a56bf6020a7ad057dc0c26fc7d223da',
             'com.google.zxing:core:f00b32f7a1b0edc914a8f74301e8dc34f189afc4698e9c8cc54e5d46772734a5',
+            'org.whispersystems:libpastelog:3ccf00fe1597eb8ca1e5de99b17fc225387a1b80b5bbc00ec1bc4d4f3ea9cdde',
+            'com.android.support:support-annotations:fdee2354787ef66b268e75958de3f7f6c4f8f325510a6dac9f49c929f83a63de',
+            'org.slf4j:slf4j-api:367b909030f714ee1176ab096b681e06348f03385e98d1bce0ed801b5452357e',
             'org.slf4j:jcl-over-slf4j:261e66d2b5d95ce1bc9923ab5e614f58b2568787b2b55f74dbb861b60ff798e0',
             'org.jsoup:jsoup:37e3b44fb9476a677a956fb684090b9b4a1e4d38bcfc30b499dbc83f109422c0',
             'org.freemarker:freemarker:c26923394f3f1cf0427f515ee3bb6be66d1a7f4261e6d6f0504fdec63ab85da8',
@@ -86,9 +83,7 @@ dependencyVerification {
             'commons-lang:commons-lang:50f11b09f877c294d56f24463f47d28f929cf5044f648661c0f0cfbae9a2f49c',
             'backport-util-concurrent:backport-util-concurrent:f5759b7fcdfc83a525a036deedcbd32e5b536b625ebc282426f16ca137eb5902',
             'com.fasterxml.jackson.core:jackson-annotations:0c8c3811322cc84c09a93f34436fe784a1259dd5376a90aec5a73493456f757d',
-            'org.slf4j:slf4j-api:fe30825245d2336c859dc38d60c0fc5f3668dbf29cd586828d2b5667ec355b91',
-            'com.fasterxml.jackson.core:jackson-core:61f84f93e3f901134d7498b50119ee01074f10d59560e45ccd3e1d48cfec493b',
-            'org.whispersystems:libpastelog:3ccf00fe1597eb8ca1e5de99b17fc225387a1b80b5bbc00ec1bc4d4f3ea9cdde'
+            'com.fasterxml.jackson.core:jackson-core:61f84f93e3f901134d7498b50119ee01074f10d59560e45ccd3e1d48cfec493b'
     ]
 }
 

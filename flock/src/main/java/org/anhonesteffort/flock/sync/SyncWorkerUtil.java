@@ -24,13 +24,14 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Optional;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.registration.RegistrationApiParseException;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
+import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.json.JSONException;
@@ -58,11 +59,11 @@ public class SyncWorkerUtil {
       DavException ex = (DavException) e;
       Log.e(TAG, "error code: " + ex.getErrorCode() + ", status phrase: " + ex.getStatusPhrase(), e);
 
-      if (ex.getErrorCode() == DavServletResponse.SC_UNAUTHORIZED)
+      if (ex.getErrorCode() == WebDavConstants.SC_UNAUTHORIZED)
         result.stats.numAuthExceptions++;
       else if (ex.getErrorCode() == OwsWebDav.STATUS_PAYMENT_REQUIRED)
         result.stats.numSkippedEntries++;
-      else if (ex.getErrorCode() != DavServletResponse.SC_PRECONDITION_FAILED)
+      else if (ex.getErrorCode() != WebDavConstants.SC_PRECONDITION_FAILED)
         result.stats.numConflictDetectedExceptions++;
     }
 

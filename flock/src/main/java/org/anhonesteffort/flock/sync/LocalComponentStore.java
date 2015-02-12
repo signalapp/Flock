@@ -21,7 +21,7 @@ package org.anhonesteffort.flock.sync;
 
 import android.os.RemoteException;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 
 import java.util.List;
 

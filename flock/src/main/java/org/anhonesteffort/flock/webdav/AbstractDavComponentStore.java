@@ -19,11 +19,9 @@
 
 package org.anhonesteffort.flock.webdav;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.apache.commons.httpclient.Header;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.Status;
@@ -109,11 +107,11 @@ public abstract class AbstractDavComponentStore <C extends DavComponentCollectio
 
   protected Optional<String> getCurrentUserPrincipalFromMultiStatus(MultiStatus multiStatus) {
     for (MultiStatusResponse msResponse : multiStatus.getResponses()) {
-      DavPropertySet foundProperties = msResponse.getProperties(DavServletResponse.SC_OK);
+      DavPropertySet foundProperties = msResponse.getProperties(WebDavConstants.SC_OK);
       DavProperty    homeSetProperty = foundProperties.get(WebDavConstants.PROPERTY_NAME_CURRENT_USER_PRINCIPAL);
 
       for (Status status : msResponse.getStatus()) {
-        if (status.getStatusCode() == DavServletResponse.SC_OK) {
+        if (status.getStatusCode() == WebDavConstants.SC_OK) {
 
           if (homeSetProperty != null && homeSetProperty.getValue() instanceof ArrayList) {
             for (Object child : (ArrayList<?>) homeSetProperty.getValue()) {
@@ -181,11 +179,11 @@ public abstract class AbstractDavComponentStore <C extends DavComponentCollectio
 
     } catch (DavException e) {
 
-      if (e.getErrorCode() == DavServletResponse.SC_MOVED_PERMANENTLY ||
-          e.getErrorCode() == DavServletResponse.SC_MOVED_TEMPORARILY ||
-          e.getErrorCode() == DavServletResponse.SC_SEE_OTHER         ||
-          e.getErrorCode() == DavServletResponse.SC_USE_PROXY         ||
-          e.getErrorCode() == DavServletResponse.SC_TEMPORARY_REDIRECT)
+      if (e.getErrorCode() == WebDavConstants.SC_MOVED_PERMANENTLY ||
+          e.getErrorCode() == WebDavConstants.SC_MOVED_TEMPORARILY ||
+          e.getErrorCode() == WebDavConstants.SC_SEE_OTHER         ||
+          e.getErrorCode() == WebDavConstants.SC_USE_PROXY         ||
+          e.getErrorCode() == WebDavConstants.SC_TEMPORARY_REDIRECT)
       {
         Header locationHeader = propFindMethod.getResponseHeader("location"); // TODO: find constant for this...
         if (locationHeader.getValue() != null) {
@@ -211,7 +209,7 @@ public abstract class AbstractDavComponentStore <C extends DavComponentCollectio
 
       getClient().execute(deleteMethod);
 
-      if (!deleteMethod.succeeded() && deleteMethod.getStatusCode() != DavServletResponse.SC_OK)
+      if (!deleteMethod.succeeded() && deleteMethod.getStatusCode() != WebDavConstants.SC_OK)
         throw new DavException(deleteMethod.getStatusCode(), deleteMethod.getStatusText());
 
     } finally {

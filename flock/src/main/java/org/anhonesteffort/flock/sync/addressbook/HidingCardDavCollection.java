@@ -19,7 +19,6 @@
 
 package org.anhonesteffort.flock.sync.addressbook;
 
-import com.google.common.base.Optional;
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.parameter.ImageType;
@@ -27,6 +26,7 @@ import ezvcard.property.Photo;
 import ezvcard.property.RawProperty;
 import ezvcard.property.StructuredName;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.DecryptedMultiStatusResult;
 import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
 import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;

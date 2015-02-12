@@ -19,19 +19,19 @@
 
 package org.anhonesteffort.flock.webdav.carddav;
 
-import com.google.common.base.Optional;
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.property.ProductId;
 
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.webdav.AbstractDavComponentCollection;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.MultiStatusResult;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
+import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.client.methods.PutMethod;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
@@ -128,7 +128,7 @@ public class CardDavCollection extends AbstractDavComponentCollection<VCard> imp
     for (MultiStatusResponse response : msResponses) {
       VCard          vCard       = null;
       String         eTag        = null;
-      DavPropertySet propertySet = response.getProperties(DavServletResponse.SC_OK);
+      DavPropertySet propertySet = response.getProperties(WebDavConstants.SC_OK);
 
       if (propertySet.get(CardDavConstants.PROPERTY_NAME_ADDRESS_DATA) != null) {
         String addressData = (String) propertySet.get(CardDavConstants.PROPERTY_NAME_ADDRESS_DATA).getValue();
@@ -186,15 +186,15 @@ public class CardDavCollection extends AbstractDavComponentCollection<VCard> imp
       client.execute(putMethod);
       int status = putMethod.getStatusCode();
 
-      if (status == DavServletResponse.SC_REQUEST_ENTITY_TOO_LARGE ||
-          status == DavServletResponse.SC_FORBIDDEN)
+      if (status == WebDavConstants.SC_REQUEST_ENTITY_TOO_LARGE ||
+          status == WebDavConstants.SC_FORBIDDEN)
       {
         throw new InvalidComponentException("Put method returned bad status " + status,
                                             CardDavConstants.CARDDAV_NAMESPACE, getPath(), vCardUid);
       }
 
-      if (putMethod.getStatusCode() < DavServletResponse.SC_OK ||
-          putMethod.getStatusCode() > DavServletResponse.SC_NO_CONTENT)
+      if (putMethod.getStatusCode() < WebDavConstants.SC_OK ||
+          putMethod.getStatusCode() > WebDavConstants.SC_NO_CONTENT)
       {
         throw new DavException(putMethod.getStatusCode(), putMethod.getStatusText());
       }

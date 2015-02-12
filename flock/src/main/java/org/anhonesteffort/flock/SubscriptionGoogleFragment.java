@@ -382,7 +382,7 @@ public class SubscriptionGoogleFragment extends Fragment {
         if (skuDetails.getInt("RESPONSE_CODE") == 0)
           return skuDetails.getStringArrayList("DETAILS_LIST");
         else {
-          Log.e(TAG, "sku details response code is != 0");
+          Log.e(TAG, "sku details response code is " + skuDetails.getInt("RESPONSE_CODE"));
           result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_GOOGLE_PLAY_ERROR);
           return new ArrayList<String>(0);
         }
@@ -526,6 +526,12 @@ public class SubscriptionGoogleFragment extends Fragment {
           Bundle ownedItems = subscriptionActivity.billingService
               .getPurchases(3, SubscriptionGoogleFragment.class.getPackage().getName(),
                                PRODUCT_TYPE_SUBSCRIPTION, null);
+
+          if (ownedItems.getInt("RESPONSE_CODE") != 0) {
+            Log.e(TAG, "owned items response code is " + ownedItems.getInt("RESPONSE_CODE"));
+            result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_GOOGLE_PLAY_ERROR);
+            return result;
+          }
 
           ArrayList<String> purchaseDataList =
               ownedItems.getStringArrayList("INAPP_PURCHASE_DATA_LIST");

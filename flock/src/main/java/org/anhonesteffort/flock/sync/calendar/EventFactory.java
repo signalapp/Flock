@@ -28,11 +28,11 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.InvalidLocalComponentException;
 import org.anhonesteffort.flock.sync.InvalidRemoteComponentException;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
+import org.anhonesteffort.flock.webdav.ComponentETagPair;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ComponentList;
@@ -75,7 +75,6 @@ import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.XProperty;
 import net.fortuna.ical4j.util.Calendars;
 
-import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;

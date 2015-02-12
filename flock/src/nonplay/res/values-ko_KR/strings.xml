@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+  ~ Copyright (C) 2015 Open Whisper Systems
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+
+    <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock은 사용자의 연락처와 달력을 일정을 암호화하여 개인정보를 보호함과 동시에, 다양한 기기에 동기화하여 사용할 수 있게 합니다. <![CDATA[<a href="http://anhonesteffort.org/flock/legal.html">Privacy and Terms of Service</a>]]></string>
+
+</resources>

@@ -35,8 +35,7 @@ import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.KeyStore;
@@ -56,6 +55,7 @@ import org.anhonesteffort.flock.sync.key.DavKeyCollection;
 import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
+import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.anhonesteffort.flock.webdav.caldav.CalDavStore;
 import org.anhonesteffort.flock.webdav.carddav.CardDavStore;
 import org.apache.jackrabbit.webdav.DavException;
@@ -426,7 +426,7 @@ public class MigrationService extends Service {
       handleException(e);
     } catch (DavException e) {
 
-      if (e.getErrorCode() == DavServletResponse.SC_FORBIDDEN) {
+      if (e.getErrorCode() == WebDavConstants.SC_FORBIDDEN) {
         Log.w(TAG, "caught 403 when trying to create key collection, assuming already exists.");
         setState(STATE_REPLACED_KEY_COLLECTION);
       }
@@ -569,7 +569,7 @@ public class MigrationService extends Service {
         handleException(e);
       } catch (DavException e) {
 
-        if (e.getErrorCode() != DavServletResponse.SC_FORBIDDEN)
+        if (e.getErrorCode() != WebDavConstants.SC_FORBIDDEN)
           handleException(e);
 
       } catch (GeneralSecurityException e) {
@@ -612,7 +612,7 @@ public class MigrationService extends Service {
 
       } catch (DavException e) {
 
-        if (e.getErrorCode() != DavServletResponse.SC_FORBIDDEN)
+        if (e.getErrorCode() != WebDavConstants.SC_FORBIDDEN)
           handleException(e);
 
       } catch (GeneralSecurityException e) {

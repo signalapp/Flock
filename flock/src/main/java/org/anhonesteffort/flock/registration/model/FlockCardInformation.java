@@ -22,7 +22,7 @@ package org.anhonesteffort.flock.registration.model;
 import android.os.Bundle;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 
 /**
  * Programmer: rhodey

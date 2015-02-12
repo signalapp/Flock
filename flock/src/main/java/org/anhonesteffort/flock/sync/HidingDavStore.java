@@ -19,7 +19,7 @@
 
 package org.anhonesteffort.flock.sync;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 

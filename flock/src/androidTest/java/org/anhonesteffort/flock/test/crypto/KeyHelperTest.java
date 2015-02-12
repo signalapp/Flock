@@ -20,7 +20,7 @@ package org.anhonesteffort.flock.test.crypto;
 import android.content.Context;
 import android.test.AndroidTestCase;
 
-import com.google.common.base.Optional;
+import org.anhonesteffort.flock.util.guava.Optional;
 
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.KeyStore;

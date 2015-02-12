@@ -26,12 +26,12 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.util.Pair;
 
-import com.google.common.base.Optional;
-
+import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.webdav.ComponentETagPair;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
+import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
@@ -348,7 +348,7 @@ public abstract class AbstractDavSyncWorker<T> implements SyncWorker {
 
           SyncWorkerUtil.handleException(context, e, result);
 
-          if (e.getErrorCode() == DavServletResponse.SC_PRECONDITION_FAILED)
+          if (e.getErrorCode() == WebDavConstants.SC_PRECONDITION_FAILED)
             SyncWorkerUtil.handleServerRejectedLocalComponent(localCollection, componentId, context, result);
           else
             SyncWorkerUtil.handleServerErrorOnPushNewLocalComponent(localCollection, componentId, context, result);
