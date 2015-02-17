@@ -20,6 +20,6 @@
 <resources>
 
     <string name="privacy_and_terms_of_service"><![CDATA[<a href="http://anhonesteffort.org/flock/legal.html">Datenschutzerklärung und AGB</a>]]></string>
-    <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock synchronisiert deine Kontakte und Kalender zwischen mehreren Geräten und schützt dabei deine Privatsphäre durch starke Verschlüsselung. <![CDATA[<a href="http://anhonesteffort.org/flock/legal.html">Datenschutzerklärung und AGB</a>]]></string>
+    <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock synchronisiert Ihre Kontakte und Kalender zwischen mehreren Geräten und schützt dabei Ihre Privatsphäre durch starke Verschlüsselung. <![CDATA[<a href="http://anhonesteffort.org/flock/legal.html">Datenschutzerklärung und AGB</a>]]></string>
 
 </resources>

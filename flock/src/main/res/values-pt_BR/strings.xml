@@ -1,0 +1,246 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  ~ Copyright (C) 2015 Open Whisper Systems
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+  <string name="app_name">Flock</string>
+  <string name="at_flock_sync">\@flock</string>
+  <string name="support_email_address">rhodey@anhonesteffort.org</string>
+  <string name="begin">Começo</string>
+  <string name="next">Próximo</string>
+  <string name="skip">Pular</string>
+  <string name="previous">Anterior</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Cancelar</string>
+  <string name="thanks">obrigado!</string>
+  <string name="days">dias</string>
+  <string name="addressbook">endereços</string>
+  <string name="display_name_missing">Faltando nome</string>
+  <!--Notifications-->
+  <string name="notification_contact_import">Importar contato</string>
+  <string name="notification_importing_contacts">Importando contatos</string>
+  <string name="notification_importing_contacts_from">Importando contatos de %1$s</string>
+  <string name="notification_import_complete_copied_contacts">Importação completada, copiados %1$d contatos.</string>
+  <string name="notification_import_complete_copied_contacts_failed">Importação completada, copiados %1$d contatos, %2$d falharam.</string>
+  <string name="notification_calendar_import">Importar calendário</string>
+  <string name="notification_importing_calendars">Importando calendários.</string>
+  <string name="notification_importing_events_from">Importando eventos de %1$s</string>
+  <string name="notification_import_complete_copied_events">Importação completa, copiados %1$d eventos.</string>
+  <string name="notification_import_complete_copied_events_failed">Importação completa, copiados %1$d eventos, %2$d faiharam.</string>
+  <string name="notification_flock_login_error">Flock erro de login</string>
+  <string name="notification_tap_to_correct_password">Toque para corrigir senha.</string>
+  <string name="notification_flock_encryption_error">Erro de criptografia</string>
+  <string name="notification_tap_to_correct_encryption_password">Toque para corrigir senha de criptografia.</string>
+  <string name="notification_flock_subscription_expired">Inscrição no Flock expirou</string>
+  <string name="notification_tap_to_update_subscription">Toque para atualizar inscrição.</string>
+  <!--status header stuff-->
+  <string name="status_header_status_good">Está tudo funcionando!</string>
+  <string name="status_header_status_account_login_failed">Login falhou</string>
+  <string name="status_header_status_encryption_password_incorrect">Senha de criptografia incorreta</string>
+  <string name="status_header_status_sync_disabled">Sicronização do Android desabilidata</string>
+  <string name="status_header_status_our_sync_service_error">Sincronização temporariamente indisponível...</string>
+  <string name="status_header_status_their_sync_service_error">O servidor WebDAV  possui erros</string>
+  <string name="status_header_status_registration_service_error">Serviço de registro temporariamente indisponível...</string>
+  <string name="status_header_status_migration_in_progress">Migração em progresso</string>
+  <string name="please_wait_this_will_take_a_few_minutes">Por favor espere, isso pode levar alguns minutos...</string>
+  <string name="status_header_sync_time">Última sincronização em %1$s</string>
+  <string name="status_header_sync_in_progress">Sincronização em progresso...</string>
+  <!--SetupActivity, intro-->
+  <string name="welcome_to_flock">Bem-vindo ao Flock!</string>
+  <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">O Flock sincroniza seus contatos e calendários entre múltiplos dispositivos enquanto protege sua privacidade com criptografia forte.</string>
+  <!--SetupActivity, select service provider-->
+  <string name="title_chose_sync_service">Escolha um serviço de sincronização</string>
+  <string name="flock_sync">Flock Sync</string>
+  <string name="privacy_and_terms_of_service"><![CDATA[<a href="https://whispersystems.org/flock/legal.html">Termos de Privacidade e Serviço</a>]]></string>
+  <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">Flock Sync é um serviço executado pela Open Whisper Systems disponível por $%.2f/ano. Experimente gratuitamente por 30 dias, não é necessário nenhuma informação de pagamento.</string>
+  <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">Você pode escolher executar e configurar seu próprio servidor compatível com WebDAV como um servidor de sincronização. Antes de usar com o Flock o servidor deve passar em uma série de testes.</string>
+  <!--SetupActivity, other server test-->
+  <string name="title_server_tests">Testes de servidor</string>
+  <string name="tests_not_yet_started">Os testes ainda não começaram...</string>
+  <string name="tests_interrupted">Testes interrompidos...</string>
+  <string name="stop_tests">Parar os testes</string>
+  <string name="restart_tests">Recomeçar os testes</string>
+  <string name="tests_completed_successfully">Testes completados com sucesso!</string>
+  <string name="test_caldav_create_and_delete_collections">DAV: criar ou remover coleção</string>
+  <string name="test_error_caldav_create_and_delete_collections">O servidor não suporta criação e remoção de coleções de calendários.</string>
+  <string name="test_caldav_create_and_edit_collection_properties">DAV: editar propriedades da coleção</string>
+  <string name="test_carddav_create_and_delete_contacts">CardDAV: criar e remover contatos</string>
+  <string name="test_error_carddav_create_and_delete_contacts">O servidor não suporta criação e remoção de contatos.</string>
+  <string name="test_caldav_create_and_delete_events">CalDAV: criar e remover eventos</string>
+  <string name="test_error_caldav_create_and_delete_events">O servidor não suporta criação e remoção de eventos.</string>
+  <!--SetupActivity, setup account-->
+  <string name="title_import_account">Importar conta</string>
+  <string name="title_register_account">Registrar conta</string>
+  <string name="title_setup_account">Configurar conta</string>
+  <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">Escolha um nome de usuário para a conta e uma senha forte para criptografar seus dados.</string>
+  <string name="do_you_have_a_flock_account">Você possui uma conta Flock?</string>
+  <string name="yes_log_me_in">Sim, log-me</string>
+  <string name="no_register_me">Não, registre-me</string>
+  <string name="text_setup_account_with_other">Entre o URL e as credenciais para seu servidor WebDAV e escolha uma outra senha para criptografia.</string>
+  <string name="hint_username">nome de usuário</string>
+  <string name="hint_password">senha</string>
+  <string name="hint_current_password">senha atual</string>
+  <string name="hint_repeat_password">repita a senha</string>
+  <string name="hint_href_webdav_host">https://example.com</string>
+  <string name="hint_encryption_password">senha de criptografia</string>
+  <string name="hint_repeat_encryption_password">repita a senha de criptografia</string>
+  <string name="registering_account">registrando conta...</string>
+  <string name="account_register_failed">Registro de conta falhou,</string>
+  <string name="importing_contacts_and_calendars">Importando contatos e calendários...</string>
+  <string name="account_import_completed_with_errors">Importação de conta completada com erros.</string>
+  <string name="account_import_failed">Importação de conta falhou.</string>
+  <string name="importing_encryption_secrets">Importando segredos de criptografia...</string>
+  <!--SetupActivity, import-->
+  <string name="button_import">Importar</string>
+  <string name="local_storage">Armazenamento local</string>
+  <!--SetupActivity, import contacts-->
+  <string name="select_accounts_to_import_contacts_from">Selecione contas de onde importar contatos</string>
+  <string name="contacts">contatos</string>
+  <string name="title_import_contacts">Importar contatos</string>
+  <string name="started_background_import_of_contacts">Começou importação no plano de fundo de %1$d contatos</string>
+  <!--SetupActivity, import calendars-->
+  <string name="select_calendars_to_import">Selecione calendários para importar</string>
+  <string name="title_import_calendars">Importar calendários</string>
+  <string name="started_background_import_of_calendars">Começou importação de %1$d calendários</string>
+  <!--SetupActivity, select remote addressbook and calendars-->
+  <string name="select_a_single_remote_addressbook_in_which_to_store">Selecione uma única agenda remota para armazenar contatos Flock. </string>
+  <string name="select_the_calendars_you_would_like_to_sync_with_this_device">Selecione os calendário que você gostaria de sincronizar com este dispositivo.</string>
+  <string name="setup_complete">Configuração completa!</string>
+  <!--My calendars and my addressbooks...-->
+  <string name="hint_display_name">exibir nome</string>
+  <string name="heading_display_name">Exibir nome</string>
+  <string name="heading_sync">Sincronizar</string>
+  <string name="display_name_cannot_be_empty">Nome não pode ser vazio.</string>
+  <!--My addressbooks-->
+  <string name="title_my_addressbooks">Minhas agendas</string>
+  <string name="title_edit_selected_addressbooks">Editar agendas selecionadas</string>
+  <string name="title_addressbook_properties">Propriedades da agenda</string>
+  <string name="addressbooks_selected">agendas selecionadas</string>
+  <string name="are_you_sure_you_want_to_delete_selected_addressbooks">Você tem certeza que quer remover as agendas selecionadas?</string>
+  <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">Você não pode editar agendas que ainda não foram sincronizadas.</string>
+  <!--My calendars-->
+  <string name="title_my_calendars">Meus calendários</string>
+  <string name="title_edit_selected_calendars">Editar calendários selecionados</string>
+  <string name="title_calendar_properties">Propriedades do calendário</string>
+  <string name="title_delete_selected_calendars_dialog">Remover calendários selecionados?</string>
+  <string name="calendars_selected">calendários selecionados</string>
+  <string name="are_you_sure_you_want_to_delete_selected_calendars">Você tem certeza que quer remover os calendários selecionadas?</string>
+  <string name="you_cannot_edit_calendars_that_have_not_been_synced">Você não pode editar calendários que ainda não foram sincronizadas.</string>
+  <!--PreferencesActivity-->
+  <string name="title_flock_settings">Configurações do Flock</string>
+  <string name="preference_group_sync">Sincronizar</string>
+  <string name="preference_title_sync_frequency">Frequência de sincronização</string>
+  <string name="preference_title_sync_on_content_change">Sincronizar quando houver mudança</string>
+  <string name="preference_description_sync_on_content_change">Sincroniza contatos e calendários assim que eles mudam</string>
+  <string name="preference_title_sync_now">Sincronizar agora</string>
+  <string name="sync_requested_will_begin_when_possible">Sincronização requisitada, irá começar assim que possível</string>
+  <string name="preference_group_contacts">Contatos</string>
+  <string name="preference_group_calendars">Calendários</string>
+  <string name="preference_title_default_calendar_color">Cor do calendário padão</string>
+  <string name="minutes">minutos</string>
+  <string name="new_calendars_will_be">Novos calendários serão %1$s</string>
+  <string name="preference_group_account">Conta</string>
+  <!--ChangeEncryptionPasswordActivity-->
+  <string name="title_change_encryption_password">Mudar senha de criptografia</string>
+  <string name="button_save_password">Gravar senha</string>
+  <string name="hint_new_password">nova senha</string>
+  <string name="hint_new_password_repeat">repetir a nova senha</string>
+  <string name="encryption_password_saved">Senha de criptografia gravada!</string>
+  <string name="updating_encryption_secrets">atualizado segredos de criptografia...</string>
+  <string name="password_change_failed">mudança de senha falhou.</string>
+  <!--ManageSubscriptionActivity-->
+  <string name="title_manage_subscription">Administrar inscrição</string>
+  <string name="days_remain">dias restantes</string>
+  <!--EditAutoRenewActivity-->
+  <string name="usd_per_year">$%.2f/ano</string>
+  <string name="card_verified_and_saved">Cartão verificado e gravado!</string>
+  <string name="hint_card_cvc">CVC</string>
+  <string name="hint_card_expiration">MM/AA</string>
+  <string name="hint_card_number">5555 5555 5555 5555</string>
+  <!--SendBitcoinActivity-->
+  <string name="title_send_bitcoin">Enviar bitcoins</string>
+  <string name="mBTC_to">mBTC para</string>
+  <string name="bitcoin_received">Bitcoin recebido!</string>
+  <string name="minutes_until_address_expires">minutos para expirar o endereço</string>
+  <!--DeleteAccountActivity-->
+  <!--DeleteAllContactsActivity-->
+  <string name="title_delete_all_contacts">Remover todos os contatos</string>
+  <string name="all_contacts_have_been_deleted">Todos os contatos foram removidos.</string>
+  <string name="if_you_chose_to_delete_your_flock_contacts">Se você optar por remover seus contatos do Flock eles serão removidos de todos os dispositivos que estejam usando esta conta Flock.</string>
+  <string name="are_you_sure_you_want_to_delete_all_flock_contacts">Você tem certeza que quer remover todos os contatos Flock?</string>
+  <!--CorrectPasswordActivity-->
+  <string name="title_correct_sync_password">Corrija a senha de sincronização</string>
+  <string name="unable_to_login_to_sync_service_please_correct_your_password">Não foi capaz de logar no servidor de sincronização, por favor corrija sua senha.</string>
+  <string name="login_successful">Login bem sucedido!</string>
+  <!--CorrectEncryptionPasswordActivity-->
+  <string name="encryption_password_is_invalid_please_correct_your_encryption_password">Senha de criptografia inválida, por favor corrija-a</string>
+  <string name="password_corrected">Senha corrigida!</string>
+  <!--MigrationReleaseNotesActivity-->
+  <string name="release_notes">Notas de lançamento</string>
+  <string name="the_way_that_flock_syncs_data_has_changed_to_make_future_updates_run_more_smoothly">A forma como o Flock sincroniza os dados mudou para que futuras atualizações possam rodar sem problemas. Para facilitar essa atualização os usuários devem desabilitar temporariamente a sincronização em todos os clientes mais antigos que a versão v0.8.</string>
+  <string name="after_updating_a_device_to_v08_simply_re_enable_sync">Depois de atualizar seu dispositivo para v0.8, simplesmente permita novamente a sincronização e a migração irá completar automaticamente.</string>
+  <!--SendDebugLogActivity-->
+  <string name="send_debug_log">Enviar log de depuração</string>
+  <string name="flock_debug_log">Log de depuração do Flock</string>
+  <string name="something_strange_happened_send_us_your_debug_log">Algo estranho aconteceu, envie-nos seu log de depuração para resolvermos.</string>
+  <string name="dont_ask_again">Não pergunte novamente</string>
+  <string name="send_log">Envie o log</string>
+  <!--MigrationService-->
+  <string name="migrating_to_new_version">Migrando para a nova versão</string>
+  <string name="preparing_to_upgrade_sync_protocol">Preparando para atualizar o protocolo de sincronização...</string>
+  <string name="please_enable_sync">Por favor permita a sincronização</string>
+  <string name="please_enable_anrdoid_sync_to_complete_migration">Por favor permita a sincronização Android para completar a migração</string>
+  <string name="checking_sync_for_new_contacts_and_calendar">Verificando a sincronização para novos contatos e calendários...</string>
+  <string name="generating_new_encryption_secrets">Gerando novos segredos de criptografia...</string>
+  <string name="replacing_addressbooks_and_calendars">Substituindo agendas e calendários...</string>
+  <string name="replacing_old_contacts_and_events">Substituindo antigos contatos e eventos...</string>
+  <string name="finalizing_migration">Finalizando a migração...</string>
+  <string name="migration_complete">Migração completa</string>
+  <string name="please_update_flock_on_all_your_devices">Por favor atualize o Flock em todos dispositivos.</string>
+  <string name="migration_in_progress_please_wait">Migração em progresso, por favor aguarde...</string>
+  <!--ErrorToaster messages-->
+  <string name="error_login_unauthorized">Login falhou. Nome de usuário ou senha inválido</string>
+  <string name="error_registration_api_server_error">Nossos servidores de registro estão tendo problemas, desculpe.</string>
+  <string name="error_registration_api_client_error">Erro da API do cliente de registro, por favor envie-nos os logs de depuração.</string>
+  <string name="error_our_dav_server_error">Nossos servidores de sincronização estão tendo problemas, desculpe.</string>
+  <string name="error_their_dav_server_error">Nossos servidores não estão agindo de forma esperada, verifique o log de depuração.</string>
+  <string name="error_dav_client_error">Erro de armazenamento local, por favor envie-nos os logs de depuração.</string>
+  <string name="error_connection_error">Erro de conexão, por favor verifique a conexão com a internet.</string>
+  <string name="error_our_certificate_validation">Conexão insegura com a internet, por favor envie-nos os logs de depuração.</string>
+  <string name="error_their_certificate_validation">Erro de validação de certificado, verifique os logs de depuração.</string>
+  <string name="error_unknown_io_error">Erro de IO desconhecido, por favor envie-nos os logs de depuração.</string>
+  <string name="error_invalid_encryption_password">Senha de criptografia inválida.</string>
+  <string name="error_invalid_mac_error">Erro ao descriptografar, por favor envie-nos os logs de depuração.</string>
+  <string name="error_unknown_crypto_error">Erro de criptografia desconhecido, por favor envie-nos os logs de depuração.</string>
+  <string name="error_url_cannot_be_empty">Url não pode ser vazia</string>
+  <string name="error_username_empty">O nome de usuário não pode ser vazio.</string>
+  <string name="error_spaces_in_username">O nome de usuário não pode conter espaços.</string>
+  <string name="error_username_illegal">O nome de usuário precisa conter \'@\' e pelo menos 5 caracteres de comprimento.</string>
+  <string name="error_passwords_do_not_match">As senhas não combinam.</string>
+  <string name="error_password_too_short">Senha muito curta!</string>
+  <string name="error_username_already_registered">Nome de usuário já registrado, tente outro.</string>
+  <string name="error_card_number_could_not_be_verified">O número do cartão não pode ser verificado.</string>
+  <string name="error_card_expiration_could_not_be_verified">Expiração do cartão não pode ser verificado.</string>
+  <string name="error_card_security_code_could_not_be_verified">Código de segurança do cartão não pode ser verificado.</string>
+  <string name="error_your_card_could_not_be_verified">Seu cartão não pode ser verificado</string>
+  <string name="error_stripe_api_error">Erro desconhecido noa processamento do pagamento, tente novamente ou envie-nos os logs de depuração.</string>
+  <string name="error_android_account_manager_error">Erro inesperado do Android AccountManager!</string>
+  <!--misc errors-->
+  <string name="error_multiple_accounts_not_allowed">Usuários Flock não podem ter múltiplas contas.</string>
+  <string name="error_no_account_is_registered">Nenhuma conta registrada neste dispositivo.</string>
+  <string name="error_password_unavailable_please_login">Senha indisponível, por favor faça o login.</string>
+</resources>

@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-
 <!--
-  ~ Copyright (C) 2014 Open Whisper Systems
+  ~ Copyright (C) 2015 Open Whisper Systems
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -175,20 +174,9 @@
   <!--ManageSubscriptionActivity-->
   <string name="title_manage_subscription">구독 설정</string>
   <string name="days_remain">일이 남았습니다</string>
-  <string name="subscription_history">구독 이력</string>
-  <string name="auto_renew_disabled">자동-재구독 하지 않습니다</string>
-  <string name="processing_payment">구독 정보 설정</string>
-  <string name="auto_renew_enabled">자동-재구독 합니다</string>
-  <string name="auto_renew_error">자동-재구독 에러</string>
-  <string name="button_edit_payment_details">구독 설정 수정</string>
   <!--EditAutoRenewActivity-->
   <string name="usd_per_year">$%.2f/year</string>
-  <string name="with_auto_renew_flock_automatically_charges_your_card_before">자동-재구독 하시면, Flock은 구독만료 되기전 7일 전에 자동이체를 요청합니다.</string>
-  <string name="button_save">저장</string>
-  <string name="button_verify_and_save">확인</string>
   <string name="card_verified_and_saved">카드정보 확인!</string>
-  <string name="autorenew_saved">자동--재구독 합니다!</string>
-  <string name="enable_autorenew">자동-재구독 하기</string>
   <string name="hint_card_cvc">CVC</string>
   <string name="hint_card_expiration">MM/YY</string>
   <string name="hint_card_number">5555 5555 5555 5555</string>

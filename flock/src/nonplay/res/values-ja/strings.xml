@@ -19,7 +19,7 @@
 
 <resources>
 
-    <string name="privacy_and_terms_of_service"><![CDATA[<a href="http://anhonesteffort.org/flock/legal.html">Privacy and Terms of Service</a>]]></string>
-    <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock은 사용자의 연락처와 달력을 일정을 암호화하여 개인정보를 보호함과 동시에, 다양한 기기에 동기화하여 사용할 수 있게 합니다. <![CDATA[<a href="http://anhonesteffort.org/flock/legal.html">Privacy and Terms of Service</a>]]></string>
+    <string name="privacy_and_terms_of_service"><![CDATA[<a href="http://anhonesteffort.org/flock/legal.html">プライバシーと利用規約</a>]]></string>
+    <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock は強力な暗号化でプライバシーを保護しながら、複数のデバイス間で連絡先やカレンダーを同期します。 <![CDATA[<a href="http://anhonesteffort.org/flock/legal.html">プライバシーと利用規約</a>]]></string>
 
 </resources>
