@@ -19,7 +19,7 @@ package org.anhonesteffort.flock.test.crypto;
 
 import org.anhonesteffort.flock.crypto.HidingUtil;
 import org.anhonesteffort.flock.crypto.MasterCipher;
-import org.anhonesteffort.flock.test.FlockInstrumentationTestCase;
+import org.anhonesteffort.flock.test.InstrumentationTestCaseWithMocks;
 
 import java.util.Arrays;
 
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 /**
  * rhodey
  */
-public class HidingUtilTest extends FlockInstrumentationTestCase {
+public class HidingUtilTest extends InstrumentationTestCaseWithMocks {
 
   private final byte[] PLAINTEXT_STUFF = "plaintext stuff".getBytes();
 

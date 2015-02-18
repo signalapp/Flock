@@ -8,7 +8,7 @@
   "last_stripe_charge_failed" : false,
   "auto_renew_enabled"        : false,
   "subscription_plan" : {
-    "account_id" : "ACCOUNT00",
+    "account_id" : "nope",
     "plan_type"  : 0,
     "plan_id"    : "nope"
   },

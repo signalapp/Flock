@@ -1,0 +1,7 @@
+{
+  "account_id"  : "ACCOUNT00",
+  "payment_id"  : "payment00",
+  "create_date" : 1391853600000,
+  "days_credit" : 365,
+  "cost_usd"    : 1.337
+}

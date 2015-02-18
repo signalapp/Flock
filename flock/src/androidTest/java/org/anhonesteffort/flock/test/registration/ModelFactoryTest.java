@@ -18,38 +18,88 @@
 package org.anhonesteffort.flock.test.registration;
 
 import android.content.res.AssetManager;
-import android.test.InstrumentationTestCase;
 
-import org.anhonesteffort.flock.registration.model.AugmentedFlockAccount;
+import org.anhonesteffort.flock.registration.ModelFactory;
+import org.anhonesteffort.flock.test.InstrumentationTestCaseWithMocks;
+import org.anhonesteffort.flock.test.registration.model.AugmentedFlockAccountTest;
+import org.anhonesteffort.flock.test.registration.model.FlockCardInformationTest;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 
-import static org.anhonesteffort.flock.test.util.JsonHelpers.fromJson;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import static org.anhonesteffort.flock.test.util.JsonHelpers.jsonFixture;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * rhodey
  */
-public class ModelFactoryTest extends InstrumentationTestCase {
+public class ModelFactoryTest extends InstrumentationTestCaseWithMocks {
 
-  private static final String MOCK_ACCOUNT_ID = "ACCOUNT00";
+  private AssetManager assets;
 
-  public void testBuildAccount() throws Exception {
-    final AssetManager          assets  = getInstrumentation().getContext().getAssets();
-    final AugmentedFlockAccount account = fromJson(
-        jsonFixture(assets, "fixtures/AugmentedFlockAccount.json"),
-        AugmentedFlockAccount.class
-    );
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
 
-    assertTrue(account.getId().equals(MOCK_ACCOUNT_ID.toLowerCase()));
+    assets = getInstrumentation().getContext().getAssets();
   }
 
-  public void testBuildAccountWithUnknownProperties() throws Exception {
-    final AssetManager          assets  = getInstrumentation().getContext().getAssets();
-    final AugmentedFlockAccount account = fromJson(
-        jsonFixture(assets, "fixtures/AugmentedFlockAccountWithUnknown.json"),
-        AugmentedFlockAccount.class
-    );
+  private InputStream asStream(String filename) throws IOException {
+    return new ByteArrayInputStream(jsonFixture(assets, filename).getBytes());
+  }
 
-    assertTrue(account.getId().equals(MOCK_ACCOUNT_ID.toLowerCase()));
+  public void testBuildAccount() throws Exception {
+    final HttpResponse response = mock(HttpResponse.class);
+    final HttpEntity   entity   = mock(HttpEntity.class);
+
+    when(response.getEntity()).thenReturn(entity);
+    when(entity.getContent()).thenReturn(asStream("fixtures/AugmentedFlockAccount.json"));
+
+    assertTrue(
+        ModelFactory.buildAccount(response).equals(AugmentedFlockAccountTest.accountNoPlan())
+    );
+  }
+
+  public void testBuildCard() throws Exception {
+    final HttpResponse response = mock(HttpResponse.class);
+    final HttpEntity   entity   = mock(HttpEntity.class);
+
+    when(response.getEntity()).thenReturn(entity);
+    when(entity.getContent()).thenReturn(asStream("fixtures/FlockCardInformation.json"));
+
+    assertTrue(
+        ModelFactory.buildCard(response).equals(FlockCardInformationTest.card())
+    );
+  }
+
+  public void testBuildBooleanTrue() throws Exception {
+    final HttpResponse response   = mock(HttpResponse.class);
+    final HttpEntity   entity     = mock(HttpEntity.class);
+    final InputStream  trueStream = new ByteArrayInputStream("true".getBytes());
+
+    when(response.getEntity()).thenReturn(entity);
+    when(entity.getContent()).thenReturn(trueStream);
+
+    assertTrue(
+        ModelFactory.buildBoolean(response).equals(Boolean.TRUE)
+    );
+  }
+
+  public void testBuildBooleanFalse() throws Exception {
+    final HttpResponse response    = mock(HttpResponse.class);
+    final HttpEntity   entity      = mock(HttpEntity.class);
+    final InputStream  falseStream = new ByteArrayInputStream("false".getBytes());
+
+    when(response.getEntity()).thenReturn(entity);
+    when(entity.getContent()).thenReturn(falseStream);
+
+    assertTrue(
+        ModelFactory.buildBoolean(response).equals(Boolean.FALSE)
+    );
   }
 
 }

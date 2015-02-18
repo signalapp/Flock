@@ -37,7 +37,6 @@ import java.util.Date;
 
 /**
  * Programmer: rhodey
- * Date: 1/2/14
  */
 public class FlockAccount {
 
@@ -79,12 +78,12 @@ public class FlockAccount {
   protected Boolean autoRenewEnabled;
 
   @JsonProperty
-   protected SubscriptionPlan subscriptionPlan;
+  protected SubscriptionPlan subscriptionPlan;
 
   public FlockAccount(String           id,
                       Integer          version,
-                      String           passwordSha512,
                       String           salt,
+                      String           passwordSha512,
                       String           stripeCustomerId,
                       Date             createDate,
                       Boolean          lastStripeChargeFailed,
@@ -108,7 +107,7 @@ public class FlockAccount {
     try {
 
       MessageDigest digest = MessageDigest.getInstance("SHA-512");
-      digest.update(password.getBytes());
+      digest.update(salt.concat(password).getBytes());
       return Base64.encodeBytes(digest.digest());
 
     } catch (NoSuchAlgorithmException e) {
@@ -161,8 +160,9 @@ public class FlockAccount {
 
     bundle.putString(KEY_ACCOUNT_ID,                 id);
     bundle.putInt(KEY_VERSION,                       version);
-    bundle.putString(KEY_STRIPE_CUSTOMER_ID,         stripeCustomerId);
+    bundle.putString(KEY_SALT,                       salt);
     bundle.putString(KEY_PASSWORD_SHA512,            passwordSha512);
+    bundle.putString(KEY_STRIPE_CUSTOMER_ID,         stripeCustomerId);
     bundle.putLong(KEY_CREATE_DATE,                  createDate.getTime());
     bundle.putBoolean(KEY_LAST_STRIPE_CHARGE_FAILED, lastStripeChargeFailed);
     bundle.putBoolean(KEY_AUTO_RENEW_ENABLED,        autoRenewEnabled);

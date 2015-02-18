@@ -22,7 +22,7 @@ import android.test.InstrumentationTestCase;
 /**
  * rhodey
  */
-public class FlockInstrumentationTestCase extends InstrumentationTestCase {
+public class InstrumentationTestCaseWithMocks extends InstrumentationTestCase {
 
   @Override
   public void setUp() throws Exception {

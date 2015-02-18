@@ -73,9 +73,9 @@ public class AccountStore {
 
   public static Optional<Long> getDaysRemaining(Context context) {
     Long timestamp     = getStore(context).getLong(KEY_DAYS_REMAINING_TIMESTAMP, -1L);
-    Long daysRemaining = getStore(context).getLong(KEY_DAYS_REMAINING,           -1L);
+    Long daysRemaining = getStore(context).getLong(KEY_DAYS_REMAINING,           Long.MIN_VALUE);
 
-    if (timestamp <= 0L || daysRemaining <= 0L)
+    if (timestamp <= 0L || daysRemaining == Long.MIN_VALUE)
       return Optional.absent();
 
     long msSinceStore   = (new Date().getTime() - timestamp);

@@ -1,0 +1,8 @@
+{
+  "account_id"      : "ACCOUNT00",
+  "plan_type"       : 2,
+  "plan_id"         : "google00",
+  "package_name"    : "org.anhonesteffort.flock",
+  "purchase_token"  : "purchase00",
+  "expiration_date" : 1391853600000
+}

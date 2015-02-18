@@ -44,6 +44,7 @@ import org.anhonesteffort.flock.registration.model.SubscriptionPlan;
 import org.anhonesteffort.flock.sync.account.AccountStore;
 import org.anhonesteffort.flock.sync.account.AccountSyncScheduler;
 import org.anhonesteffort.flock.util.Base64;
+import org.anhonesteffort.flock.util.TimeUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -544,7 +545,7 @@ public class SubscriptionGoogleFragment extends Fragment {
               if (msSincePurchase < 0)
                 msSincePurchase = 0;
 
-              daysTillNextCharge = 365 - (msSincePurchase / 1000 / 60 / 60 / 24);
+              daysTillNextCharge = 365 - TimeUtil.millisecondsToDays(msSincePurchase);
               if (daysTillNextCharge < 0)
                 daysTillNextCharge = 0;
             }

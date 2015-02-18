@@ -22,6 +22,8 @@ package org.anhonesteffort.flock.registration.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.anhonesteffort.flock.util.TimeUtil;
+
 import java.util.Date;
 import java.util.List;
 
@@ -34,9 +36,9 @@ public class AugmentedFlockAccount extends FlockAccount {
   protected List<FlockSubscription> subscriptions;
 
   public AugmentedFlockAccount(FlockAccount account, List<FlockSubscription> subscriptions) {
-    super(account.getId(),                    account.getVersion(),          account.getSalt(),
-         account.getPasswordSha512(),         account.getStripeCustomerId(), account.getCreateDate(),
-         account.getLastStripeChargeFailed(), account.getAutoRenewEnabled(), account.subscriptionPlan);
+    super(account.id,                          account.getVersion(),          account.getSalt(),
+          account.getPasswordSha512(),         account.getStripeCustomerId(), account.getCreateDate(),
+          account.getLastStripeChargeFailed(), account.getAutoRenewEnabled(), account.getSubscriptionPlan());
 
     this.subscriptions = subscriptions;
   }
@@ -49,14 +51,10 @@ public class AugmentedFlockAccount extends FlockAccount {
 
   @JsonIgnore
   public Long getDaysRemaining() {
-    long days_expired = 0;
+    long days_expired = TimeUtil.millisecondsToDays(new Date().getTime() - createDate.getTime());
 
-    for (int i = 0; i < subscriptions.size(); i++) {
-      if (i == 0)
-        days_expired = ((new Date().getTime() - subscriptions.get(i).getCreateDate().getTime())
-            / (1000 * 60 * 60 * 24));
-      days_expired -= subscriptions.get(i).getDaysCredit();
-    }
+    for (FlockSubscription subscription : subscriptions)
+      days_expired -= subscription.getDaysCredit();
 
     return -1 * days_expired;
   }

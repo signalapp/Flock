@@ -95,7 +95,7 @@ public class FlockCardInformation {
     FlockCardInformation that = (FlockCardInformation)other;
     return this.accountId.equals(that.accountId)       &&
            this.cardLastFour.equals(that.cardLastFour) &&
-           this.cardExpiration.equals(that.cardExpiration);
+           this.getCardExpiration().equals(that.getCardExpiration());
   }
 
   @Override
