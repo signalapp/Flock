@@ -58,8 +58,6 @@
   <string name="status_header_status_our_sync_service_error">同期は一時的に利用できません…</string>
   <string name="status_header_status_their_sync_service_error">WebDAV サーバーにエラーがあります</string>
   <string name="status_header_status_registration_service_error">登録サービスが一時的に利用できません…</string>
-  <string name="status_header_status_migration_in_progress">移行処理中</string>
-  <string name="please_wait_this_will_take_a_few_minutes">しばらくお待ちください、数分かかることがあります…</string>
   <string name="status_header_sync_time">最後の同期 %1$s</string>
   <string name="status_header_sync_in_progress">同期処理中…</string>
   <!--SetupActivity, intro-->
@@ -220,29 +218,12 @@
   <string name="title_correct_encryption_password">暗号化パスワードを修正</string>
   <string name="encryption_password_is_invalid_please_correct_your_encryption_password">暗号化パスワードが正しくありません。暗号化パスワードを修正してください。</string>
   <string name="password_corrected">パスワードが修正されました!</string>
-  <!--MigrationReleaseNotesActivity-->
-  <string name="release_notes">リリースノート</string>
-  <string name="the_way_that_flock_syncs_data_has_changed_to_make_future_updates_run_more_smoothly">今後のアップデートがよりスムーズに実行するように、Flock がデータを同期する方法が変更されました。この更新を容易にするため、v0.8より古いすべてのクライアントでは、ユーザーは一時的に同期を無効にする必要があります。</string>
-  <string name="after_updating_a_device_to_v08_simply_re_enable_sync">デバイスをv0.8にアップデートした後で同期を再度有効にすると、自動的に移行が完了します。</string>
   <!--SendDebugLogActivity-->
   <string name="send_debug_log">デバッグログを送信</string>
   <string name="flock_debug_log">Flock デバッグログ</string>
   <string name="something_strange_happened_send_us_your_debug_log">何か問題が発生した場合に、私たちにデバッグログを送信していただくと、それを修正することができます。</string>
   <string name="dont_ask_again">再度表示しない</string>
   <string name="send_log">ログを送信</string>
-  <!--MigrationService-->
-  <string name="migrating_to_new_version">新しいバージョンに移行</string>
-  <string name="preparing_to_upgrade_sync_protocol">同期プロトコルをアップグレードする準備中…</string>
-  <string name="please_enable_sync">同期を有効にしてください</string>
-  <string name="please_enable_anrdoid_sync_to_complete_migration">移行を完了するために、Android の同期を有効にしてください。</string>
-  <string name="checking_sync_for_new_contacts_and_calendar">新しい連絡先とカレンダーの同期を確認中…</string>
-  <string name="generating_new_encryption_secrets">新しい暗号化の秘密を生成中…</string>
-  <string name="replacing_addressbooks_and_calendars">アドレス帳とカレンダーを置換中…</string>
-  <string name="replacing_old_contacts_and_events">古い連絡先とイベントの置換中…</string>
-  <string name="finalizing_migration">移行の終了処理中…</string>
-  <string name="migration_complete">移行が完了しました</string>
-  <string name="please_update_flock_on_all_your_devices">すべてのデバイスで Flock を更新してください。</string>
-  <string name="migration_in_progress_please_wait">移行処理中。しばらくお待ちください…</string>
   <!--ErrorToaster messages-->
   <string name="error_login_unauthorized">ログインに失敗しました。ユーザー名またはパスワードが正しくありません</string>
   <string name="error_registration_api_server_error">登録サーバーに問題があります。申し訳ありません。</string>

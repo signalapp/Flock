@@ -62,7 +62,7 @@ public class UnregisterAccountActivity extends AccountAndKeyRequiredActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    if (!accountAndKeyAvailableAndMigrationComplete())
+    if (!accountAndKeyAvailable())
       return;
 
     requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);

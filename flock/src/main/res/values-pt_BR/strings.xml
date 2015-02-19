@@ -55,8 +55,6 @@
   <string name="status_header_status_our_sync_service_error">Sincronização temporariamente indisponível...</string>
   <string name="status_header_status_their_sync_service_error">O servidor WebDAV  possui erros</string>
   <string name="status_header_status_registration_service_error">Serviço de registro temporariamente indisponível...</string>
-  <string name="status_header_status_migration_in_progress">Migração em progresso</string>
-  <string name="please_wait_this_will_take_a_few_minutes">Por favor espere, isso pode levar alguns minutos...</string>
   <string name="status_header_sync_time">Última sincronização em %1$s</string>
   <string name="status_header_sync_in_progress">Sincronização em progresso...</string>
   <!--SetupActivity, intro-->
@@ -189,29 +187,12 @@
   <!--CorrectEncryptionPasswordActivity-->
   <string name="encryption_password_is_invalid_please_correct_your_encryption_password">Senha de criptografia inválida, por favor corrija-a</string>
   <string name="password_corrected">Senha corrigida!</string>
-  <!--MigrationReleaseNotesActivity-->
-  <string name="release_notes">Notas de lançamento</string>
-  <string name="the_way_that_flock_syncs_data_has_changed_to_make_future_updates_run_more_smoothly">A forma como o Flock sincroniza os dados mudou para que futuras atualizações possam rodar sem problemas. Para facilitar essa atualização os usuários devem desabilitar temporariamente a sincronização em todos os clientes mais antigos que a versão v0.8.</string>
-  <string name="after_updating_a_device_to_v08_simply_re_enable_sync">Depois de atualizar seu dispositivo para v0.8, simplesmente permita novamente a sincronização e a migração irá completar automaticamente.</string>
   <!--SendDebugLogActivity-->
   <string name="send_debug_log">Enviar log de depuração</string>
   <string name="flock_debug_log">Log de depuração do Flock</string>
   <string name="something_strange_happened_send_us_your_debug_log">Algo estranho aconteceu, envie-nos seu log de depuração para resolvermos.</string>
   <string name="dont_ask_again">Não pergunte novamente</string>
   <string name="send_log">Envie o log</string>
-  <!--MigrationService-->
-  <string name="migrating_to_new_version">Migrando para a nova versão</string>
-  <string name="preparing_to_upgrade_sync_protocol">Preparando para atualizar o protocolo de sincronização...</string>
-  <string name="please_enable_sync">Por favor permita a sincronização</string>
-  <string name="please_enable_anrdoid_sync_to_complete_migration">Por favor permita a sincronização Android para completar a migração</string>
-  <string name="checking_sync_for_new_contacts_and_calendar">Verificando a sincronização para novos contatos e calendários...</string>
-  <string name="generating_new_encryption_secrets">Gerando novos segredos de criptografia...</string>
-  <string name="replacing_addressbooks_and_calendars">Substituindo agendas e calendários...</string>
-  <string name="replacing_old_contacts_and_events">Substituindo antigos contatos e eventos...</string>
-  <string name="finalizing_migration">Finalizando a migração...</string>
-  <string name="migration_complete">Migração completa</string>
-  <string name="please_update_flock_on_all_your_devices">Por favor atualize o Flock em todos dispositivos.</string>
-  <string name="migration_in_progress_please_wait">Migração em progresso, por favor aguarde...</string>
   <!--ErrorToaster messages-->
   <string name="error_login_unauthorized">Login falhou. Nome de usuário ou senha inválido</string>
   <string name="error_registration_api_server_error">Nossos servidores de registro estão tendo problemas, desculpe.</string>

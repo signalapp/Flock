@@ -21,7 +21,6 @@ package org.anhonesteffort.flock;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
-import android.widget.Toast;
 
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.MasterCipher;
@@ -42,16 +41,7 @@ public class AccountAndKeyRequiredFragment extends Fragment {
     masterCipher = AccountAndKeyRequiredActivity.handleGetMasterCipherOrFail(getActivity());
   }
 
-  protected boolean accountAndKeyAvailableAndMigrationComplete() {
-    if (MigrationHelperBroadcastReceiver.getUiDisabledForMigration(getActivity())) {
-      Toast.makeText(getActivity(),
-                     R.string.migration_in_progress_please_wait,
-                     Toast.LENGTH_LONG).show();
-
-      getActivity().finish();
-      return false;
-    }
-
+  protected boolean accountAndKeyAvailable() {
     return account != null && masterCipher != null;
   }
 

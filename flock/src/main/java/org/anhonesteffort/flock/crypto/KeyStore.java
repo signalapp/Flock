@@ -36,7 +36,6 @@ public class KeyStore {
   private static final String TAG = "org.anhonesteffort.flock.crypto.KeyStore";
 
   private static final String PREFERENCES_NAME            = "org.anhonesteffort.flock.crypto.KeyStore";
-  private static final String KEY_USE_CIPHER_VERSION_ZERO = "KEY_USE_CIPHER_VERSION_ZERO";
   private static final String KEY_MASTER_PASSPHRASE       = "KEY_OLD_MASTER_PASSPHRASE";
   private static final String KEY_CIPHER_KEY              = "KEY_CIPHER_KEY";
   private static final String KEY_MAC_KEY                 = "KEY_MAC_KEY";
@@ -45,15 +44,6 @@ public class KeyStore {
 
   private static SharedPreferences getSharedPreferences(Context context) {
     return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
-  }
-
-  public static boolean getUseCipherVersionZero(Context context) {
-    return getSharedPreferences(context).getBoolean(KEY_USE_CIPHER_VERSION_ZERO, false);
-  }
-
-  public static void setUseCipherVersionZero(Context context, boolean useCipherVersionZero) {
-    getSharedPreferences(context).edit().putBoolean(KEY_USE_CIPHER_VERSION_ZERO,
-                                                    useCipherVersionZero).apply();
   }
 
   public static void saveCipherKey(Context context, byte[] cipherKey) {

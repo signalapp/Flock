@@ -75,7 +75,7 @@ public class ImportContactsFragment extends AccountAndKeyRequiredFragment
   {
     View fragmentView = inflater.inflate(R.layout.fragment_simple_list, container, false);
 
-    if (!accountAndKeyAvailableAndMigrationComplete())
+    if (!accountAndKeyAvailable())
       return fragmentView;
 
     initButtons();
@@ -87,7 +87,7 @@ public class ImportContactsFragment extends AccountAndKeyRequiredFragment
   public void onResume() {
     super.onResume();
 
-    if (!accountAndKeyAvailableAndMigrationComplete())
+    if (!accountAndKeyAvailable())
       return ;
 
     initializeList();

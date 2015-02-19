@@ -1,17 +1,8 @@
 package org.anhonesteffort.flock.sync.key;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Date;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.Description;
-import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
 
 import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.sync.OwsWebDav;
@@ -19,7 +10,6 @@ import org.anhonesteffort.flock.webdav.AbstractDavComponentCollection;
 import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.MultiStatusResult;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
-import org.anhonesteffort.flock.webdav.WebDavConstants;
 import org.anhonesteffort.flock.webdav.caldav.CalDavCollection;
 import org.anhonesteffort.flock.webdav.caldav.CalDavConstants;
 import org.anhonesteffort.flock.webdav.caldav.CalDavStore;
@@ -40,11 +30,6 @@ import java.io.IOException;
 public class DavKeyCollection extends AbstractDavComponentCollection<Calendar> {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.key.DavKeyCollection";
-
-  private static final String KEY_WE_STARTED_MIGRATION = "KEY_WE_STARTED_MIGRATION";
-
-  private static final String UID_MIGRATION_COMPLETE = "migration-complete";
-  private static final String UID_MIGRATION_STARTED  = "migration00-started";
 
   protected static final String PROPERTY_NAME_KEY_MATERIAL_SALT      = "X-KEY-MATERIAL-SALT";
   protected static final String PROPERTY_NAME_ENCRYPTED_KEY_MATERIAL = "X-ENCRYPTED-KEY-MATERIAL";
@@ -131,92 +116,6 @@ public class DavKeyCollection extends AbstractDavComponentCollection<Calendar> {
     updateProperties.add(new DefaultDavProperty<String>(PROPERTY_ENCRYPTED_KEY_MATERIAL, encryptedKeyMaterial));
 
     patchProperties(updateProperties, new DavPropertyNameSet());
-  }
-
-  public static boolean weStartedMigration(Context context) {
-    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-    return settings.getBoolean(KEY_WE_STARTED_MIGRATION, false);
-  }
-
-  private static void setWeStartedMigration(Context context, boolean weStarted) {
-    Log.w(TAG, "setWeStartedMigration() >> " + weStarted);
-
-    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-    settings.edit().putBoolean(KEY_WE_STARTED_MIGRATION, weStarted).apply();
-  }
-
-  private static Calendar getMockCalendarForUid(String uid) {
-    java.util.Calendar calendar = java.util.Calendar.getInstance();
-    calendar.set(java.util.Calendar.MONTH, java.util.Calendar.JULY);
-    calendar.set(java.util.Calendar.DAY_OF_MONTH, 24);
-
-    net.fortuna.ical4j.model.Calendar putCalendar = new net.fortuna.ical4j.model.Calendar();
-    putCalendar.getProperties().add(Version.VERSION_2_0);
-    putCalendar.getProperties().add(CalScale.GREGORIAN);
-
-    Date putStartDate = new Date(calendar.getTime());
-    Date putEndDate   = new Date(putStartDate.getTime() + (1000 * 60 * 60 * 24));
-
-    VEvent vEventPut = new VEvent(putStartDate, putEndDate, "Mock");
-    vEventPut.getProperties().add(new Uid(uid));
-    vEventPut.getProperties().add(new Description("Mock"));
-    putCalendar.getComponents().add(vEventPut);
-
-    return putCalendar;
-  }
-
-  public boolean setMigrationStarted(Context context)
-      throws InvalidComponentException, DavException, IOException
-  {
-    Log.w(TAG, "setMigrationStarted()");
-
-    CalDavCollection calDavCollection = new CalDavCollection((CalDavStore) getStore(), getPath());
-
-    try {
-
-      calDavCollection.addComponent(getMockCalendarForUid(UID_MIGRATION_STARTED));
-      setWeStartedMigration(context, true);
-
-    } catch (DavException e) {
-      if (e.getErrorCode() == WebDavConstants.SC_PRECONDITION_FAILED)
-        return false;
-
-      throw e;
-    }
-
-    return true;
-  }
-
-  public boolean isMigrationStarted()
-      throws InvalidComponentException, DavException, IOException
-  {
-    CalDavCollection calDavCollection = new CalDavCollection((CalDavStore) getStore(), getPath());
-    return calDavCollection.getComponent(UID_MIGRATION_STARTED).isPresent();
-  }
-
-  public boolean isMigrationComplete()
-      throws InvalidComponentException, DavException, IOException
-  {
-    CalDavCollection calDavCollection = new CalDavCollection((CalDavStore) getStore(), getPath());
-    return calDavCollection.getComponent(UID_MIGRATION_COMPLETE).isPresent();
-  }
-
-  public void setMigrationComplete(Context context)
-      throws InvalidComponentException, DavException, IOException
-  {
-    Log.w(TAG, "setMigrationComplete()");
-
-    CalDavCollection calDavCollection = new CalDavCollection((CalDavStore) getStore(), getPath());
-
-    try {
-
-      calDavCollection.addComponent(getMockCalendarForUid(UID_MIGRATION_COMPLETE));
-      setWeStartedMigration(context, false);
-
-    } catch (DavException e) {
-      if (e.getErrorCode() != WebDavConstants.SC_PRECONDITION_FAILED)
-        throw e;
-    }
   }
 
   @Override

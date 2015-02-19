@@ -126,8 +126,6 @@
 
         <activity android:name="org.anhonesteffort.flock.SendBitcoinActivity" />
 
-        <activity android:name="org.anhonesteffort.flock.MigrationReleaseNotesActivity" />
-
         <activity android:name="org.anhonesteffort.flock.SendDebugLogActivity"
                   android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
                   android:windowSoftInputMode="stateHidden"/>
@@ -209,9 +207,6 @@
         <service android:name="org.anhonesteffort.flock.ChangeEncryptionPasswordService"
                  android:exported="false"/>
 
-        <service android:name="org.anhonesteffort.flock.MigrationService"
-                 android:exported="false"/>
-
         <receiver android:name="org.anhonesteffort.flock.sync.SyncBooter">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -221,16 +216,6 @@
         <receiver android:name="org.anhonesteffort.flock.NotificationDrawer">
             <intent-filter>
                 <action android:name="org.anhonesteffort.flock.ACTION_STOP_ASKING_FOR_LOGS"/>
-            </intent-filter>
-        </receiver>
-
-        <receiver android:name="org.anhonesteffort.flock.MigrationHelperBroadcastReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-                <action android:name="org.anhonesteffort.flock.MigrationService.ACTION_MIGRATION_STARTED"/>
-                <action android:name="org.anhonesteffort.flock.MigrationService.ACTION_MIGRATION_COMPLETE"/>
-                <action android:name="org.anhonesteffort.flock.sync.key.ACTION_KEY_MATERIAL_IMPORTED"/>
-                <action android:name="org.anhonesteffort.flock.sync.addressbook.AddressbookSyncWorker.ACTION_PUSH_CREATED_CONTACTS"/>
             </intent-filter>
         </receiver>
 

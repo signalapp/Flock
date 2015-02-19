@@ -37,10 +37,6 @@ import org.anhonesteffort.flock.registration.RegistrationApi;
 import org.anhonesteffort.flock.registration.RegistrationApiException;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
-import org.anhonesteffort.flock.sync.key.DavKeyCollection;
-import org.anhonesteffort.flock.sync.key.DavKeyStore;
-import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -65,7 +61,6 @@ public class StatusHeaderView extends LinearLayout {
   private AsyncTask            asyncTaskSubscription;
   private AsyncTask            asyncTaskCard;
   private AsyncTask            asyncTaskMasterPassphrase;
-  private AsyncTask            asyncTaskMigration;
 
   private long    timeLastSync                  = -1;
   private boolean syncInProgress                = false;
@@ -187,15 +182,6 @@ public class StatusHeaderView extends LinearLayout {
     else if (!cardIsValid) {
       syncStatusText     = getContext().getString(R.string.status_header_status_auto_renew_error);
       syncStatusDrawable = R.drawable.sad_cloud;
-    }
-    else if (MigrationHelperBroadcastReceiver.getUiDisabledForMigration(getContext())) {
-      syncStatusText     = getContext().getString(R.string.status_header_status_migration_in_progress);
-      syncStatusDrawable = R.drawable.migration_in_progress;
-
-      timeLastSyncView.setText(R.string.please_wait_this_will_take_a_few_minutes);
-      timeLastSyncView.setVisibility(VISIBLE);
-
-      new KeySyncScheduler(getContext()).requestSync();
     }
     else if (!cipherPassphraseIsValid) {
       syncStatusText     = getContext().getString(R.string.status_header_status_encryption_password_incorrect);
@@ -351,59 +337,6 @@ public class StatusHeaderView extends LinearLayout {
     }.execute();
   }
 
-  private void handleUpdateMigrationInProgress() {
-    if ((asyncTaskMigration != null && !asyncTaskMigration.isCancelled()) ||
-        !MigrationHelperBroadcastReceiver.getUiDisabledForMigration(getContext()))
-      return;
-
-    Log.d(TAG, "handleUpdateMigrationInProgress()");
-
-    asyncTaskMigration = new AsyncTask<String, Void, Bundle>() {
-
-      @Override
-      protected Bundle doInBackground(String... params) {
-        boolean migrationInProgress = true;
-        Bundle  result              = new Bundle();
-
-        try {
-
-          DavKeyStore                davKeyStore   = DavAccountHelper.getDavKeyStore(getContext(), account.get());
-          Optional<DavKeyCollection> keyCollection = davKeyStore.getCollection();
-
-          if (keyCollection.isPresent())
-            migrationInProgress = !keyCollection.get().isMigrationComplete();
-
-          MigrationHelperBroadcastReceiver.setUiDisabledForMigration(getContext(), migrationInProgress);
-
-          if (!migrationInProgress)
-            MigrationHelperBroadcastReceiver.setMigrationUpdateHandled(getContext());
-
-          result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_SUCCESS);
-
-        } catch (InvalidComponentException e) {
-          ErrorToaster.handleBundleError(e, result);
-        } catch (PropertyParseException e) {
-          ErrorToaster.handleBundleError(e, result);
-        } catch (DavException e) {
-          ErrorToaster.handleBundleError(e, result);
-        } catch (IOException e) {
-          ErrorToaster.handleBundleError(e, result);
-        }
-
-        return result;
-      }
-
-      @Override
-      protected void onPostExecute(Bundle result) {
-        asyncTaskMigration = null;
-
-        if (result.getInt(ErrorToaster.KEY_STATUS_CODE) != ErrorToaster.CODE_SUCCESS)
-          ErrorToaster.handleDisplayToastBundledError(getContext(), result);
-      }
-
-    }.execute();
-  }
-
   private final Runnable refreshUiRunnable = new Runnable() {
     @Override
     public void run() {
@@ -427,12 +360,6 @@ public class StatusHeaderView extends LinearLayout {
     @Override
     public void run() {
       handleUpdateCipherPassphraseIsValid();
-    }
-  };
-  private final Runnable refreshMigrationRunnable = new Runnable() {
-    @Override
-    public void run() {
-      handleUpdateMigrationInProgress();
     }
   };
 
@@ -464,12 +391,6 @@ public class StatusHeaderView extends LinearLayout {
         uiHandler.post(refreshCipherPassphraseRunnable);
       }
     };
-    TimerTask migrationTask = new TimerTask() {
-      @Override
-      public void run() {
-        uiHandler.post(refreshMigrationRunnable);
-      }
-    };
 
     intervalTimer.schedule(uiTask, 0, 2000);
 
@@ -480,8 +401,6 @@ public class StatusHeaderView extends LinearLayout {
       }
       else
         intervalTimer.schedule(passphraseTask, 0, 10000);
-
-      intervalTimer.schedule(migrationTask, 0, 10000);
     }
   }
 }

@@ -56,8 +56,6 @@
   <string name="status_header_status_our_sync_service_error">동기화를 일시적으로  이용할 수 없습니다...</string>
   <string name="status_header_status_their_sync_service_error">WebDAV 서버 에러</string>
   <string name="status_header_status_registration_service_error">계정 등록 서비스를 일시적으로 이용할 수 없습니다...</string>
-  <string name="status_header_status_migration_in_progress">정보 이동 중</string>
-  <string name="please_wait_this_will_take_a_few_minutes">잠시 기다려 주세요, 몇 분 정도 걸릴 것입니다..</string>
   <string name="status_header_sync_time">%1$s 에 마지막으로 동기화</string>
   <string name="status_header_sync_in_progress">동기화 중...</string>
   <!--SetupActivity, intro-->
@@ -204,29 +202,12 @@
   <string name="title_correct_encryption_password">암호화 암호 고치기</string>
   <string name="encryption_password_is_invalid_please_correct_your_encryption_password">암호화 암호가 인식되지 않습니다, 고쳐주세요.</string>
   <string name="password_corrected">암호가 고쳐졌습니다!</string>
-  <!--MigrationReleaseNotesActivity-->
-  <string name="release_notes">업데이트 기록</string>
-  <string name="the_way_that_flock_syncs_data_has_changed_to_make_future_updates_run_more_smoothly">Fock 동기화 운영방식이 전반적으로 업그레이드 되었습니다. v0.8 이전 버전의 Flock 을 사용하시면, 동기화를 잠시 비활성화 시켜주세요.</string>
-  <string name="after_updating_a_device_to_v08_simply_re_enable_sync">v0.8으로 기기를 업데이트 하신 다음에, 동기화를 다시 활성화하시면 정보가 자동으로 이전될 것입니다.</string>
   <!--SendDebugLogActivity-->
   <string name="send_debug_log">디버그 로그 보내기</string>
   <string name="flock_debug_log">Flock 디버그 로그</string>
   <string name="something_strange_happened_send_us_your_debug_log">에러가 발생했으면, 디버그 로그를 보내주세요.</string>
   <string name="dont_ask_again">다사ㅣ 묻지 않기</string>
   <string name="send_log">로그 보내기</string>
-  <!--MigrationService-->
-  <string name="migrating_to_new_version">새로운 버전으로 정보 이동 중</string>
-  <string name="preparing_to_upgrade_sync_protocol">동기화 운영방식 업그레드 준비 중</string>
-  <string name="please_enable_sync">동기화를 활성화 해주세요</string>
-  <string name="please_enable_anrdoid_sync_to_complete_migration">정보 이전을 완료하시려면 안드로이드 동기화를 활성화 해주세요.</string>
-  <string name="checking_sync_for_new_contacts_and_calendar">새로운 연락처와 일정을 확인할 동기화 중</string>
-  <string name="generating_new_encryption_secrets">새 암호화 정보 업데이트 중...</string>
-  <string name="replacing_addressbooks_and_calendars">주소록과 달력 업데이트 중...</string>
-  <string name="replacing_old_contacts_and_events">연락처와 일정 업데이트 중...</string>
-  <string name="finalizing_migration">업데이트 완료 중...</string>
-  <string name="migration_complete">업데이트 완료</string>
-  <string name="please_update_flock_on_all_your_devices">여러 기기의 Flock을 모두 업데이트 해주세요.</string>
-  <string name="migration_in_progress_please_wait">업데이트 중, 잠시 기다려 주세요...</string>
   <!--ErrorToaster messages-->
   <string name="error_login_unauthorized">로그인 실패. 인식 불가능한 이름 혹은 암호</string>
   <string name="error_registration_api_server_error">저희 계정등록서버 접속이 잠시 문제가 있습니다, 죄송합니다.</string>

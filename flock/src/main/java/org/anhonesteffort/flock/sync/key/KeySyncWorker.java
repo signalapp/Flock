@@ -20,23 +20,17 @@
 package org.anhonesteffort.flock.sync.key;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SyncResult;
 import android.util.Log;
 
 import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.DavAccountHelper;
-import org.anhonesteffort.flock.MigrationHelperBroadcastReceiver;
-import org.anhonesteffort.flock.MigrationService;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
 import org.anhonesteffort.flock.crypto.KeyHelper;
 import org.anhonesteffort.flock.crypto.KeyStore;
 import org.anhonesteffort.flock.sync.SyncWorker;
 import org.anhonesteffort.flock.sync.SyncWorkerUtil;
-import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
-import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -50,8 +44,6 @@ public class KeySyncWorker implements SyncWorker {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.key.KeySyncWorker";
 
-  public static final String ACTION_KEY_MATERIAL_IMPORTED = "org.anhonesteffort.flock.sync.key.ACTION_KEY_MATERIAL_IMPORTED";
-
   private final Context    context;
   private final DavAccount account;
   private final SyncResult result;
@@ -64,31 +56,12 @@ public class KeySyncWorker implements SyncWorker {
     Thread.currentThread().setContextClassLoader(context.getClassLoader());
   }
 
-  private void handleDisableCalendarAndContactSync() {
-    Log.w(TAG, "handleDisableCalendarAndContactSync()");
-
-    new CalendarsSyncScheduler(context).setSyncEnabled(account.getOsAccount(), false);
-    new AddressbookSyncScheduler(context).setSyncEnabled(account.getOsAccount(), false);
-
-    new CalendarsSyncScheduler(context).cancelPendingSyncs(account.getOsAccount());
-    new AddressbookSyncScheduler(context).cancelPendingSyncs(account.getOsAccount());
-  }
-
-  private void handleEnableCalendarAndContactSync() {
-    Log.w(TAG, "handleEnableCalendarAndContactSync()");
-
-    new CalendarsSyncScheduler(context).setSyncEnabled(account.getOsAccount(), true);
-    new AddressbookSyncScheduler(context).setSyncEnabled(account.getOsAccount(), true);
-  }
-
   private void handleMigrationComplete(SyncResult       result,
                                        String           localKeyMaterialSalt,
                                        String           localEncryptedKeyMaterial,
                                        DavKeyCollection keyCollection)
   {
     Log.w(TAG, "handleMigrationComplete()");
-
-    new KeySyncScheduler(context).restoreSyncIntervalFromUserSetting();
 
     try {
 
@@ -126,11 +99,6 @@ public class KeySyncWorker implements SyncWorker {
               remoteEncryptedKeyMaterial.get()
           });
 
-          Intent intent = new Intent();
-          intent.setPackage(MigrationHelperBroadcastReceiver.class.getPackage().getName());
-          intent.setAction(ACTION_KEY_MATERIAL_IMPORTED);
-          context.sendBroadcast(intent);
-
         } catch (InvalidMacException e) {
           Log.w(TAG, "caught invalid mac exception while importing remote key material, " +
                      "assuming password change for non-flock sync user.");
@@ -146,40 +114,6 @@ public class KeySyncWorker implements SyncWorker {
     } catch (IOException e) {
       SyncWorkerUtil.handleException(context, e, result);
     } catch (GeneralSecurityException e) {
-      SyncWorkerUtil.handleException(context, e, result);
-    }
-
-    handleEnableCalendarAndContactSync();
-  }
-
-  private void handleStartOrResumeMigrationService() {
-    Log.w(TAG, "handleStartOrResumeMigrationService()");
-    context.startService(new Intent(context, MigrationService.class));
-  }
-
-  private void handleMigrationInProgress(SyncResult       result,
-                                         DavKeyCollection keyCollection)
-  {
-    Log.w(TAG, "handleMigrationInProgress()");
-    new KeySyncScheduler(context).setSyncInterval(1);
-
-    try {
-
-      if (!DavKeyCollection.weStartedMigration(context)) {
-        boolean preconditionSucceeded = keyCollection.setMigrationStarted(context);
-        if (!preconditionSucceeded)
-          handleDisableCalendarAndContactSync();
-        else
-          handleStartOrResumeMigrationService();
-      }
-      else
-        handleStartOrResumeMigrationService();
-
-    } catch (InvalidComponentException e) {
-      SyncWorkerUtil.handleException(context, e, result);
-    } catch (DavException e) {
-      SyncWorkerUtil.handleException(context, e, result);
-    } catch (IOException e) {
       SyncWorkerUtil.handleException(context, e, result);
     }
   }
@@ -208,13 +142,8 @@ public class KeySyncWorker implements SyncWorker {
           return;
         }
 
-        if (keyCollection.get().isMigrationComplete())
-          handleMigrationComplete(result, localKeyMaterialSalt.get(), localEncryptedKeyMaterial.get(), keyCollection.get());
-        else
-          handleMigrationInProgress(result, keyCollection.get());
+        handleMigrationComplete(result, localKeyMaterialSalt.get(), localEncryptedKeyMaterial.get(), keyCollection.get());
 
-      } catch (InvalidComponentException e) {
-        SyncWorkerUtil.handleException(context, e, result);
       } catch (PropertyParseException e) {
         SyncWorkerUtil.handleException(context, e, result);
       } catch (DavException e) {

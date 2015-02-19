@@ -14,7 +14,6 @@ import org.anhonesteffort.flock.crypto.KeyStore;
 import org.anhonesteffort.flock.sync.key.DavKeyCollection;
 import org.anhonesteffort.flock.sync.key.DavKeyStore;
 import org.anhonesteffort.flock.sync.key.KeySyncScheduler;
-import org.anhonesteffort.flock.webdav.InvalidComponentException;
 import org.anhonesteffort.flock.webdav.PropertyParseException;
 import org.apache.jackrabbit.webdav.DavException;
 
@@ -54,15 +53,6 @@ public abstract class ImportAccountService extends Service {
               }
           );
         }
-        if (!keyCollection.get().isMigrationComplete() &&
-            !keyCollection.get().isMigrationStarted())
-        {
-          KeyStore.setUseCipherVersionZero(getBaseContext(), true);
-        }
-        else if (keyCollection.get().isMigrationComplete()) {
-          MigrationHelperBroadcastReceiver.setMigrationUpdateHandled(getBaseContext());
-          MigrationHelperBroadcastReceiver.setUiDisabledForMigration(getBaseContext(), false);
-        }
       }
       else {
         DavKeyStore.createCollection(getBaseContext(), account);
@@ -72,14 +62,8 @@ public abstract class ImportAccountService extends Service {
           result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_DAV_SERVER_ERROR);
           return;
         }
-
-        keyCollection.get().setMigrationComplete(getBaseContext());
-        MigrationHelperBroadcastReceiver.setMigrationUpdateHandled(getBaseContext());
-        MigrationHelperBroadcastReceiver.setUiDisabledForMigration(getBaseContext(), false);
       }
 
-    } catch (InvalidComponentException e) {
-      ErrorToaster.handleBundleError(e, result);
     } catch (PropertyParseException e) {
       ErrorToaster.handleBundleError(e, result);
     } catch (DavException e) {

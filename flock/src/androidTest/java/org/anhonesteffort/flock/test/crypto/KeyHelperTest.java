@@ -136,4 +136,24 @@ public class KeyHelperTest extends AndroidTestCase {
                Arrays.equals(resultMacKeyBytes.get(),    macKeyBytes)    &&
                Arrays.equals(resultSaltBytes.get(),      saltBytes));
   }
+
+  public void testMasterPassphraseIsValid() throws Exception {
+    final String masterPassphrase = "oioioi";
+
+    KeyStore.saveMasterPassphrase(context, masterPassphrase);
+    KeyHelper.generateAndSaveSaltAndKeyMaterial(context);
+
+    assertTrue(KeyHelper.masterPassphraseIsValid(context));
+  }
+
+  public void testMasterPassphraseIsInvalid() throws Exception {
+    final String masterPassphrase = "oioioi";
+
+    KeyStore.saveMasterPassphrase(context, masterPassphrase);
+    KeyHelper.generateAndSaveSaltAndKeyMaterial(context);
+    KeyStore.saveMasterPassphrase(context, masterPassphrase.concat("nope"));
+
+    assertTrue(!KeyHelper.masterPassphraseIsValid(context));
+  }
+
 }

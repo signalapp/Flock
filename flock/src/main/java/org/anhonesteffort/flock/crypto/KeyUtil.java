@@ -27,7 +27,6 @@ import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Date;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
