@@ -27,6 +27,7 @@ import android.content.SharedPreferences;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import org.anhonesteffort.flock.sync.account.AccountStore;
 import org.anhonesteffort.flock.util.guava.Optional;
 import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
@@ -125,9 +126,25 @@ public class NotificationDrawer extends BroadcastReceiver {
     Intent                     clickIntent         = new Intent(context, ManageSubscriptionActivity.class);
 
     notificationBuilder.setContentTitle(context.getString(R.string.notification_flock_subscription_expired));
-    notificationBuilder.setContentText(context.getString(R.string.notification_tap_to_update_subscription));
     notificationBuilder.setSmallIcon(R.drawable.flock_actionbar_icon);
     notificationBuilder.setAutoCancel(true);
+
+    Optional<Long> daysRemaining = AccountStore.getDaysRemaining(context);
+
+    if (!daysRemaining.isPresent() || daysRemaining.get() > 0)
+      notificationBuilder.setContentText(context.getString(R.string.notification_tap_to_update_subscription));
+    else {
+      Integer limitDaysExpired = context.getResources().getInteger(R.integer.limit_days_expired);
+      Long    daysTillExpire   = limitDaysExpired - (-1 * daysRemaining.get());
+
+      if (daysTillExpire < 0)
+        daysTillExpire = 0L;
+
+      notificationBuilder.setContentText(context.getString(
+          R.string.account_will_be_deleted_in_days_tap_to_update_subscription,
+          daysTillExpire
+      ));
+    }
 
     Optional<DavAccount> account = DavAccountHelper.getAccount(context);
     clickIntent.putExtra(ManageSubscriptionActivity.KEY_DAV_ACCOUNT_BUNDLE, account.get().toBundle());

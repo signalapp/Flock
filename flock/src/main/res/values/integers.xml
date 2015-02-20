@@ -2,7 +2,7 @@
 <resources>
 
     <integer name="cost_per_year_usd">5</integer>
-    <integer name="auto_renew_trigger_days_remaining">7</integer>
+    <integer name="limit_days_expired">20</integer>
 
     <integer name="tag_view_holder">1337</integer>
     <integer name="tag_collection_path">100</integer>

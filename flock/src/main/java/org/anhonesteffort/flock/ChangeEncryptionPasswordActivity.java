@@ -116,7 +116,6 @@ public class ChangeEncryptionPasswordActivity extends AccountAndKeyRequiredActiv
       return;
 
     Bundle result                    = new Bundle();
-    String cipherPassphrase          = ((TextView)findViewById(R.id.cipher_passphrase)).getText().toString().trim();
     String newCipherPassphrase       = ((TextView)findViewById(R.id.new_cipher_passphrase)).getText().toString().trim();
     String newCipherPassphraseRepeat = ((TextView)findViewById(R.id.new_cipher_passphrase_repeat)).getText().toString().trim();
 
@@ -136,11 +135,10 @@ public class ChangeEncryptionPasswordActivity extends AccountAndKeyRequiredActiv
     }
 
     Optional<String> savedPassphrase = KeyStore.getMasterPassphrase(getBaseContext());
-    if (!savedPassphrase.isPresent() || !savedPassphrase.get().equals(cipherPassphrase)) {
+    if (!savedPassphrase.isPresent()) {
       result.putInt(ErrorToaster.KEY_STATUS_CODE, ErrorToaster.CODE_INVALID_CIPHER_PASSPHRASE);
       ErrorToaster.handleDisplayToastBundledError(getBaseContext(), result);
 
-      ((TextView)findViewById(R.id.cipher_passphrase)).setText("");
       ((TextView)findViewById(R.id.new_cipher_passphrase)).setText("");
       ((TextView)findViewById(R.id.new_cipher_passphrase_repeat)).setText("");
       return;
@@ -149,7 +147,7 @@ public class ChangeEncryptionPasswordActivity extends AccountAndKeyRequiredActiv
     Intent changeService = new Intent(getBaseContext(), ChangeEncryptionPasswordService.class);
 
     changeService.putExtra(ChangeEncryptionPasswordService.KEY_MESSENGER,             new Messenger(new MessageHandler()));
-    changeService.putExtra(ChangeEncryptionPasswordService.KEY_OLD_MASTER_PASSPHRASE, cipherPassphrase);
+    changeService.putExtra(ChangeEncryptionPasswordService.KEY_OLD_MASTER_PASSPHRASE, savedPassphrase.get());
     changeService.putExtra(ChangeEncryptionPasswordService.KEY_NEW_MASTER_PASSPHRASE, newCipherPassphrase);
     changeService.putExtra(ChangeEncryptionPasswordService.KEY_ACCOUNT,               account.toBundle());
 
@@ -177,8 +175,7 @@ public class ChangeEncryptionPasswordActivity extends AccountAndKeyRequiredActiv
         errorBundler.putInt(ErrorToaster.KEY_STATUS_CODE, message.arg1);
         ErrorToaster.handleDisplayToastBundledError(getBaseContext(), errorBundler);
 
-        if (findViewById(R.id.cipher_passphrase) != null) {
-          ((TextView)findViewById(R.id.cipher_passphrase)).setText("");
+        if (findViewById(R.id.new_cipher_passphrase) != null) {
           ((TextView)findViewById(R.id.new_cipher_passphrase)).setText("");
           ((TextView)findViewById(R.id.new_cipher_passphrase_repeat)).setText("");
         }
