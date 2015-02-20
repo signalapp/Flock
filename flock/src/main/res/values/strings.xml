@@ -125,7 +125,7 @@
     <string name="title_import_account">Import Account</string>
     <string name="title_register_account">Register Account</string>
     <string name="title_setup_account">Setup account</string>
-    <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">Choose a username for your account and a strong password to encrypt your data.</string>
+    <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">Choose a username and a strong password to encrypt your data, If your password is forgotten it cannot be reset.</string>
 
     <string name="do_you_have_a_flock_account">Do you have a Flock account?</string>
     <string name="yes_log_me_in">Yes, log me in</string>
