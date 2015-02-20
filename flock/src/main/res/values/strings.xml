@@ -60,6 +60,7 @@
     <string name="notification_tap_to_correct_encryption_password">Tap to correct encryption password.</string>
     <string name="notification_flock_subscription_expired">Flock subscription expired</string>
     <string name="notification_tap_to_update_subscription">Tap to update subscription.</string>
+    <string name="account_will_be_deleted_in_days_tap_to_update_subscription">Your account will be deleted in %1$d days, tap to update subscription.</string>
 
 
     <!-- status header stuff -->
