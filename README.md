@@ -11,7 +11,9 @@ multiple devices a "sync service" is required, this can be any standards complia
 3. RFC 6352 - CardDAV: vCard Extensions to Web Distributed Authoring and Versioning (WebDAV)
 4. RFC 4791 - Calendaring Extensions to WebDAV (CalDAV)
 
-Currently available on the Play store.
+The Android app can be downloaded through [Google Play](https://play.google.com/store/apps/details?id=org.anhonesteffort.flock) or via our
+[alternative distribution channel](https://flock-supplychain.anhonesteffort.org/packages/org.anhonesteffort.flock/current). Note that the
+certificate presented by our alternative distribution channel is signed by the same private certificate authority pinned by [Flock's trust store](https://github.com/WhisperSystems/Flock/blob/master/flock/src/main/assets/flock.store).
 
 *[![Play Store Badge](https://developer.android.com/images/brand/en_app_rgb_wo_60.png)](https://play.google.com/store/apps/details?id=org.anhonesteffort.flock)*
 
