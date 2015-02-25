@@ -22,7 +22,6 @@ package org.anhonesteffort.flock.sync;
 import android.accounts.Account;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.ContentUris;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
@@ -33,27 +32,25 @@ import android.util.Pair;
 
 import org.anhonesteffort.flock.util.guava.Optional;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Programmer: rhodey
- * Date: 2/4/14
+ * rhodey
  */
 // TODO: I really don't think we need all of these null cursor checks...
 public abstract class AbstractLocalComponentCollection<T> implements LocalComponentCollection<T> {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.AbstractLocalComponentCollection";
 
-  protected       ContentProviderClient client;
-  protected       Account               account;
-  protected       String                remotePath;
-  protected final Long                  localId;
+  protected final ContentProviderClient         client;
+  protected final ContentProviderOperationQueue operationQueue;
 
-  protected ArrayList<ContentProviderOperation> pendingOperations;
+  protected final Account account;
+  protected final String  remotePath;
+  protected final Long    localId;
 
   public AbstractLocalComponentCollection(ContentProviderClient client,
                                           Account               account,
@@ -61,11 +58,10 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
                                           Long                  localId)
   {
     this.client     = client;
+    operationQueue  = new ContentProviderOperationQueue(client);
     this.account    = account;
     this.remotePath = remotePath;
     this.localId    = localId;
-
-    pendingOperations = new ArrayList<ContentProviderOperation>();
   }
 
   public Account getAccount() {
@@ -92,14 +88,12 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
 
   protected abstract String getColumnNameDirty();
   protected abstract String getColumnNameDeleted();
-  protected abstract String getColumnNameQueuedForMigration();
   protected abstract String getColumnNameAccountType();
 
   public List<Long> getNewComponentIds() throws RemoteException {
     final String[] PROJECTION = new String[]{getColumnNameComponentLocalId(), getColumnNameComponentUid()};
-    final String   SELECTION  = "(" + getColumnNameComponentUid() + " IS NULL OR "  +
-                                      getColumnNameQueuedForMigration() + "=1) AND " +
-                                      getColumnNameCollectionLocalId()  + "=" + localId;
+    final String   SELECTION  = getColumnNameComponentUid() + " IS NULL AND " +
+                                getColumnNameCollectionLocalId()  + "=" + localId;
 
     Cursor     cursor = client.query(getUriForComponents(), PROJECTION, SELECTION, null, null);
     List<Long> newIds = new LinkedList<Long>();
@@ -162,8 +156,7 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
     final String[] PROJECTION = new String[]{};
     final String   SELECTION  = "(" + getColumnNameComponentUid() + " IS NULL OR "   +
                                       getColumnNameDirty()        + "=1 OR "         +
-                                      getColumnNameDeleted()      + "=1 OR "         +
-                                      getColumnNameQueuedForMigration() + "=1) AND " +
+                                      getColumnNameDeleted()      + "=1) AND "       +
                                 getColumnNameCollectionLocalId()  + "=" + localId;
 
     Cursor  cursor     = client.query(getUriForComponents(), PROJECTION, SELECTION, null, null);
@@ -287,7 +280,7 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
     String rand = UUID.randomUUID().toString();
     Log.d(TAG, "populateComponentUid() gonna populate " + localId + " with " + rand);
 
-    pendingOperations.add(ContentProviderOperation
+    operationQueue.queue(ContentProviderOperation
         .newUpdate(ContentUris.withAppendedId(getUriForComponents(), localId))
         .withValue(getColumnNameComponentUid(), rand)
         .withYieldAllowed(false)
@@ -300,7 +293,7 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
   public void removeComponent(Long localId) {
     Log.d(TAG, "removeComponent() localId " + localId);
 
-    pendingOperations.add(ContentProviderOperation
+    operationQueue.queue(ContentProviderOperation
         .newDelete(ContentUris.withAppendedId(getUriForComponents(), localId))
         .withYieldAllowed(true)
         .build());
@@ -312,7 +305,7 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
                                     getColumnNameCollectionLocalId() + "=" + localId;
     final String[] SELECTION_ARGS = new String[]{remoteUId};
 
-    pendingOperations.add(ContentProviderOperation
+    operationQueue.queue(ContentProviderOperation
         .newDelete(getUriForComponents())
         .withSelection(SELECTION, SELECTION_ARGS)
         .withYieldAllowed(true)
@@ -325,7 +318,7 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
     final Uri    COMPONENT_URI = getUriForComponents().buildUpon().clearQuery().build();
     final Uri    CONTENT_URI   = handleAddAccountQueryParams(COMPONENT_URI);
 
-    pendingOperations.add(ContentProviderOperation
+    operationQueue.queue(ContentProviderOperation
         .newDelete(CONTENT_URI)
         .withSelection(SELECTION, null)
         .withYieldAllowed(true)
@@ -356,17 +349,16 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
   public void cleanComponent(Long localId) {
     Log.d(TAG, "cleanComponent() localId " + localId);
 
-    pendingOperations.add(ContentProviderOperation
+    operationQueue.queue(ContentProviderOperation
         .newUpdate(ContentUris.withAppendedId(getUriForComponents(), localId))
         .withValue(getColumnNameDirty(), 0)
-        .withValue(getColumnNameQueuedForMigration(), 0)
         .build());
   }
 
   public void dirtyComponent(Long localId) {
     Log.d(TAG, "dirtyComponent() localId " + localId);
 
-    pendingOperations.add(ContentProviderOperation
+    operationQueue.queue(ContentProviderOperation
         .newUpdate(ContentUris.withAppendedId(getUriForComponents(), localId))
         .withValue(getColumnNameDirty(), 1).build());
   }
@@ -374,32 +366,16 @@ public abstract class AbstractLocalComponentCollection<T> implements LocalCompon
   public void setUidToNull(Long localId) {
     Log.d(TAG, "setUidToNull() localId " + localId);
 
-    pendingOperations.add(ContentProviderOperation
+    operationQueue.queue(ContentProviderOperation
         .newUpdate(ContentUris.withAppendedId(getUriForComponents(), localId))
         .withValue(getColumnNameComponentUid(), null)
         .build());
   }
 
-  public void queueForMigration(Long localId)
-      throws RemoteException
-  {
-      pendingOperations.add(ContentProviderOperation
-          .newUpdate(ContentUris.withAppendedId(getUriForComponents(), localId))
-          .withValue(getColumnNameQueuedForMigration(), 1)
-          .withYieldAllowed(false)
-          .build());
-  }
-
   public int commitPendingOperations()
       throws OperationApplicationException, RemoteException
   {
-    ContentProviderResult[] result = new ContentProviderResult[0];
-
-    if (!pendingOperations.isEmpty())
-      result = client.applyBatch(pendingOperations);
-
-    pendingOperations.clear();
-    return result.length;
+    return operationQueue.commit();
   }
 
 }

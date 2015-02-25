@@ -76,21 +76,24 @@ public class ContactFactory {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.addressbook.ContactFactory";
 
-  private static final String PROPERTY_PHONETIC_GIVEN_NAME  = "X-PHONETIC-GIVEN-NAME";
-  private static final String PROPERTY_PHONETIC_MIDDLE_NAME = "X-PHONETIC-MIDDLE-NAME";
-  private static final String PROPERTY_PHONETIC_FAMILY_NAME = "X-PHONETIC-FAMILY-NAME";
+  public static final String COLUMN_NAME_CONTACT_UID  = ContactsContract.RawContacts.SOURCE_ID;
+  public static final String COLUMN_NAME_CONTACT_ETAG = ContactsContract.RawContacts.SYNC1;
 
-  private static final EmailType EMAIL_TYPE_MOBILE = EmailType.get("X-MOBILE");
+  public static final String PROPERTY_PHONETIC_GIVEN_NAME  = "X-PHONETIC-GIVEN-NAME";
+  public static final String PROPERTY_PHONETIC_MIDDLE_NAME = "X-PHONETIC-MIDDLE-NAME";
+  public static final String PROPERTY_PHONETIC_FAMILY_NAME = "X-PHONETIC-FAMILY-NAME";
 
-  private static final String PROPERTY_SIP                 = "X-SIP";
-  private static final String PROPERTY_STARRED             = "X-STARRED";
-  private static final String PROPERTY_EVENT_ANNIVERSARY   = "X-EVENT-ANNIVERSARY";
-  private static final String PROPERTY_EVENT_OTHER         = "X-EVENT-OTHER";
-  private static final String PROPERTY_EVENT_CUSTOM        = "X-EVENT-CUSTOM";
-  private static final String PARAMETER_EVENT_CUSTOM_LABEL = "X-EVENT-CUSTOM-LABEL";
+  public static final EmailType EMAIL_TYPE_MOBILE = EmailType.get("X-MOBILE");
 
-  private static final String PROPERTY_INVISIBLE_CONTACT      = "X-INVISIBLE-CONTACT";
-  private static final String PROPERTY_AGGREGATION_EXCEPTIONS = "X-AGGREGATION-EXCEPTIONS";
+  public static final String PROPERTY_SIP                 = "X-SIP";
+  public static final String PROPERTY_STARRED             = "X-STARRED";
+  public static final String PROPERTY_EVENT_ANNIVERSARY   = "X-EVENT-ANNIVERSARY";
+  public static final String PROPERTY_EVENT_OTHER         = "X-EVENT-OTHER";
+  public static final String PROPERTY_EVENT_CUSTOM        = "X-EVENT-CUSTOM";
+  public static final String PARAMETER_EVENT_CUSTOM_LABEL = "X-EVENT-CUSTOM-LABEL";
+
+  public static final String PROPERTY_INVISIBLE_CONTACT      = "X-INVISIBLE-CONTACT";
+  public static final String PROPERTY_AGGREGATION_EXCEPTIONS = "X-AGGREGATION-EXCEPTIONS";
 
   private static String getUid(VCard vCard) {
     if (vCard.getUid() != null)
@@ -99,43 +102,47 @@ public class ContactFactory {
     return null;
   }
 
-  private static String propertyNameToLabel(String propertyName) {
+  /*
+  TODO:
+    neither of the below two methods were necessary originally but are now due to legacy :[
+   */
+  public static String propertyNameToLabel(String propertyName) {
     return WordUtils.capitalize(propertyName.toLowerCase().replace("x-", "").replace("_", " "));
   }
 
-  protected static String labelToPropertyName(String label) {
+  public static String labelToPropertyName(String label) {
     return "X-" + label.replace(" ","_").toUpperCase();
   }
 
-  protected static String[] getProjectionForRawContact() {
+  public static String[] getProjectionForRawContact() {
     return new String[] {
         ContactsContract.RawContacts._ID,
-        ContactsContract.RawContacts.SOURCE_ID, // UID
-        ContactsContract.RawContacts.SYNC1,     // ETAG
+        COLUMN_NAME_CONTACT_UID,
+        COLUMN_NAME_CONTACT_ETAG,
         ContactsContract.RawContacts.STARRED
     };
   }
 
-  protected static ContentValues getValuesForRawContact(Cursor cursor) {
+  public static ContentValues getValuesForRawContact(Cursor cursor) {
     ContentValues values = new ContentValues(4);
 
-    values.put(ContactsContract.RawContacts._ID,       cursor.getLong(0));
-    values.put(ContactsContract.RawContacts.SOURCE_ID, cursor.getString(1));
-    values.put(ContactsContract.RawContacts.SYNC1,     cursor.getString(2));
-    values.put(ContactsContract.RawContacts.STARRED,   (cursor.getInt(3) != 0));
+    values.put(ContactsContract.RawContacts._ID,     cursor.getLong(0));
+    values.put(COLUMN_NAME_CONTACT_UID,              cursor.getString(1));
+    values.put(COLUMN_NAME_CONTACT_ETAG,             cursor.getString(2));
+    values.put(ContactsContract.RawContacts.STARRED, (cursor.getInt(3) != 0));
 
     return values;
   }
 
-  protected static ContentValues getValuesForRawContact(ComponentETagPair<VCard> vCard) {
+  public static ContentValues getValuesForRawContact(ComponentETagPair<VCard> vCard) {
     ContentValues values = new ContentValues();
     Uid           uid    = vCard.getComponent().getUid();
 
     if (uid != null)
-      values.put(ContactsContract.RawContacts.SOURCE_ID, uid.getValue());
+      values.put(COLUMN_NAME_CONTACT_UID, uid.getValue());
 
     if (vCard.getETag().isPresent())
-      values.put(ContactsContract.RawContacts.SYNC1, vCard.getETag().get());
+      values.put(COLUMN_NAME_CONTACT_ETAG, vCard.getETag().get());
 
     RawProperty starredProp = vCard.getComponent().getExtendedProperty(PROPERTY_STARRED);
     if (starredProp != null) {
@@ -146,25 +153,23 @@ public class ContactFactory {
     return values;
   }
 
-  protected static ComponentETagPair<VCard> getVCard(ContentValues rawContactValues) {
-    String  uidText  = rawContactValues.getAsString(ContactsContract.RawContacts.SOURCE_ID);
-    String  eTagText = rawContactValues.getAsString(ContactsContract.RawContacts.SYNC1);
+  public static ComponentETagPair<VCard> getVCard(ContentValues rawContactValues) {
+    String  uidText  = rawContactValues.getAsString(COLUMN_NAME_CONTACT_UID);
+    String  eTagText = rawContactValues.getAsString(COLUMN_NAME_CONTACT_ETAG);
     Boolean starred  = rawContactValues.getAsBoolean(ContactsContract.RawContacts.STARRED);
 
     VCard vCard = new VCard();
-    vCard.setVersion(VCardVersion.V3_0);
 
+    vCard.setVersion(VCardVersion.V3_0);
     vCard.setUid(new Uid(uidText));
 
     if (starred != null)
       vCard.setExtendedProperty(PROPERTY_STARRED, starred ? "1" : "0");
 
-    Optional<String> eTag = Optional.fromNullable(eTagText);
-
-    return new ComponentETagPair<VCard>(vCard, eTag);
+    return new ComponentETagPair<VCard>(vCard, Optional.fromNullable(eTagText));
   }
 
-  protected static String[] getProjectionForStructuredName() {
+  public static String[] getProjectionForStructuredName() {
     return new String[] {
         ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,         // 00
         ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,           // 01
@@ -178,7 +183,7 @@ public class ContactFactory {
     };
   }
 
-  protected static ContentValues getValuesForStructuredName(Cursor cursor) {
+  public static ContentValues getValuesForStructuredName(Cursor cursor) {
     ContentValues values = new ContentValues(9);
 
     values.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,         cursor.getString(0));
@@ -194,61 +199,62 @@ public class ContactFactory {
     return values;
   }
 
-  protected static Optional<ContentValues> getValuesForStructuredName(VCard vCard) {
-    if (vCard.getStructuredName() != null) {
-      ContentValues values = new ContentValues();
+  public static Optional<ContentValues> getValuesForStructuredName(VCard vCard) {
+    FormattedName  formattedName  = vCard.getFormattedName();
+    StructuredName structuredName = vCard.getStructuredName();
 
-      values.put(ContactsContract.Data.MIMETYPE,
-                 ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
+    if (formattedName == null && structuredName == null)
+      return Optional.absent();
 
-      FormattedName formattedName = vCard.getFormattedName();
-      if (formattedName != null)
-        values.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
-                   formattedName.getValue());
+    ContentValues values = new ContentValues();
 
-      StructuredName structuredName = vCard.getStructuredName();
-      if (structuredName != null) {
-        values.put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
-                   structuredName.getGiven());
-        values.put(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
-                   structuredName.getFamily());
+    values.put(ContactsContract.Data.MIMETYPE,
+               ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
 
-        if (structuredName.getPrefixes().size() > 0) {
-          values.put(ContactsContract.CommonDataKinds.StructuredName.PREFIX,
-                     StringUtils.join(structuredName.getPrefixes(), " "));
-        }
-
-        if (structuredName.getAdditional().size() > 0)
-          values.put(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME,
-                     StringUtils.join(structuredName.getAdditional(), " "));
-
-        if (structuredName.getSuffixes().size() > 0)
-          values.put(ContactsContract.CommonDataKinds.StructuredName.SUFFIX,
-                     StringUtils.join(structuredName.getSuffixes(), " "));
-      }
-
-      RawProperty phoneticGivenName = vCard.getExtendedProperty(PROPERTY_PHONETIC_GIVEN_NAME);
-      if (phoneticGivenName != null)
-        values.put(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_GIVEN_NAME,
-                   phoneticGivenName.getValue());
-
-      RawProperty phoneticMiddleName = vCard.getExtendedProperty(PROPERTY_PHONETIC_MIDDLE_NAME);
-      if (phoneticMiddleName != null)
-        values.put(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_MIDDLE_NAME,
-                   phoneticMiddleName.getValue());
-
-      RawProperty phoneticFamilyName = vCard.getExtendedProperty(PROPERTY_PHONETIC_FAMILY_NAME);
-      if (phoneticFamilyName != null)
-        values.put(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_FAMILY_NAME,
-                   phoneticFamilyName.getValue());
-
-      return Optional.of(values);
+    if (formattedName != null) {
+      values.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+                 formattedName.getValue());
     }
 
-    return Optional.absent();
+    if (structuredName != null) {
+      values.put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
+                 structuredName.getGiven());
+      values.put(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
+                 structuredName.getFamily());
+
+      if (structuredName.getPrefixes().size() > 0) {
+        values.put(ContactsContract.CommonDataKinds.StructuredName.PREFIX,
+                   StringUtils.join(structuredName.getPrefixes(), " "));
+      }
+
+      if (structuredName.getAdditional().size() > 0)
+        values.put(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME,
+                   StringUtils.join(structuredName.getAdditional(), " "));
+
+      if (structuredName.getSuffixes().size() > 0)
+        values.put(ContactsContract.CommonDataKinds.StructuredName.SUFFIX,
+                   StringUtils.join(structuredName.getSuffixes(), " "));
+    }
+
+    RawProperty phoneticGivenName = vCard.getExtendedProperty(PROPERTY_PHONETIC_GIVEN_NAME);
+    if (phoneticGivenName != null)
+      values.put(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_GIVEN_NAME,
+                 phoneticGivenName.getValue());
+
+    RawProperty phoneticMiddleName = vCard.getExtendedProperty(PROPERTY_PHONETIC_MIDDLE_NAME);
+    if (phoneticMiddleName != null)
+      values.put(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_MIDDLE_NAME,
+                 phoneticMiddleName.getValue());
+
+    RawProperty phoneticFamilyName = vCard.getExtendedProperty(PROPERTY_PHONETIC_FAMILY_NAME);
+    if (phoneticFamilyName != null)
+      values.put(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_FAMILY_NAME,
+                 phoneticFamilyName.getValue());
+
+    return Optional.of(values);
   }
 
-  protected static void addStructuredName(VCard vCard, ContentValues structuredNameValues) {
+  public static void addStructuredName(VCard vCard, ContentValues structuredNameValues) {
     String displayName        = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME);
     String givenName          = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME);
     String familyName         = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME);
@@ -259,47 +265,48 @@ public class ContactFactory {
     String phoneticMiddleName = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_MIDDLE_NAME);
     String phoneticFamilyName = structuredNameValues.getAsString(ContactsContract.CommonDataKinds.StructuredName.PHONETIC_FAMILY_NAME);
 
-    if (displayName != null) {
-      FormattedName formattedName = new FormattedName(displayName);
-      vCard.addFormattedName(formattedName);
-
-      StructuredName structuredName = new StructuredName();
-
-      if (givenName != null)
-        structuredName.setGiven(givenName);
-
-      if (familyName != null)
-        structuredName.setFamily(familyName);
-
-      if (prefixes != null) {
-        for (String prefix : StringUtils.split(prefixes))
-          structuredName.addPrefix(prefix);
-      }
-
-      if (middleName != null)
-        structuredName.addAdditional(middleName);
-
-      if (suffixes != null) {
-        for (String suffix : StringUtils.split(suffixes))
-          structuredName.addSuffix(suffix);
-      }
-
-      vCard.setStructuredName(structuredName);
-
-      if (phoneticGivenName != null)
-        vCard.addExtendedProperty(PROPERTY_PHONETIC_GIVEN_NAME, phoneticGivenName);
-
-      if (phoneticMiddleName != null)
-        vCard.addExtendedProperty(PROPERTY_PHONETIC_MIDDLE_NAME, phoneticMiddleName);
-
-      if (phoneticFamilyName != null)
-        vCard.addExtendedProperty(PROPERTY_PHONETIC_FAMILY_NAME, phoneticFamilyName);
-    }
-    else
+    if (displayName == null) {
       Log.w(TAG, "display name missing, nothing to add");
+      return;
+    }
+
+    FormattedName  formattedName  = new FormattedName(displayName);
+    StructuredName structuredName = new StructuredName();
+
+    vCard.addFormattedName(formattedName);
+
+    if (givenName != null)
+      structuredName.setGiven(givenName);
+
+    if (familyName != null)
+      structuredName.setFamily(familyName);
+
+    if (prefixes != null) {
+      for (String prefix : StringUtils.split(prefixes))
+        structuredName.addPrefix(prefix);
+    }
+
+    if (middleName != null)
+      structuredName.addAdditional(middleName);
+
+    if (suffixes != null) {
+      for (String suffix : StringUtils.split(suffixes))
+        structuredName.addSuffix(suffix);
+    }
+
+    vCard.setStructuredName(structuredName);
+
+    if (phoneticGivenName != null)
+      vCard.setExtendedProperty(PROPERTY_PHONETIC_GIVEN_NAME, phoneticGivenName);
+
+    if (phoneticMiddleName != null)
+      vCard.setExtendedProperty(PROPERTY_PHONETIC_MIDDLE_NAME, phoneticMiddleName);
+
+    if (phoneticFamilyName != null)
+      vCard.setExtendedProperty(PROPERTY_PHONETIC_FAMILY_NAME, phoneticFamilyName);
   }
 
-  protected static String[] getProjectionForPhoneNumber() {
+  public static String[] getProjectionForPhoneNumber() {
     return new String[] {
         ContactsContract.CommonDataKinds.Phone.TYPE,            // 00
         ContactsContract.CommonDataKinds.Phone.LABEL,           // 01
@@ -309,7 +316,7 @@ public class ContactFactory {
     };
   }
 
-  protected static ContentValues getValuesForPhoneNumber(Cursor cursor) {
+  public static ContentValues getValuesForPhoneNumber(Cursor cursor) {
     ContentValues values = new ContentValues(5);
 
     values.put(ContactsContract.CommonDataKinds.Phone.TYPE,             cursor.getInt(0));
@@ -321,7 +328,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForPhoneNumbers(VCard vCard) {
+  public static List<ContentValues> getValuesForPhoneNumbers(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
     List<Telephone>     telephones = vCard.getTelephoneNumbers();
 
@@ -370,69 +377,65 @@ public class ContactFactory {
     return valuesList;
   }
 
-  protected static void addPhoneNumber(String path, VCard vCard, ContentValues phoneNumberValues)
-      throws InvalidLocalComponentException
-  {
+  public static void addPhoneNumber(VCard vCard, ContentValues phoneNumberValues) {
     Integer type           = phoneNumberValues.getAsInteger(ContactsContract.CommonDataKinds.Phone.TYPE);
     String  label          = phoneNumberValues.getAsString(ContactsContract.CommonDataKinds.Phone.LABEL);
     String  number         = phoneNumberValues.getAsString(ContactsContract.CommonDataKinds.Phone.NUMBER);
     Boolean isPrimary      = phoneNumberValues.getAsBoolean(ContactsContract.CommonDataKinds.Phone.IS_PRIMARY);
     Boolean isSuperPrimary = phoneNumberValues.getAsBoolean(ContactsContract.CommonDataKinds.Phone.IS_SUPER_PRIMARY);
 
-    if (type != null && number != null) {
-      Telephone telephone = new Telephone(number);
-
-      switch (type) {
-        case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
-          telephone.addType(TelephoneType.CELL);
-          break;
-
-        case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
-          telephone.addType(TelephoneType.WORK);
-          break;
-
-        case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
-          telephone.addType(TelephoneType.HOME);
-          break;
-
-        case ContactsContract.CommonDataKinds.Phone.TYPE_FAX_WORK:
-          telephone.addType(TelephoneType.FAX);
-          telephone.addType(TelephoneType.WORK);
-          break;
-
-        case ContactsContract.CommonDataKinds.Phone.TYPE_FAX_HOME:
-          telephone.addType(TelephoneType.FAX);
-          telephone.addType(TelephoneType.HOME);
-          break;
-
-        case ContactsContract.CommonDataKinds.Phone.TYPE_PAGER:
-          telephone.addType(TelephoneType.PAGER);
-          break;
-
-        case ContactsContract.CommonDataKinds.Phone.TYPE_MAIN:
-          telephone.addType(TelephoneType.PREF);
-          break;
-
-        default:
-          if (label != null)
-            telephone.addType(TelephoneType.get(labelToPropertyName(label)));
-      }
-
-      if (isPrimary != null && isPrimary)
-        telephone.addType(TelephoneType.PREF);
-      else if (isSuperPrimary != null && isSuperPrimary)
-        telephone.addType(TelephoneType.PREF);
-
-      vCard.addTelephoneNumber(telephone);
+    if (type == null || number == null) {
+      Log.w(TAG, "phone type or number is null, not adding anything");
+      return;
     }
-    else {
-      Log.e(TAG, "phone type or number is null, not adding anything");
-      throw new InvalidLocalComponentException("phone type or number is null",
-                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
+
+    Telephone telephone = new Telephone(number);
+
+    switch (type) {
+      case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+        telephone.addType(TelephoneType.CELL);
+        break;
+
+      case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+        telephone.addType(TelephoneType.WORK);
+        break;
+
+      case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+        telephone.addType(TelephoneType.HOME);
+        break;
+
+      case ContactsContract.CommonDataKinds.Phone.TYPE_FAX_WORK:
+        telephone.addType(TelephoneType.FAX);
+        telephone.addType(TelephoneType.WORK);
+        break;
+
+      case ContactsContract.CommonDataKinds.Phone.TYPE_FAX_HOME:
+        telephone.addType(TelephoneType.FAX);
+        telephone.addType(TelephoneType.HOME);
+        break;
+
+      case ContactsContract.CommonDataKinds.Phone.TYPE_PAGER:
+        telephone.addType(TelephoneType.PAGER);
+        break;
+
+      case ContactsContract.CommonDataKinds.Phone.TYPE_MAIN:
+        telephone.addType(TelephoneType.PREF);
+        break;
+
+      default:
+        if (label != null)
+          telephone.addType(TelephoneType.get(labelToPropertyName(label)));
     }
+
+    if (isPrimary != null && isPrimary)
+      telephone.addType(TelephoneType.PREF);
+    else if (isSuperPrimary != null && isSuperPrimary)
+      telephone.addType(TelephoneType.PREF);
+
+    vCard.addTelephoneNumber(telephone);
   }
 
-  protected static String[] getProjectionForEmailAddress() {
+  public static String[] getProjectionForEmailAddress() {
     return new String[] {
         ContactsContract.CommonDataKinds.Email.TYPE,            // 00
         ContactsContract.CommonDataKinds.Email.ADDRESS,         // 01
@@ -442,7 +445,7 @@ public class ContactFactory {
     };
   }
 
-  protected static ContentValues getValuesForEmailAddress(Cursor cursor) {
+  public static ContentValues getValuesForEmailAddress(Cursor cursor) {
     ContentValues values = new ContentValues(5);
 
     values.put(ContactsContract.CommonDataKinds.Email.TYPE,             cursor.getInt(0));
@@ -454,7 +457,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForEmailAddresses(VCard vCard) {
+  public static List<ContentValues> getValuesForEmailAddresses(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
     List<Email>         emails     = vCard.getEmails();
 
@@ -496,58 +499,54 @@ public class ContactFactory {
     return valuesList;
   }
 
-  protected static void addEmailAddress(String path, VCard vCard, ContentValues emailValues)
-      throws InvalidLocalComponentException
-  {
+  public static void addEmailAddress(VCard vCard, ContentValues emailValues) {
     Integer type           = emailValues.getAsInteger(ContactsContract.CommonDataKinds.Email.TYPE);
     String  label          = emailValues.getAsString(ContactsContract.CommonDataKinds.Email.LABEL);
     String  address        = emailValues.getAsString(ContactsContract.CommonDataKinds.Email.ADDRESS);
     Boolean isPrimary      = emailValues.getAsBoolean(ContactsContract.CommonDataKinds.Email.IS_PRIMARY);
     Boolean isSuperPrimary = emailValues.getAsBoolean(ContactsContract.CommonDataKinds.Email.IS_SUPER_PRIMARY);
 
-    if (type != null && address != null) {
-      Email email = new Email(address);
-
-      switch (type) {
-        case ContactsContract.CommonDataKinds.Email.TYPE_HOME:
-          email.addType(EmailType.HOME);
-          break;
-
-        case ContactsContract.CommonDataKinds.Email.TYPE_WORK:
-          email.addType(EmailType.WORK);
-          break;
-
-        case ContactsContract.CommonDataKinds.Email.TYPE_MOBILE:
-          email.addType(EMAIL_TYPE_MOBILE);
-          break;
-
-        default:
-          if (label != null)
-            email.addType(EmailType.get(label));
-          break;
-      }
-
-      if (isPrimary != null && isPrimary)
-        email.addType(EmailType.PREF);
-      else if (isSuperPrimary != null && isSuperPrimary)
-        email.addType(EmailType.PREF);
-
-      vCard.addEmail(email);
+    if (type == null || address == null) {
+      Log.w(TAG, "email type or address is null, not adding anything");
+      return;
     }
-    else {
-      Log.e(TAG, "email type or address is null, not adding anything");
-      throw new InvalidLocalComponentException("email type or address is null",
-                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
+
+    Email email = new Email(address);
+
+    switch (type) {
+      case ContactsContract.CommonDataKinds.Email.TYPE_HOME:
+        email.addType(EmailType.HOME);
+        break;
+
+      case ContactsContract.CommonDataKinds.Email.TYPE_WORK:
+        email.addType(EmailType.WORK);
+        break;
+
+      case ContactsContract.CommonDataKinds.Email.TYPE_MOBILE:
+        email.addType(EMAIL_TYPE_MOBILE);
+        break;
+
+      default:
+        if (label != null)
+          email.addType(EmailType.get(label));
+        break;
     }
+
+    if (isPrimary != null && isPrimary)
+      email.addType(EmailType.PREF);
+    else if (isSuperPrimary != null && isSuperPrimary)
+      email.addType(EmailType.PREF);
+
+    vCard.addEmail(email);
   }
 
-  protected static String[] getProjectionForPhoto() {
+  public static String[] getProjectionForPhoto() {
     return new String[] {
         ContactsContract.CommonDataKinds.Photo.PHOTO // 00 raw bytes of image
     };
   }
 
-  protected static ContentValues getValuesForPhoto(Cursor cursor) {
+  public static ContentValues getValuesForPhoto(Cursor cursor) {
     ContentValues values = new ContentValues(1);
 
     values.put(ContactsContract.CommonDataKinds.Photo.PHOTO, cursor.getBlob(0));
@@ -555,7 +554,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static Optional<Photo> getPhotoForValues(ContentValues values) {
+  public static Optional<Photo> getPhotoForValues(ContentValues values) {
     byte[] thumbnailBytes = values.getAsByteArray(ContactsContract.CommonDataKinds.Photo.PHOTO);
 
     if (thumbnailBytes == null || thumbnailBytes.length <= 0)
@@ -566,7 +565,7 @@ public class ContactFactory {
     );
   }
 
-  protected static Optional<ContentValues> getValuesForPhoto(VCard vCard) {
+  public static Optional<ContentValues> getValuesForPhoto(VCard vCard) {
     if (vCard.getPhotos().size() > 0) {
       ContentValues values = new ContentValues();
 
@@ -582,14 +581,18 @@ public class ContactFactory {
     return Optional.absent();
   }
 
-  protected static String[] getProjectionForOrganization() {
+  public static Integer getSizeOfPhotoInBytes(ContentValues photoValues) {
+    return photoValues.getAsByteArray(ContactsContract.CommonDataKinds.Photo.PHOTO).length;
+  }
+
+  public static String[] getProjectionForOrganization() {
     return new String[] {
         ContactsContract.CommonDataKinds.Organization.COMPANY, // 00
         ContactsContract.CommonDataKinds.Organization.TITLE    // 01
     };
   }
 
-  protected static ContentValues getValuesForOrganization(Cursor cursor) {
+  public static ContentValues getValuesForOrganization(Cursor cursor) {
     ContentValues values = new ContentValues(2);
 
     values.put(ContactsContract.CommonDataKinds.Organization.COMPANY, cursor.getString(0));
@@ -598,7 +601,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForOrganization(VCard vCard) {
+  public static List<ContentValues> getValuesForOrganizations(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
     for (int i = 0; i < vCard.getOrganizations().size(); i++) {
@@ -621,9 +624,9 @@ public class ContactFactory {
     return valuesList;
   }
 
-  protected static void addOrganizer(VCard vCard, ContentValues organizerValues) {
-    String companyText = organizerValues.getAsString(ContactsContract.CommonDataKinds.Organization.COMPANY);
-    String roleText    = organizerValues.getAsString(ContactsContract.CommonDataKinds.Organization.TITLE);
+  public static void addOrganization(VCard vCard, ContentValues organizationValues) {
+    String companyText = organizationValues.getAsString(ContactsContract.CommonDataKinds.Organization.COMPANY);
+    String roleText    = organizationValues.getAsString(ContactsContract.CommonDataKinds.Organization.TITLE);
 
     if (companyText != null) {
       Organization organization = new Organization();
@@ -637,7 +640,7 @@ public class ContactFactory {
     }
   }
 
-  protected static String[] getProjectionForInstantMessaging() {
+  public static String[] getProjectionForInstantMessaging() {
     return new String[] {
         ContactsContract.CommonDataKinds.Im.TYPE,           // 00
         ContactsContract.CommonDataKinds.Im.DATA,           // 01
@@ -647,7 +650,7 @@ public class ContactFactory {
     };
   }
 
-  protected static ContentValues getValuesForInstantMessaging(Cursor cursor) {
+  public static ContentValues getValuesForInstantMessaging(Cursor cursor) {
     ContentValues values = new ContentValues(5);
 
     values.put(ContactsContract.CommonDataKinds.Im.TYPE,            cursor.getInt(0));
@@ -659,7 +662,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForInstantMessaging(VCard vCard) {
+  public static List<ContentValues> getValuesForInstantMessaging(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
     for (Impp messenger : vCard.getImpps()) {
@@ -718,77 +721,71 @@ public class ContactFactory {
     return valuesList;
   }
 
-  protected static void addInstantMessaging(String path, VCard vCard, ContentValues imValues)
-      throws InvalidLocalComponentException
-  {
-    Integer type           = imValues.getAsInteger(ContactsContract.CommonDataKinds.Im.TYPE);
+  public static void addInstantMessaging(VCard vCard, ContentValues imValues) {
     Integer protocol       = imValues.getAsInteger(ContactsContract.CommonDataKinds.Im.PROTOCOL);
     String  customProtocol = imValues.getAsString(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL);
     String  handle         = imValues.getAsString(ContactsContract.CommonDataKinds.Im.DATA);
 
-    if (type != null && protocol != null && handle != null) {
-      Impp impp;
-
-      switch (protocol) {
-        case ContactsContract.CommonDataKinds.Im.PROTOCOL_AIM:
-          impp = Impp.aim(handle);
-          break;
-
-        case ContactsContract.CommonDataKinds.Im.PROTOCOL_MSN:
-          impp = Impp.msn(handle);
-          break;
-
-        case ContactsContract.CommonDataKinds.Im.PROTOCOL_YAHOO:
-          impp = Impp.yahoo(handle);
-          break;
-
-        case ContactsContract.CommonDataKinds.Im.PROTOCOL_SKYPE:
-          impp = Impp.skype(handle);
-          break;
-
-        case ContactsContract.CommonDataKinds.Im.PROTOCOL_ICQ:
-          impp = Impp.icq(handle);
-          break;
-
-        case ContactsContract.CommonDataKinds.Im.PROTOCOL_QQ:
-          impp = new Impp("qq", handle);
-          break;
-
-        case ContactsContract.CommonDataKinds.Im.PROTOCOL_GOOGLE_TALK:
-          impp = new Impp("google-talk", handle);
-          break;
-
-        case ContactsContract.CommonDataKinds.Im.PROTOCOL_NETMEETING:
-          impp = new Impp("netmeeting", handle);
-          break;
-
-        case ContactsContract.CommonDataKinds.Im.PROTOCOL_CUSTOM:
-          impp = new Impp(customProtocol, handle);
-          break;
-
-        default:
-          impp = Impp.xmpp(handle);
-          break;
-      }
-
-      impp.addType(ImppType.PERSONAL);
-
-      vCard.addImpp(impp);
+    if (protocol == null || handle == null) {
+      Log.w(TAG, "im protocol, or handle is null, not adding anything");
+      return;
     }
-    else {
-      Log.e(TAG, "im type, protocol, or handle is null, not adding anything");
-      throw new InvalidLocalComponentException("im type, protocol, or handle is null",
-                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
+
+    Impp impp;
+
+    switch (protocol) {
+      case ContactsContract.CommonDataKinds.Im.PROTOCOL_AIM:
+        impp = Impp.aim(handle);
+        break;
+
+      case ContactsContract.CommonDataKinds.Im.PROTOCOL_MSN:
+        impp = Impp.msn(handle);
+        break;
+
+      case ContactsContract.CommonDataKinds.Im.PROTOCOL_YAHOO:
+        impp = Impp.yahoo(handle);
+        break;
+
+      case ContactsContract.CommonDataKinds.Im.PROTOCOL_SKYPE:
+        impp = Impp.skype(handle);
+        break;
+
+      case ContactsContract.CommonDataKinds.Im.PROTOCOL_ICQ:
+        impp = Impp.icq(handle);
+        break;
+
+      case ContactsContract.CommonDataKinds.Im.PROTOCOL_QQ:
+        impp = new Impp("qq", handle);
+        break;
+
+      case ContactsContract.CommonDataKinds.Im.PROTOCOL_GOOGLE_TALK:
+        impp = new Impp("google-talk", handle);
+        break;
+
+      case ContactsContract.CommonDataKinds.Im.PROTOCOL_NETMEETING:
+        impp = new Impp("netmeeting", handle);
+        break;
+
+      case ContactsContract.CommonDataKinds.Im.PROTOCOL_CUSTOM:
+        impp = new Impp(customProtocol, handle);
+        break;
+
+      default:
+        impp = Impp.xmpp(handle);
+        break;
     }
+
+    impp.addType(ImppType.PERSONAL);
+    vCard.addImpp(impp);
   }
 
-  protected static String[] getProjectionForNickName() {
+  public static String[] getProjectionForNickName() {
     return new String[] {
         ContactsContract.CommonDataKinds.Nickname.NAME // 00
     };
   }
 
-  protected static ContentValues getValuesForNickName(Cursor cursor) {
+  public static ContentValues getValuesForNickName(Cursor cursor) {
     ContentValues values = new ContentValues(1);
 
     values.put(ContactsContract.CommonDataKinds.Nickname.NAME, cursor.getString(0));
@@ -796,7 +793,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForNickName(VCard vCard) {
+  public static List<ContentValues> getValuesForNickNames(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
     for (Nickname nickname : vCard.getNicknames()) {
@@ -813,7 +810,7 @@ public class ContactFactory {
     return valuesList;
   }
 
-  protected static void addNickName(VCard vCard, ContentValues nickNameValues) {
+  public static void addNickName(VCard vCard, ContentValues nickNameValues) {
     String nickNameText = nickNameValues.getAsString(ContactsContract.CommonDataKinds.Nickname.NAME);
 
     if (nickNameText != null) {
@@ -824,13 +821,13 @@ public class ContactFactory {
     }
   }
 
-  protected static String[] getProjectionForNote() {
+  public static String[] getProjectionForNote() {
     return new String[] {
         ContactsContract.CommonDataKinds.Note.NOTE // 00
     };
   }
 
-  protected static ContentValues getValuesForNote(Cursor cursor) {
+  public static ContentValues getValuesForNote(Cursor cursor) {
     ContentValues values = new ContentValues(1);
 
     values.put(ContactsContract.CommonDataKinds.Note.NOTE, cursor.getString(0));
@@ -838,7 +835,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForNote(VCard vCard) {
+  public static List<ContentValues> getValuesForNotes(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
     for (Note note : vCard.getNotes()) {
@@ -853,7 +850,7 @@ public class ContactFactory {
         noteContents = new String(Base64.decode(noteContents));
 
       } catch (IOException e) {
-        Log.e(TAG, "error base64 decoding note, skipping decode", e);
+        Log.w(TAG, "error base64 decoding note, skipping decode", e);
       }
 
       values.put(ContactsContract.CommonDataKinds.Note.NOTE, noteContents);
@@ -863,7 +860,7 @@ public class ContactFactory {
     return valuesList;
   }
 
-  protected static void addNote(VCard vCard, ContentValues noteValues) {
+  public static void addNote(VCard vCard, ContentValues noteValues) {
     String noteText = noteValues.getAsString(ContactsContract.CommonDataKinds.Note.NOTE);
 
     if (noteText != null) {
@@ -872,7 +869,11 @@ public class ContactFactory {
     }
   }
 
-  protected static String[] getProjectionForPostalAddress() {
+  public static Integer getSizeOfNoteInBytes(ContentValues noteValues) {
+    return noteValues.getAsString(ContactsContract.CommonDataKinds.Note.NOTE).getBytes().length;
+  }
+
+  public static String[] getProjectionForPostalAddress() {
     return new String[] {
         ContactsContract.CommonDataKinds.StructuredPostal.TYPE,              // 00
         ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, // 01
@@ -887,7 +888,7 @@ public class ContactFactory {
     };
   }
 
-  protected static ContentValues getValuesForPostalAddress(Cursor cursor) {
+  public static ContentValues getValuesForPostalAddress(Cursor cursor) {
     ContentValues values = new ContentValues(10);
 
     values.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE,              cursor.getInt(0));
@@ -904,7 +905,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForPostalAddresses(VCard vCard) {
+  public static List<ContentValues> getValuesForPostalAddresses(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
     for (ezvcard.property.Address address : vCard.getAddresses()) {
@@ -923,7 +924,7 @@ public class ContactFactory {
         values.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
                    ContactsContract.CommonDataKinds.StructuredPostal.TYPE_CUSTOM);
         values.put(ContactsContract.CommonDataKinds.StructuredPostal.LABEL,
-                   propertyNameToLabel(address.getTypes().iterator().next().getValue()));
+                   address.getTypes().iterator().next().getValue());
       }
       else
         values.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
@@ -937,7 +938,7 @@ public class ContactFactory {
           formattedAddress = new String(Base64.decode(formattedAddress));
 
         } catch (IOException e) {
-          Log.e(TAG, "formatted address is not base64 encoded, skipping decode.");
+          Log.w(TAG, "formatted address is not base64 encoded, skipping decode.");
         }
 
         values.put(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, formattedAddress);
@@ -956,9 +957,7 @@ public class ContactFactory {
     return valuesList;
   }
 
-  protected static void addPostalAddress(String path, VCard vCard, ContentValues addressValues)
-    throws InvalidLocalComponentException
-  {
+  public static void addPostalAddress(VCard vCard, ContentValues addressValues) {
     Integer addressType      = addressValues.getAsInteger(ContactsContract.CommonDataKinds.StructuredPostal.TYPE);
     String  formattedAddress = addressValues.getAsString(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS);
     String  label            = addressValues.getAsString(ContactsContract.CommonDataKinds.StructuredPostal.LABEL);
@@ -967,65 +966,63 @@ public class ContactFactory {
     String  neighborhood     = addressValues.getAsString(ContactsContract.CommonDataKinds.StructuredPostal.NEIGHBORHOOD);
     String  city             = addressValues.getAsString(ContactsContract.CommonDataKinds.StructuredPostal.CITY);
     String  region           = addressValues.getAsString(ContactsContract.CommonDataKinds.StructuredPostal.REGION);
-    String  postcode         = addressValues.getAsString(ContactsContract.CommonDataKinds.StructuredPostal.POBOX);
+    String  postcode         = addressValues.getAsString(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE);
     String  country          = addressValues.getAsString(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY);
 
-    if (addressType != null && formattedAddress != null) {
-      Address address = new Address();
-      address.setLabel(Base64.encodeBytes(formattedAddress.getBytes()));
-
-      switch (addressType) {
-        case ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME:
-          address.addType(AddressType.HOME);
-          break;
-
-        case ContactsContract.CommonDataKinds.StructuredPostal.TYPE_WORK:
-          address.addType(AddressType.WORK);
-          break;
-
-        case ContactsContract.CommonDataKinds.StructuredPostal.TYPE_CUSTOM:
-          if (label != null)
-            AddressType.get(label);
-          break;
-      }
-
-      if (street != null)
-        address.setStreetAddress(street);
-
-      if (poBox != null)
-        address.setPoBox(poBox);
-
-      if (neighborhood != null)
-        address.setExtendedAddress(neighborhood);
-
-      if (city != null)
-        address.setLocality(city);
-
-      if (region != null)
-        address.setRegion(region);
-
-      if (postcode != null)
-        address.setPostalCode(postcode);
-
-      if (country != null)
-        address.setCountry(country);
-
-      vCard.addAddress(address);
+    if (addressType == null || formattedAddress == null) {
+      Log.w(TAG, "address type or formatted address is null, not adding anything");
+      return;
     }
-    else {
-      Log.e(TAG, "address type or formatted address is null, not adding anything");
-      throw new InvalidLocalComponentException("address type or formatted address is null",
-                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
+
+    Address address = new Address();
+    address.setLabel(Base64.encodeBytes(formattedAddress.getBytes()));
+
+    switch (addressType) {
+      case ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME:
+        address.addType(AddressType.HOME);
+        break;
+
+      case ContactsContract.CommonDataKinds.StructuredPostal.TYPE_WORK:
+        address.addType(AddressType.WORK);
+        break;
+
+      case ContactsContract.CommonDataKinds.StructuredPostal.TYPE_CUSTOM:
+        if (label != null)
+          address.addType(AddressType.get(label));
+        break;
     }
+
+    if (street != null)
+      address.setStreetAddress(street);
+
+    if (poBox != null)
+      address.setPoBox(poBox);
+
+    if (neighborhood != null)
+      address.setExtendedAddress(neighborhood);
+
+    if (city != null)
+      address.setLocality(city);
+
+    if (region != null)
+      address.setRegion(region);
+
+    if (postcode != null)
+      address.setPostalCode(postcode);
+
+    if (country != null)
+      address.setCountry(country);
+
+    vCard.addAddress(address);
   }
 
-  protected static String[] getProjectionForWebsite() {
+  public static String[] getProjectionForWebsite() {
     return new String[] {
         ContactsContract.CommonDataKinds.Website.URL // 00
     };
   }
 
-  protected static ContentValues getValuesForWebsite(Cursor cursor) {
+  public static ContentValues getValuesForWebsite(Cursor cursor) {
     ContentValues values = new ContentValues(1);
 
     values.put(ContactsContract.CommonDataKinds.Website.URL, cursor.getString(0));
@@ -1033,7 +1030,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForWebsites(VCard vCard) {
+  public static List<ContentValues> getValuesForWebsites(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
     for (Url url : vCard.getUrls()) {
@@ -1049,23 +1046,16 @@ public class ContactFactory {
     return valuesList;
   }
 
-  protected static void addWebsite(String path, VCard vCard, ContentValues websiteValues)
-    throws InvalidLocalComponentException
-  {
+  public static void addWebsite(VCard vCard, ContentValues websiteValues) {
     String urlText = websiteValues.getAsString(ContactsContract.CommonDataKinds.Website.URL);
 
     if (urlText != null) {
       Url url = new Url(urlText);
       vCard.addUrl(url);
     }
-    else {
-      Log.e(TAG, "url is null, not adding anything");
-      throw new InvalidLocalComponentException("website url is null",
-                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
-    }
   }
 
-  protected static String[] getProjectionForEvent() {
+  public static String[] getProjectionForEvent() {
     return new String[] {
         ContactsContract.CommonDataKinds.Event.TYPE,      // 00
         ContactsContract.CommonDataKinds.Event.LABEL,     // 01
@@ -1073,7 +1063,7 @@ public class ContactFactory {
     };
   }
 
-  protected static ContentValues getValuesForEvent(Cursor cursor) {
+  public static ContentValues getValuesForEvent(Cursor cursor) {
     ContentValues values = new ContentValues(3);
 
     values.put(ContactsContract.CommonDataKinds.Event.TYPE,       cursor.getInt(0));
@@ -1083,7 +1073,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForEvents(VCard vCard) {
+  public static List<ContentValues> getValuesForEvents(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
     if (vCard.getBirthday() != null && vCard.getBirthday().getDate() != null) {
@@ -1152,7 +1142,7 @@ public class ContactFactory {
     return valuesList;
   }
 
-  protected static void addEvent(String path, VCard vCard, ContentValues eventValues)
+  public static void addEvent(String path, VCard vCard, ContentValues eventValues)
       throws InvalidLocalComponentException
   {
     Integer          eventType      = eventValues.getAsInteger(ContactsContract.CommonDataKinds.Event.TYPE);
@@ -1160,42 +1150,40 @@ public class ContactFactory {
     String           eventStartDate = eventValues.getAsString(ContactsContract.CommonDataKinds.Event.START_DATE);
     SimpleDateFormat formatter      = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
-    if (eventType != null && eventStartDate != null) {
-      try {
+    if (eventType == null || eventStartDate == null) {
+      Log.w(TAG, "event type or event start date is null, not adding anything");
+      return;
+    }
 
-        if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY) {
-          /*
-            aCalendar birthday with "year unknown" option...
-            https://github.com/WhisperSystems/Flock/issues/26
-          */
-          if (eventStartDate.startsWith("-"))
-            eventStartDate = "0001" + eventStartDate.substring(1);
+    try {
 
-          Birthday birthday = new Birthday(formatter.parse(eventStartDate));
-          vCard.setBirthday(birthday);
-        }
+      if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY) {
+        /*
+          aCalendar birthday with "year unknown" option...
+          https://github.com/WhisperSystems/Flock/issues/26
+        */
+        if (eventStartDate.startsWith("-"))
+          eventStartDate = "0001" + eventStartDate.substring(1);
 
-      } catch (ParseException e) {
-        throw new InvalidLocalComponentException("caught exception while parsing birthday",
-                                                 CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard), e);
+        Birthday birthday = new Birthday(formatter.parse(eventStartDate));
+        vCard.setBirthday(birthday);
       }
 
-      if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_ANNIVERSARY)
-        vCard.setExtendedProperty(PROPERTY_EVENT_ANNIVERSARY, eventStartDate);
-      else if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_OTHER)
-        vCard.setExtendedProperty(PROPERTY_EVENT_OTHER, eventStartDate);
-      else if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_CUSTOM)
-        vCard.setExtendedProperty(PROPERTY_EVENT_CUSTOM, eventStartDate)
-            .setParameter(PARAMETER_EVENT_CUSTOM_LABEL, eventLabel);
+    } catch (ParseException e) {
+      throw new InvalidLocalComponentException("caught exception while parsing birthday",
+                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard), e);
     }
-    else {
-      Log.e(TAG, "event type or event start date is null, not adding anything");
-      throw new InvalidLocalComponentException("event type or event start date is null",
-                                               CardDavConstants.CARDDAV_NAMESPACE, path, getUid(vCard));
-    }
+
+    if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_ANNIVERSARY)
+      vCard.setExtendedProperty(PROPERTY_EVENT_ANNIVERSARY, eventStartDate);
+    else if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_OTHER)
+      vCard.setExtendedProperty(PROPERTY_EVENT_OTHER, eventStartDate);
+    else if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_CUSTOM)
+      vCard.setExtendedProperty(PROPERTY_EVENT_CUSTOM, eventStartDate)
+           .setParameter(PARAMETER_EVENT_CUSTOM_LABEL, eventLabel);
   }
 
-  protected static String[] getProjectionForSipAddress() {
+  public static String[] getProjectionForSipAddress() {
     return new String[] {
         ContactsContract.CommonDataKinds.SipAddress.SIP_ADDRESS, // 00
         ContactsContract.CommonDataKinds.SipAddress.TYPE,        // 01
@@ -1203,7 +1191,7 @@ public class ContactFactory {
     };
   }
 
-  protected static ContentValues getValuesForSipAddress(Cursor cursor) {
+  public static ContentValues getValuesForSipAddress(Cursor cursor) {
     ContentValues values = new ContentValues(3);
 
     values.put(ContactsContract.CommonDataKinds.SipAddress.SIP_ADDRESS, cursor.getString(0));
@@ -1213,7 +1201,7 @@ public class ContactFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForSipAddresses(VCard vCard) {
+  public static List<ContentValues> getValuesForSipAddresses(VCard vCard) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
 
     for (RawProperty sipAddress : vCard.getExtendedProperties(PROPERTY_SIP)) {
@@ -1234,50 +1222,33 @@ public class ContactFactory {
     return valuesList;
   }
 
-  protected static void addSipAddress(VCard vCard, ContentValues sipAddressValues) {
+  public static void addSipAddress(VCard vCard, ContentValues sipAddressValues) {
     String sipAddress = sipAddressValues.getAsString(ContactsContract.CommonDataKinds.SipAddress.SIP_ADDRESS);
 
     if (sipAddress != null)
       vCard.setExtendedProperty(PROPERTY_SIP, sipAddress);
   }
 
-  protected static String[] getProjectionForGroupMembership() {
+  public static String[] getProjectionForGroupMembership() {
     return new String[] {
         ContactsContract.Data.DATA1, // 00
     };
   }
 
-  protected static Long getIdForGroupMembership(Cursor cursor) {
+  public static Long getIdForGroupMembership(Cursor cursor) {
     return cursor.getLong(0);
   }
 
-  protected static void addInvisibleProperty(VCard vCard) {
+  public static void addInvisibleProperty(VCard vCard) {
     Log.d(TAG, "addInvisibleProperty()");
-    vCard.addExtendedProperty(PROPERTY_INVISIBLE_CONTACT, "true");
+    vCard.setExtendedProperty(PROPERTY_INVISIBLE_CONTACT, "true");
   }
 
-  protected static boolean hasInvisibleProperty(VCard vCard) {
+  public static boolean hasInvisibleProperty(VCard vCard) {
     return vCard.getExtendedProperty(PROPERTY_INVISIBLE_CONTACT) != null;
   }
 
-  protected static void addAggregationExceptions(VCard vCard, List<AggregationException> exceptions) {
-    if (exceptions.isEmpty())
-      return;
-
-    Log.d(TAG, "need to add " + exceptions.size() + " aggregate exceptions.");
-
-    String exceptionsString = null;
-    for (AggregationException exception : exceptions) {
-      if (exceptionsString != null)
-        exceptionsString += "," + exception.toString();
-      else
-        exceptionsString = exception.toString();
-    }
-
-    vCard.addExtendedProperty(PROPERTY_AGGREGATION_EXCEPTIONS, exceptionsString);
-  }
-
-  protected static List<AggregationException> getAggregationExceptions(VCard vCard)
+  public static List<AggregationException> getAggregationExceptions(VCard vCard)
       throws IllegalArgumentException
   {
     List<AggregationException> exceptions     = new LinkedList<AggregationException>();
@@ -1292,19 +1263,36 @@ public class ContactFactory {
     return exceptions;
   }
 
-  protected static class AggregationException {
+  public static void addAggregationExceptions(VCard vCard, List<AggregationException> exceptions) {
+    if (exceptions.isEmpty())
+      return;
+
+    Log.d(TAG, "need to add " + exceptions.size() + " aggregate exceptions.");
+
+    String exceptionsString = null;
+    for (AggregationException exception : exceptions) {
+      if (exceptionsString != null)
+        exceptionsString += "," + exception.toString();
+      else
+        exceptionsString = exception.toString();
+    }
+
+    vCard.setExtendedProperty(PROPERTY_AGGREGATION_EXCEPTIONS, exceptionsString);
+  }
+
+  public static class AggregationException {
 
     private int     type;
     private Account contactAccount;
     private String  contactUid;
 
-    protected AggregationException(int type, Account contactAccount, String contactUid) {
+    public AggregationException(int type, Account contactAccount, String contactUid) {
       this.type           = type;
       this.contactAccount = contactAccount;
       this.contactUid     = contactUid;
     }
 
-    protected static AggregationException build(String stringEncodedAggregateException)
+    public static AggregationException build(String stringEncodedAggregateException)
         throws IllegalArgumentException
     {
       String[] parts = stringEncodedAggregateException.split(":");
@@ -1329,15 +1317,15 @@ public class ContactFactory {
       }
     }
 
-    protected int getType() {
+    public int getType() {
       return type;
     }
 
-    protected Account getContactAccount() {
+    public Account getContactAccount() {
       return contactAccount;
     }
 
-    protected String getContactUid() {
+    public String getContactUid() {
       return contactUid;
     }
 

@@ -144,12 +144,12 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
   @Override
   protected String getColumnNameComponentUid() {
-    return ContactsContract.RawContacts.SOURCE_ID;
+    return ContactFactory.COLUMN_NAME_CONTACT_UID;
   }
 
   @Override
   protected String getColumnNameComponentETag() {
-    return ContactsContract.RawContacts.SYNC1;
+    return ContactFactory.COLUMN_NAME_CONTACT_ETAG;
   }
 
   @Override
@@ -160,11 +160,6 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   @Override
   protected String getColumnNameDeleted() {
     return ContactsContract.RawContacts.DELETED;
-  }
-
-  @Override
-  protected String getColumnNameQueuedForMigration() {
-    return ContactsContract.RawContacts.SYNC2;
   }
 
   @Override
@@ -222,7 +217,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void addPhoneNumbers(Long rawContactId, VCard vCard)
-      throws InvalidLocalComponentException, RemoteException
+      throws RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
@@ -239,13 +234,13 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
     while (cursor.moveToNext()) {
       ContentValues phoneNumberValues = ContactFactory.getValuesForPhoneNumber(cursor);
-      ContactFactory.addPhoneNumber(getPath(), vCard, phoneNumberValues);
+      ContactFactory.addPhoneNumber(vCard, phoneNumberValues);
     }
     cursor.close();
   }
 
   private void addEmailAddresses(Long rawContactId, VCard vCard)
-      throws InvalidLocalComponentException, RemoteException
+      throws RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
@@ -262,13 +257,13 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
     while (cursor.moveToNext()) {
       ContentValues emailAddressValues = ContactFactory.getValuesForEmailAddress(cursor);
-      ContactFactory.addEmailAddress(getPath(), vCard, emailAddressValues);
+      ContactFactory.addEmailAddress(vCard, emailAddressValues);
     }
     cursor.close();
   }
 
   private Optional<Photo> getDisplayPhoto(Long rawContactId)
-      throws InvalidLocalComponentException, RemoteException
+      throws RemoteException
   {
     try {
 
@@ -312,7 +307,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void addPhotos(Long rawContactId, VCard vCard)
-      throws InvalidLocalComponentException, RemoteException
+      throws RemoteException
   {
     Optional<Photo> photo = getDisplayPhoto(rawContactId);
     if (!photo.isPresent())
@@ -338,13 +333,13 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
     while (cursor.moveToNext()) {
       ContentValues organizationValues = ContactFactory.getValuesForOrganization(cursor);
-      ContactFactory.addOrganizer(vCard, organizationValues);
+      ContactFactory.addOrganization(vCard, organizationValues);
     }
     cursor.close();
   }
 
   private void addInstantMessaging(Long rawContactId, VCard vCard)
-      throws InvalidLocalComponentException, RemoteException
+      throws RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
@@ -361,7 +356,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
     while (cursor.moveToNext()) {
       ContentValues instantMessagingValues = ContactFactory.getValuesForInstantMessaging(cursor);
-      ContactFactory.addInstantMessaging(getPath(), vCard, instantMessagingValues);
+      ContactFactory.addInstantMessaging(vCard, instantMessagingValues);
     }
     cursor.close();
   }
@@ -409,7 +404,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   }
 
   private void addPostalAddresses(Long rawContactId, VCard vCard)
-      throws InvalidLocalComponentException, RemoteException
+      throws RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
@@ -426,13 +421,13 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
     while (cursor.moveToNext()) {
       ContentValues postalAddressValues = ContactFactory.getValuesForPostalAddress(cursor);
-      ContactFactory.addPostalAddress(getPath(), vCard, postalAddressValues);
+      ContactFactory.addPostalAddress(vCard, postalAddressValues);
     }
     cursor.close();
   }
 
   private void addWebsites(Long rawContactId, VCard vCard)
-      throws InvalidLocalComponentException, RemoteException
+      throws RemoteException
   {
     String   SELECTION      = getColumnNameComponentDataLocalId() + "=? " +
                               "AND " + ContactsContract.Data.MIMETYPE + "=?";
@@ -449,7 +444,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
     while (cursor.moveToNext()) {
       ContentValues websiteValues = ContactFactory.getValuesForWebsite(cursor);
-      ContactFactory.addWebsite(getPath(), vCard, websiteValues);
+      ContactFactory.addWebsite(vCard, websiteValues);
     }
     cursor.close();
   }
@@ -580,7 +575,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
     String[] PROJECTION     = new String[] {
         ContactsContract.RawContacts.ACCOUNT_NAME,
         ContactsContract.RawContacts.ACCOUNT_TYPE,
-        ContactsContract.RawContacts.SOURCE_ID
+        ContactFactory.COLUMN_NAME_CONTACT_UID
     };
     String   SELECTION      = ContactsContract.RawContacts._ID + "=? ";
     String[] SELECTION_ARGS = new String[] { rawContactId.toString() };
@@ -680,7 +675,6 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
   {
     String   SELECTION      = getColumnNameComponentUid() + "=?";
     String[] SELECTION_ARGS = new String[]{uid};
-
 
     Cursor cursor = client.query(getUriForComponents(),
                                  ContactFactory.getProjectionForRawContact(),
@@ -784,115 +778,142 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
 
   @Override
   public int addComponent(ComponentETagPair<VCard> vCard) throws RemoteException {
+    int rawContactOpIndex = operationQueue.size();
+
     ContentValues rawContactValues = ContactFactory.getValuesForRawContact(vCard);
-
-    int raw_contact_op_index = pendingOperations.size();
-
-    pendingOperations.add(ContentProviderOperation.newInsert(getUriForComponents())
-        .withValues(rawContactValues)
-        .build());
+    operationQueue.queue(
+        ContentProviderOperation.newInsert(getUriForComponents())
+            .withValues(rawContactValues)
+            .build(),
+        128
+    );
 
     Optional<ContentValues> structuredName = ContactFactory.getValuesForStructuredName(vCard.getComponent());
     if (structuredName.isPresent()) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(structuredName.get())
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(structuredName.get())
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          256);
     }
 
     List<ContentValues> phoneNumbers = ContactFactory.getValuesForPhoneNumbers(vCard.getComponent());
     for (ContentValues phoneNumber : phoneNumbers) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(phoneNumber)
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(phoneNumber)
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          128);
     }
 
     List<ContentValues> emailAddresses = ContactFactory.getValuesForEmailAddresses(vCard.getComponent());
     for (ContentValues emailAddress : emailAddresses) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(emailAddress)
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(emailAddress)
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          256);
     }
 
     Optional<ContentValues> picture = ContactFactory.getValuesForPhoto(vCard.getComponent());
     if (picture.isPresent()) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(picture.get())
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(picture.get())
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          ContactFactory.getSizeOfPhotoInBytes(picture.get()));
     }
 
-    List<ContentValues> organizations = ContactFactory.getValuesForOrganization(vCard.getComponent());
+    List<ContentValues> organizations = ContactFactory.getValuesForOrganizations(vCard.getComponent());
     for (ContentValues organization : organizations) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(organization)
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(organization)
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          256);
     }
 
     List<ContentValues> instantMessaging = ContactFactory.getValuesForInstantMessaging(vCard.getComponent());
     for (ContentValues instantMessenger : instantMessaging) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(instantMessenger)
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(instantMessenger)
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          256);
     }
 
-    List<ContentValues> nickNames = ContactFactory.getValuesForNickName(vCard.getComponent());
+    List<ContentValues> nickNames = ContactFactory.getValuesForNickNames(vCard.getComponent());
     for (ContentValues nickName : nickNames) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(nickName)
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(nickName)
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          256);
     }
 
-    List<ContentValues> notes = ContactFactory.getValuesForNote(vCard.getComponent());
+    List<ContentValues> notes = ContactFactory.getValuesForNotes(vCard.getComponent());
     for (ContentValues note : notes) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(note)
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(note)
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          ContactFactory.getSizeOfNoteInBytes(note));
     }
 
     List<ContentValues> postalAddresses = ContactFactory.getValuesForPostalAddresses(vCard.getComponent());
     for (ContentValues postalAddress : postalAddresses) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(postalAddress)
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(postalAddress)
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          256);
     }
 
     List<ContentValues> websites = ContactFactory.getValuesForWebsites(vCard.getComponent());
     for (ContentValues website : websites) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(website)
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(website)
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          256);
     }
 
     List<ContentValues> events = ContactFactory.getValuesForEvents(vCard.getComponent());
     for (ContentValues event : events) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(event)
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(event)
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          256);
     }
 
     List<ContentValues> sipAddresses = ContactFactory.getValuesForSipAddresses(vCard.getComponent());
     for (ContentValues sipAddress : sipAddresses) {
-      pendingOperations.add(ContentProviderOperation.newInsert(getUriForData())
-          .withValues(sipAddress)
-          .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, raw_contact_op_index)
-          .build());
+      operationQueue.queue(
+          ContentProviderOperation.newInsert(getUriForData())
+              .withValues(sipAddress)
+              .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactOpIndex)
+              .build(),
+          256);
     }
 
-    pendingOperations.addAll(
-        getOperationsForAggregationExceptions(vCard.getComponent(), raw_contact_op_index)
+    operationQueue.queueAll(
+        getOperationsForAggregationExceptions(vCard.getComponent(), rawContactOpIndex),
+        256
     );
 
-    return pendingOperations.size() - raw_contact_op_index;
+    return operationQueue.size() - rawContactOpIndex;
   }
 
   @Override
@@ -915,43 +936,40 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
                                             ContactCopiedListener  listener,
                                             boolean                forceFull)
   {
-    int operationSum = 0;
-    for (int operationCount : contactOperationCounts)
-      operationSum += operationCount;
+    if (toCollection.operationQueue.hasSpace() && !forceFull)
+      return false;
 
-    if (operationSum >= 100 || forceFull) {
-      try {
+    try {
 
-        int pendingCount = toCollection.pendingOperations.size();
-        int successCount = toCollection.commitPendingOperations();
-        int failCount    = pendingCount - successCount;
+      int pendingCount = toCollection.operationQueue.size();
+      int successCount = toCollection.commitPendingOperations();
+      int failCount    = pendingCount - successCount;
 
-        Log.d(TAG, pendingCount + " were pending " + successCount + " were committed");
+      Log.d(TAG, pendingCount + " were pending " + successCount + " were committed");
 
-        for (int operationCount : contactOperationCounts)
-          listener.onContactCopied(account, toCollection.getAccount());
+      int contactCount = 0;
+      while (contactCount++ < contactOperationCounts.size())
+        listener.onContactCopied(account, toCollection.getAccount());
 
-        if (failCount > 0)
-          Log.e(TAG, "failed to commit " + failCount + "" +
-                     "operations but no idea which contacts they're from!");
+      if (failCount > 0)
+        Log.e(TAG, "failed to commit " + failCount + " " +
+                   "operations but no idea which contacts they're from!");
 
-      } catch (OperationApplicationException e) {
+    } catch (OperationApplicationException e) {
 
-        for (int operationCount : contactOperationCounts)
-          listener.onContactCopyFailed(e, account, toCollection.getAccount());
-        toCollection.pendingOperations.clear();
+      int contactCount = 0;
+      while (contactCount++ < contactOperationCounts.size())
+        listener.onContactCopyFailed(e, account, toCollection.getAccount());
 
-      } catch (RemoteException e) {
+    } catch (RemoteException e) {
 
-        for (int operationCount : contactOperationCounts)
-          listener.onContactCopyFailed(e, account, toCollection.getAccount());
-        toCollection.pendingOperations.clear();
+      int contactCount = 0;
+      while (contactCount++ < contactOperationCounts.size())
+        listener.onContactCopyFailed(e, account, toCollection.getAccount());
 
-      }
-
-      return true;
     }
-    return false;
+
+    return true;
   }
 
   public void copyToAccount(Account toAccount, ContactCopiedListener listener)
@@ -992,7 +1010,7 @@ public class LocalContactCollection extends AbstractLocalComponentCollection<VCa
       }
     }
 
-    if (toCollection.pendingOperations.size() > 0)
+    if (toCollection.operationQueue.size() > 0)
       handleCommitPendingIfFull(toCollection, contactOperationCounts, listener, true);
   }
 }

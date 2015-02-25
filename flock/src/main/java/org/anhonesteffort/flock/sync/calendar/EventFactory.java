@@ -98,6 +98,10 @@ public class EventFactory {
 
   private static final String TAG = "org.anhonesteffort.flock.sync.calendar.EventFactory";
 
+  protected static final String COLUMN_NAME_EVENT_UID       = CalendarContract.Events._SYNC_ID;
+  protected static final String COLUMN_NAME_EVENT_ETAG      = CalendarContract.Events.SYNC_DATA1;
+  protected static final String COLUMN_NAME_COPIED_EVENT_ID = CalendarContract.Events.SYNC_DATA2;
+
   private   static final String PROPERTY_NAME_FLOCK_ALL_DAY                = "X-FLOCK-ALL-DAY";
   private   static final String PROPERTY_NAME_FLOCK_ORIGINAL_SYNC_ID       = "X-FLOCK-ORIGINAL-SYNC-ID";
   private   static final String PROPERTY_NAME_FLOCK_ORIGINAL_INSTANCE_TIME = "X-FLOCK-ORIGINAL-INSTANCE-TIME";
@@ -150,9 +154,9 @@ public class EventFactory {
         CalendarContract.Events.ORIGINAL_ALL_DAY,       // 21
         CalendarContract.Events.AVAILABILITY,           // 22
         CalendarContract.Events.STATUS,                 // 23
-        CalendarContract.Events._SYNC_ID,               // 24 UID
-        CalendarContract.Events.SYNC_DATA1,             // 25 ETag
-        CalendarContract.Events.SYNC_DATA2              // 26 copies event id
+        COLUMN_NAME_EVENT_UID,                          // 24
+        COLUMN_NAME_EVENT_ETAG,                         // 25
+        COLUMN_NAME_COPIED_EVENT_ID                     // 26
     };
   }
 
@@ -183,9 +187,9 @@ public class EventFactory {
     values.put(CalendarContract.Events.ORIGINAL_ALL_DAY,       (cursor.getInt(21) != 0));
     values.put(CalendarContract.Events.AVAILABILITY,           cursor.getInt(22));
     values.put(CalendarContract.Events.STATUS,                 cursor.getInt(23));
-    values.put(CalendarContract.Events._SYNC_ID,               cursor.getString(24));
-    values.put(CalendarContract.Events.SYNC_DATA1,             cursor.getString(25));
-    values.put(CalendarContract.Events.SYNC_DATA2,             cursor.getLong(26));
+    values.put(COLUMN_NAME_EVENT_UID,                          cursor.getString(24));
+    values.put(COLUMN_NAME_EVENT_ETAG,                         cursor.getString(25));
+    values.put(COLUMN_NAME_COPIED_EVENT_ID,                    cursor.getLong(26));
 
     return values;
   }
@@ -224,7 +228,7 @@ public class EventFactory {
   private static void handleAttachPropertiesForCopiedRecurrenceWithExceptions(ContentValues values,
                                                                               VEvent        event)
   {
-    Long copiedEventId = values.getAsLong(CalendarContract.Events.SYNC_DATA2);
+    Long copiedEventId = values.getAsLong(COLUMN_NAME_COPIED_EVENT_ID);
 
     if (copiedEventId != null && copiedEventId > 0)
       event.getProperties().add(new XProperty(PROPERTY_NAME_FLOCK_COPY_EVENT_ID,
@@ -237,7 +241,7 @@ public class EventFactory {
     Property copyIdProp = event.getProperty(PROPERTY_NAME_FLOCK_COPY_EVENT_ID);
 
     if (copyIdProp != null)
-      values.put(CalendarContract.Events.SYNC_DATA2, Long.valueOf(copyIdProp.getValue()));
+      values.put(COLUMN_NAME_COPIED_EVENT_ID, Long.valueOf(copyIdProp.getValue()));
   }
 
   protected static void handleReplaceOriginalSyncId(String path, String syncId, VEvent event)
@@ -376,12 +380,12 @@ public class EventFactory {
       values.put(CalendarContract.Events.CALENDAR_ID, calendarId);
 
       if (vEvent.getUid() != null && vEvent.getUid().getValue() != null)
-        values.put(CalendarContract.Events._SYNC_ID, vEvent.getUid().getValue());
+        values.put(COLUMN_NAME_EVENT_UID, vEvent.getUid().getValue());
       else
-        values.putNull(CalendarContract.Events._SYNC_ID);
+        values.putNull(COLUMN_NAME_EVENT_UID);
 
       if (component.getETag().isPresent())
-        values.put(CalendarContract.Events.SYNC_DATA1, component.getETag().get());
+        values.put(COLUMN_NAME_EVENT_ETAG, component.getETag().get());
 
       DtStart dtStart = vEvent.getStartDate();
       if (dtStart != null && dtStart.getDate() != null) {
@@ -503,7 +507,7 @@ public class EventFactory {
 
     Long   originalLocalId = eventValues.getAsLong(CalendarContract.Events.ORIGINAL_ID);
     String originalSyncId  = eventValues.getAsString(CalendarContract.Events.ORIGINAL_SYNC_ID);
-    String syncId          = eventValues.getAsString(CalendarContract.Events._SYNC_ID);
+    String syncId          = eventValues.getAsString(COLUMN_NAME_EVENT_UID);
 
     if (TextUtils.isEmpty(originalSyncId))
       throw new InvalidLocalComponentException("original sync id required on recurring event deletion exceptions",
@@ -532,7 +536,7 @@ public class EventFactory {
     Long   originalLocalId      = eventValues.getAsLong(CalendarContract.Events.ORIGINAL_ID);
     String originalSyncId       = eventValues.getAsString(CalendarContract.Events.ORIGINAL_SYNC_ID);
     Long   originalInstanceTime = eventValues.getAsLong(CalendarContract.Events.ORIGINAL_INSTANCE_TIME);
-    String syncId               = eventValues.getAsString(CalendarContract.Events._SYNC_ID);
+    String syncId               = eventValues.getAsString(COLUMN_NAME_EVENT_UID);
 
     if (TextUtils.isEmpty(originalSyncId))
       throw new InvalidLocalComponentException("original sync id required on recurring event edit exceptions",
@@ -562,7 +566,7 @@ public class EventFactory {
     calendar.getProperties().add(Version.VERSION_2_0);
     handleAttachPropertiesForCopiedRecurrenceWithExceptions(eventValues, vEvent);
 
-    String uidText = eventValues.getAsString(CalendarContract.Events._SYNC_ID);
+    String uidText = eventValues.getAsString(COLUMN_NAME_EVENT_UID);
     if (!StringUtils.isEmpty(uidText)) {
       Uid eventUid = new Uid(uidText);
       vEvent.getProperties().add(eventUid);
@@ -710,12 +714,12 @@ public class EventFactory {
     }
 
     calendar.getComponents().add(vEvent);
-    Optional<String> eTag = Optional.fromNullable(eventValues.getAsString(CalendarContract.Events.SYNC_DATA1));
+    Optional<String> eTag = Optional.fromNullable(eventValues.getAsString(COLUMN_NAME_EVENT_ETAG));
 
     return new ComponentETagPair<Calendar>(calendar, eTag);
   }
 
-  protected static String[] getProjectionForAttendee() {
+  public static String[] getProjectionForAttendee() {
     return new String[] {
         CalendarContract.Attendees.EVENT_ID,              // 00
         CalendarContract.Attendees.ATTENDEE_EMAIL,        // 01
@@ -728,7 +732,7 @@ public class EventFactory {
     };
   }
 
-  protected static ContentValues getValuesForAttendee(Cursor cursor) {
+  public static ContentValues getValuesForAttendee(Cursor cursor) {
     ContentValues values = new ContentValues(8);
 
     values.put(CalendarContract.Attendees.EVENT_ID,              cursor.getLong(0));
@@ -743,7 +747,7 @@ public class EventFactory {
     return values;
   }
 
-  protected static List<ContentValues> getValuesForAttendees(Calendar component) {
+  public static List<ContentValues> getValuesForAttendees(Calendar component) {
     List<ContentValues> valuesList = new LinkedList<ContentValues>();
     VEvent              vEvent     = (VEvent) component.getComponent(VEvent.VEVENT);
 
@@ -823,7 +827,7 @@ public class EventFactory {
     return valuesList;
   }
 
-  protected static void addAttendee(String path, Calendar component, ContentValues attendeeValues)
+  public static void addAttendee(String path, Calendar component, ContentValues attendeeValues)
       throws InvalidLocalComponentException
   {
     VEvent vEvent = (VEvent) component.getComponent(VEvent.VEVENT);
@@ -840,14 +844,13 @@ public class EventFactory {
     Integer status       = attendeeValues.getAsInteger(CalendarContract.Attendees.ATTENDEE_STATUS);
 
     if (StringUtils.isEmpty(email)) {
-      Log.e(TAG, "attendee email is null or empty");
-      throw new InvalidLocalComponentException("attendee email is null or empty",
-                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(vEvent));
+      Log.w(TAG, "attendee email is null or empty, not going to add anything");
+      return;
     }
 
     try {
 
-      Attendee attendee = new Attendee(new URI("mailto", email, null));
+      Attendee      attendee       = new Attendee(new URI("mailto", email, null));
       ParameterList attendeeParams = attendee.getParameters();
 
       attendeeParams.add(CuType.INDIVIDUAL);
@@ -890,7 +893,7 @@ public class EventFactory {
     }
   }
 
-  protected static String [] getProjectionForReminder() {
+  public static String [] getProjectionForReminder() {
     return new String[] {
         CalendarContract.Reminders.EVENT_ID, // 00
         CalendarContract.Reminders.MINUTES,  // 01
@@ -898,27 +901,23 @@ public class EventFactory {
     };
   }
 
-  protected static ContentValues getValuesForReminder(String path, Cursor cursor)
-      throws InvalidLocalComponentException
-  {
-    if (!cursor.isNull(0) && !cursor.isNull(1)) {
-      ContentValues values = new ContentValues(3);
+  public static Optional<ContentValues> getValuesForReminder(Cursor cursor) {
+    if (cursor.isNull(0) || cursor.isNull(1))
+      return Optional.absent();
 
-      values.put(CalendarContract.Reminders.EVENT_ID, cursor.getLong(0));
-      values.put(CalendarContract.Reminders.MINUTES,  cursor.getInt(1));
-      values.put(CalendarContract.Reminders.METHOD,   cursor.getInt(2));
-      return values;
-    }
+    ContentValues values = new ContentValues(3);
 
-    Log.e(TAG, "reminder event id or minutes is null");
-    throw new InvalidLocalComponentException("reminder event id or minutes is null",
-                                             CalDavConstants.CALDAV_NAMESPACE, path);
+    values.put(CalendarContract.Reminders.EVENT_ID, cursor.getLong(0));
+    values.put(CalendarContract.Reminders.MINUTES,  cursor.getInt(1));
+    values.put(CalendarContract.Reminders.METHOD,   cursor.getInt(2));
+
+    return Optional.of(values);
   }
 
-  protected static List<ContentValues> getValuesForReminders(Calendar component) {
+  public static List<ContentValues> getValuesForReminders(Calendar component) {
     List<ContentValues> valueList = new LinkedList<ContentValues>();
-    VEvent              vEvent = (VEvent) component.getComponent(VEvent.VEVENT);
-    VToDo               vToDo  = (VToDo)  component.getComponent(VToDo.VTODO);
+    VEvent              vEvent    = (VEvent) component.getComponent(VEvent.VEVENT);
+    VToDo               vToDo     = (VToDo)  component.getComponent(VToDo.VTODO);
     ComponentList       vAlarms;
 
     if (vEvent != null)
@@ -936,7 +935,7 @@ public class EventFactory {
         if (trigger != null && trigger.getDuration() != null) {
           ContentValues values = new ContentValues();
           values.put(CalendarContract.Reminders.MINUTES, (trigger.getDuration().getMinutes()));
-          values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
+          values.put(CalendarContract.Reminders.METHOD,  CalendarContract.Reminders.METHOD_ALERT);
           valueList.add(values);
         }
       }
@@ -946,33 +945,32 @@ public class EventFactory {
   }
 
   // TODO: can we support more alarm types?
-  protected static void addReminder(String path, Calendar component, ContentValues reminderValues)
-    throws InvalidLocalComponentException
-  {
+  public static void addReminder(Calendar component, ContentValues reminderValues) {
     Integer minutes = reminderValues.getAsInteger(CalendarContract.Reminders.MINUTES);
 
-    if (minutes != null) {
-      VAlarm       vAlarm     = new VAlarm(new Dur(0, 0, -minutes, 0));
-      PropertyList alarmProps = vAlarm.getProperties();
-
-      alarmProps.add(Action.DISPLAY);
-
-      VEvent vEvent = (VEvent) component.getComponent(VEvent.VEVENT);
-      VToDo  vToDo  = (VToDo) component.getComponent(VEvent.VTODO);
-
-      if (vEvent != null && vEvent.getSummary() != null) {
-        alarmProps.add(new Description(vEvent.getSummary().getValue()));
-        vEvent.getAlarms().add(vAlarm);
-      }
-      else if (vToDo != null && vToDo.getSummary() != null) {
-        alarmProps.add(new Description(vToDo.getSummary().getValue()));
-        vToDo.getAlarms().add(vAlarm);
-      }
+    if (minutes == null) {
+      Log.w(TAG, "reminder minutes is null, nothing to add.");
+      return;
     }
-    else {
-      Log.e(TAG, "reminder minutes is null");
-      throw new InvalidLocalComponentException("reminder minutes is null",
-                                               CalDavConstants.CALDAV_NAMESPACE, path, getUid(component));
+
+    VAlarm       vAlarm     = new VAlarm(new Dur(0, 0, -minutes, 0));
+    PropertyList alarmProps = vAlarm.getProperties();
+
+    alarmProps.add(Action.DISPLAY);
+
+    VEvent vEvent = (VEvent) component.getComponent(VEvent.VEVENT);
+    VToDo  vToDo  = (VToDo)  component.getComponent(VEvent.VTODO);
+
+    if (vEvent != null) {
+      if (vEvent.getSummary() != null)
+        alarmProps.add(new Description(vEvent.getSummary().getValue()));
+      vEvent.getAlarms().add(vAlarm);
+    }
+
+    else if (vToDo != null) {
+      if (vToDo.getSummary() != null)
+        alarmProps.add(new Description(vToDo.getSummary().getValue()));
+      vToDo.getAlarms().add(vAlarm);
     }
   }
 }
