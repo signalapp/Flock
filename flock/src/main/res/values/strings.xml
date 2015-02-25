@@ -87,7 +87,7 @@
     <string name="privacy_and_terms_of_service"><![CDATA[<a href="https://whispersystems.org/flock/legal.html">Privacy and Terms of Service</a>]]></string>
     <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">Flock Sync is a service run by Open Whisper Systems available for $%.2f/year. Evaluate at no charge for 30 days, no payment information required.</string>
     <string name="host_my_own">Host my own</string>
-    <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">You may chose to run and configure your own WebDAV-compliant server as a sync service. Before use with Flock the server must pass a series of tests.</string>
+    <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">You may choose to run and configure your own WebDAV-compliant server as a sync service. Before use with Flock the server must pass a series of tests.</string>
 
 
     <!-- SetupActivity, other server test -->
@@ -130,7 +130,7 @@
     <string name="do_you_have_a_flock_account">Do you have a Flock account?</string>
     <string name="yes_log_me_in">Yes, log me in</string>
     <string name="no_register_me">No, register me</string>
-    <string name="text_setup_account_with_other">Enter the URL and credentials for your WebDAV host then chose a separate password for encryption.</string>
+    <string name="text_setup_account_with_other">Enter the URL and credentials for your WebDAV host then choose a separate password for encryption.</string>
 
     <string name="hint_username">username</string>
     <string name="hint_password">password</string>
@@ -266,7 +266,7 @@
 
     <!-- DeleteAccountActivity -->
     <string name="title_unregister_account">Unregister account</string>
-    <string name="if_you_chose_to_unregister_your_account_all_flock">If you chose to unregister your account, all Flock contacts, calendars, and subscription history will be permanently deleted.</string>
+    <string name="if_you_chose_to_unregister_your_account_all_flock">If you choose to unregister your account, all Flock contacts, calendars, and subscription history will be permanently deleted.</string>
     <string name="are_you_sure_you_want_to_unregister_your_account">Are you sure you want to unregister your account?</string>
     <string name="account_has_been_unregistered">Account has been unregistered.</string>
 
@@ -274,7 +274,7 @@
     <!-- DeleteAllContactsActivity -->
     <string name="title_delete_all_contacts">Delete all contacts</string>
     <string name="all_contacts_have_been_deleted">All contacts have been deleted.</string>
-    <string name="if_you_chose_to_delete_your_flock_contacts">If you chose to delete your Flock contacts they will be removed from all devices using this Flock account.</string>
+    <string name="if_you_chose_to_delete_your_flock_contacts">If you choose to delete your Flock contacts they will be removed from all devices using this Flock account.</string>
     <string name="are_you_sure_you_want_to_delete_all_flock_contacts">Are you sure you want to delete all Flock contacts?</string>
 
     <!-- CorrectPasswordActivity -->
