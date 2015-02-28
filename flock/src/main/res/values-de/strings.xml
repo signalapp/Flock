@@ -1,21 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--
-  ~ Copyright (C) 2015 Open Whisper Systems
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
-  -->
-
 <resources>
   <string name="app_name">Flock</string>
   <string name="at_flock_sync">\@flock</string>
@@ -49,6 +32,7 @@
   <string name="notification_tap_to_correct_encryption_password">Antippen zur Korrektur des Verschlüsselungspassworts.</string>
   <string name="notification_flock_subscription_expired">Flock-Abonnement abgelaufen</string>
   <string name="notification_tap_to_update_subscription">Antippen zur Aktualisierung des Abonnements.</string>
+  <string name="account_will_be_deleted_in_days_tap_to_update_subscription">Ihr Benutzerkonto wird in %1$d Tagen gelöscht. Antippen zur Aktualisierung des Abonnements.</string>
   <!--status header stuff-->
   <string name="status_header_status_good">Alles funktioniert!</string>
   <string name="status_header_status_account_login_failed">Anmeldefehler</string>
@@ -66,38 +50,38 @@
   <!--SetupActivity, select service provider-->
   <string name="title_chose_sync_service">Sychronisationsdienst auswählen</string>
   <string name="flock_sync">Flock Sync</string>
-  <string name="privacy_and_terms_of_service"><![CDATA[<a href="https://whispersystems.org/flock/legal.html">Datenschutzerklärung und AGB</a>]]></string>
-  <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">Flock Sync ist ein Dienst von Open Whisper Systems, der für %.2f USD/Jahr zur Verfügung steht. Der Dienst kann 30 Tage ohne Angabe von Zahlungsinformationen getestet werden.</string>
+  <string name="privacy_and_terms_of_service"><![CDATA[<a href=\"https://whispersystems.org/flock/legal.html\">Datenschutzerklärung und AGB</a>]]></string>
+  <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">Flock Sync ist ein Dienst von Open Whisper Systems, der für %.2f USD/Jahr zur Verfügung steht. Der Dienst kann 30 Tage ohne Angabe von Zahlungsinformationen getestet werden. </string>
   <string name="host_my_own">Eigener Server</string>
   <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">Sie können einen eigenen, WebDAV-kompatiblen Server als Synchronisationsdienst verwenden. Vor der Nutzung mit Flock wird der Server auf Kompatibilität überprüft.</string>
   <!--SetupActivity, other server test-->
   <string name="title_server_tests">Serverüberprüfung</string>
-  <string name="tests_not_yet_started">Bitte Überprüfung starten…</string>
-  <string name="tests_interrupted">Die Überprüfung wurde abgebrochen…</string>
+  <string name="tests_not_yet_started">Überprüfung steht aus...</string>
+  <string name="tests_interrupted">Überprüfung abgebrochen…</string>
   <string name="stop_tests">Überprüfung beenden</string>
   <string name="restart_tests">Erneut prüfen</string>
-  <string name="tests_completed_successfully">Die Überprüfung wurde erfolgreich beendet!</string>
+  <string name="tests_completed_successfully">Überprüfung erfolgreich abgeschlossen!</string>
   <string name="test_dav_current_user_principal">DAV: Zugriffskontrolle</string>
   <string name="test_error_carddav_current_user_principal">Keine Serverunterstützung für \"CardDAV: Well-Known URI\" oder \"DAV: Zugriffskontrolle\".</string>
   <string name="test_error_caldav_current_user_principal">Keine Serverunterstützung für \"CalDAV: Well-Known URI\" oder \"DAV: Zugriffskontrolle\".</string>
   <string name="test_carddav_addressbook_homeset">CardDAV: Adressbuchabfrage</string>
-  <string name="test_error_carddav_addressbook_homeset">Der Server unterstützt keine CardDAV-Adressbuchabfrage.</string>
+  <string name="test_error_carddav_addressbook_homeset">Server unterstützt keine CardDAV-Adressbuchabfrage.</string>
   <string name="test_caldav_calendar_homeset">CalDAV: Kalenderabfrage</string>
-  <string name="test_error_caldav_calendar_homeset">Der Server unterstützt keine CalDAV-Kalenderabfrage.</string>
+  <string name="test_error_caldav_calendar_homeset">Server unterstützt keine CalDAV-Kalenderabfrage.</string>
   <string name="test_caldav_create_and_delete_collections">CalDAV: Kalenderverwaltung</string>
-  <string name="test_error_caldav_create_and_delete_collections">Der Server unterstützt nicht das Erstellen und Löschen von Kalendern.</string>
+  <string name="test_error_caldav_create_and_delete_collections">Server unterstützt nicht das Erstellen und Löschen von Kalendern.</string>
   <string name="test_caldav_create_and_edit_collection_properties">DAV: Eigenschaften</string>
-  <string name="test_error_caldav_create_and_edit_collection_properties">Der Server unterstützt nicht das Erstellen und Bearbeiten von DAV-Eigenschaften.</string>
+  <string name="test_error_caldav_create_and_edit_collection_properties">Server unterstützt nicht das Erstellen und Bearbeiten von DAV-Eigenschaften.</string>
   <string name="test_carddav_create_and_delete_contacts">CardDAV: Kontaktverwaltung</string>
-  <string name="test_error_carddav_create_and_delete_contacts">Der Server unterstützt nicht das Erstellen und Löschen von Kontakten.</string>
+  <string name="test_error_carddav_create_and_delete_contacts">Server unterstützt nicht das Erstellen und Löschen von Kontakten.</string>
   <string name="test_caldav_create_and_delete_events">CalDAV: Terminverwaltung</string>
-  <string name="test_error_caldav_create_and_delete_events">Der Server unterstützt nicht das Erstellen und Löschen von Kalenderterminen.</string>
+  <string name="test_error_caldav_create_and_delete_events">Server unterstützt nicht das Erstellen und Löschen von Kalenderterminen.</string>
   <!--SetupActivity, setup account-->
-  <string name="title_import_account">Konto importieren</string>
-  <string name="title_register_account">Konto anlegen</string>
-  <string name="title_setup_account">Konto einrichten</string>
-  <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">Wählen Sie einen Benutzernamen und ein starkes Passwort für die Verschlüsselung Ihrer Benutzerdaten.</string>
-  <string name="do_you_have_a_flock_account">Haben Sie bereits ein Flock-Konto?</string>
+  <string name="title_import_account">Benutzerkonto importieren</string>
+  <string name="title_register_account">Benutzerkonto erstellen</string>
+  <string name="title_setup_account">Benutzerkonto einrichten</string>
+  <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">Wählen Sie einen Benutzernamen und ein starkes Passwort für die Verschlüsselung Ihrer Daten. Ein vergessenes Passwort kann nicht zurückgesetzt werden!</string>
+  <string name="do_you_have_a_flock_account">Haben Sie bereits ein Flock-Benutzerkonto?</string>
   <string name="yes_log_me_in">Ja</string>
   <string name="no_register_me">Nein</string>
   <string name="text_setup_account_with_other">Geben Sie die URL und die Zugangsdaten für Ihren WebDAV-Host ein und wählen Sie dann ein Passwort für die Verschlüsselung.</string>
@@ -108,8 +92,8 @@
   <string name="hint_href_webdav_host">https://beispiel.de</string>
   <string name="hint_encryption_password">Verschlüsselungspasswort</string>
   <string name="hint_repeat_encryption_password">Verschlüsselungspasswort wiederholen</string>
-  <string name="registering_account">Konto wird angelegt...</string>
-  <string name="account_register_failed">Das Anlegen des Kontos ist fehlgeschlagen.</string>
+  <string name="registering_account">Benutzerkonto wird erstellt...</string>
+  <string name="account_register_failed">Kontoerstellung fehlgeschlagen.</string>
   <string name="importing_contacts_and_calendars">Kontakte und Kalender werden importiert…</string>
   <string name="account_import_completed_with_errors">Kontoimport mit Fehlern abgeschlossen.</string>
   <string name="account_import_failed">Kontoimport fehlgeschlagen.</string>
@@ -134,12 +118,12 @@
   <string name="hint_display_name">Anzeigename</string>
   <string name="heading_display_name">Anzeigename</string>
   <string name="heading_sync">Synchronisation</string>
-  <string name="display_name_cannot_be_empty">Der Anzeigename darf nicht leer sein.</string>
+  <string name="display_name_cannot_be_empty">Anzeigename darf nicht leer sein.</string>
   <!--My addressbooks-->
   <string name="title_my_addressbooks">Adressbücher</string>
   <string name="title_edit_selected_addressbooks">Ausgewählte Adressbücher bearbeiten</string>
   <string name="title_addressbook_properties">Adressbucheigenschaften</string>
-  <string name="addressbooks_selected">Ausgewählte Adressbücher</string>
+  <string name="addressbooks_selected">Adressbücher ausgewählt</string>
   <string name="are_you_sure_you_want_to_delete_selected_addressbooks">Sollen die ausgewählten Adressbücher wirklich gelöscht werden?</string>
   <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">Unsynchronisierte Adressbücher können nicht bearbeitet werden.</string>
   <!--My calendars-->
@@ -147,31 +131,31 @@
   <string name="title_edit_selected_calendars">Ausgewählte Kalender bearbeiten</string>
   <string name="title_calendar_properties">Kalendereigenschaften</string>
   <string name="title_delete_selected_calendars_dialog">Ausgewählte Kalender löschen?</string>
-  <string name="calendars_selected">Ausgewählte Kalender</string>
+  <string name="calendars_selected">Kalender ausgewählt</string>
   <string name="are_you_sure_you_want_to_delete_selected_calendars">Sollen die ausgewählten Kalender wirklich gelöscht werden?</string>
   <string name="you_cannot_edit_calendars_that_have_not_been_synced">Unsychronisierte Kalender können nicht bearbeitet werden.</string>
   <!--PreferencesActivity-->
   <string name="title_flock_settings">Flock-Einstellungen</string>
   <string name="preference_group_sync">Synchronisation</string>
   <string name="preference_title_sync_frequency">Synchronisationshäufigkeit</string>
-  <string name="preference_title_sync_on_content_change">Synchronisation bei Veränderung</string>
-  <string name="preference_description_sync_on_content_change">Kontakte und Kalender synchronisieren sobald diese verändert werden.</string>
+  <string name="preference_title_sync_on_content_change">Synchronisation bei Änderung</string>
+  <string name="preference_description_sync_on_content_change">Kontakte und Kalender bei Veränderung sofort synchronisieren</string>
   <string name="preference_title_sync_now">Jetzt synchronisieren</string>
-  <string name="sync_requested_will_begin_when_possible">Die Synchronisation wird sobald wie möglich beginnen</string>
+  <string name="sync_requested_will_begin_when_possible">Die Synchronisation beginnt so bald wie möglich</string>
   <string name="preference_group_contacts">Kontakte</string>
   <string name="preference_group_calendars">Kalender</string>
   <string name="preference_title_default_calendar_color">Standardkalenderfarbe</string>
   <string name="minutes">Minuten</string>
   <string name="new_calendars_will_be">Neue Kalender werden %1$s sein</string>
-  <string name="preference_group_account">Konto</string>
+  <string name="preference_group_account">Benutzerkonto</string>
   <!--ChangeEncryptionPasswordActivity-->
   <string name="title_change_encryption_password">Verschlüsselungspasswort ändern</string>
   <string name="button_save_password">Passwort speichern</string>
   <string name="hint_new_password">Neues Passwort</string>
   <string name="hint_new_password_repeat">Neues Passwort wiederholen</string>
-  <string name="encryption_password_saved">Verschlüsselungspasswort wurde gespeichert!</string>
+  <string name="encryption_password_saved">Verschlüsselungspasswort gespeichert!</string>
   <string name="updating_encryption_secrets">Verschlüsselungsmerkmale werden aktualisiert…</string>
-  <string name="password_change_failed">Der Passwortwechsel ist fehlgeschlagen.</string>
+  <string name="password_change_failed">Passwortänderung fehlgeschlagen.</string>
   <!--ManageSubscriptionActivity-->
   <string name="title_manage_subscription">Abonnement verwalten</string>
   <string name="days_remain">verbleibende Tage</string>
@@ -184,12 +168,12 @@
   <string name="cancel_subscription">Abonnement kündigen</string>
   <string name="are_you_sure_you_want_to_cancel_your_flock_subscription">Sind Sie sicher, dass Sie Ihr Abonnement für Flock kündigen möchten?</string>
   <string name="your_subscription_is_active_well_charge_you_again_in_days">Ihr Abonnement ist aktiv. Die nächste Abbuchung wird in %1$d Tagen stattfinden.</string>
-  <string name="google_play_error_please_update_google_play_services">Fehler bei Google Play. Bitte aktualisieren Sie die Google Play Services.</string>
-  <string name="purchase_failed_check_your_google_wallet">Kauf fehlgeschlagen. Bitte überprüfen Sie Ihr Google Wallet</string>
+  <string name="google_play_error_please_update_google_play_services">Fehler bei Google Play. Bitte Google Play Services aktualisieren.</string>
+  <string name="purchase_failed_check_your_google_wallet">Kauf fehlgeschlagen. Bitte Google Wallet überprüfen.</string>
   <!--EditAutoRenewActivity-->
   <string name="usd_per_year">%.2f USD/Jahr</string>
   <string name="save_card">Karte speichern</string>
-  <string name="card_verified_and_saved">Die Karte wurde überprüft und gespeichert!</string>
+  <string name="card_verified_and_saved">Karte überprüft und gespeichert!</string>
   <string name="subscription_canceled">Abonnement gekündigt</string>
   <string name="hint_card_cvc">CVC</string>
   <string name="hint_card_expiration">MM/JJ</string>
@@ -197,18 +181,18 @@
   <!--SendBitcoinActivity-->
   <string name="title_send_bitcoin">Bitcoin senden</string>
   <string name="mBTC_to">mBTC an</string>
-  <string name="address_copied_to_clipboard">Adresse wurde in der Zwischenablage gespeichert.</string>
-  <string name="bitcoin_received">Bitcoins wurden empfangen!</string>
-  <string name="minutes_until_address_expires">Minuten bis die Adresse abläuft</string>
+  <string name="address_copied_to_clipboard">Adresse in der Zwischenablage gespeichert.</string>
+  <string name="bitcoin_received">Bitcoins empfangen!</string>
+  <string name="minutes_until_address_expires">Minuten bis zum Ablauf der Adresse</string>
   <!--DeleteAccountActivity-->
-  <string name="title_unregister_account">Konto löschen</string>
-  <string name="if_you_chose_to_unregister_your_account_all_flock">Bei Löschung des Kontos werden alle Flock-Kontakte und -Kalender sowie die Zahlungshistorie unwiderruflich gelöscht.</string>
-  <string name="are_you_sure_you_want_to_unregister_your_account">Möchten Sie das Konto wirklich löschen?</string>
-  <string name="account_has_been_unregistered">Das Konto wurde gelöscht.</string>
+  <string name="title_unregister_account">Benutzerkonto löschen</string>
+  <string name="if_you_chose_to_unregister_your_account_all_flock">Bei Löschung des Benutzerkontos werden alle Flock-Kontakte und -Kalender sowie der Zahlungsverlauf unwiderruflich gelöscht.</string>
+  <string name="are_you_sure_you_want_to_unregister_your_account">Möchten Sie das Benutzerkonto wirklich löschen?</string>
+  <string name="account_has_been_unregistered">Benutzerkonto gelöscht.</string>
   <!--DeleteAllContactsActivity-->
   <string name="title_delete_all_contacts">Alle Kontakte löschen</string>
-  <string name="all_contacts_have_been_deleted">Es wurden alle Kontakte gelöscht.</string>
-  <string name="if_you_chose_to_delete_your_flock_contacts">Bei Löschung von Flock-Kontakten werden diese auch von allen anderen Geräten mit diesem Flock-Konto gelöscht.</string>
+  <string name="all_contacts_have_been_deleted">Alle Kontakte gelöscht.</string>
+  <string name="if_you_chose_to_delete_your_flock_contacts">Bei Löschung von Flock-Kontakten werden diese auch von allen anderen mit diesem Flock-Konto verbundenen Geräten gelöscht.</string>
   <string name="are_you_sure_you_want_to_delete_all_flock_contacts">Möchten Sie wirklich alle Flock-Kontakte löschen?</string>
   <!--CorrectPasswordActivity-->
   <string name="title_correct_sync_password">Synchronisationspasswort korrigieren</string>
@@ -217,7 +201,7 @@
   <!--CorrectEncryptionPasswordActivity-->
   <string name="title_correct_encryption_password">Verschlüsselungspasswort korrigieren</string>
   <string name="encryption_password_is_invalid_please_correct_your_encryption_password">Das Verschlüsselungspasswort ist ungültig. Bitte korrigieren Sie es.</string>
-  <string name="password_corrected">Das Passwort wurde aktualisiert!</string>
+  <string name="password_corrected">Passwort aktualisiert!</string>
   <!--SendDebugLogActivity-->
   <string name="send_debug_log">Diagnoseprotokoll senden</string>
   <string name="flock_debug_log">Diagnoseprotokoll</string>
@@ -225,7 +209,7 @@
   <string name="dont_ask_again">Nicht erneut fragen</string>
   <string name="send_log">Protokoll senden</string>
   <!--ErrorToaster messages-->
-  <string name="error_login_unauthorized">Die Anmeldung ist fehlgeschlagen. Ungültige Zugangsdaten</string>
+  <string name="error_login_unauthorized">Anmeldung fehlgeschlagen. Ungültige Zugangsdaten.</string>
   <string name="error_registration_api_server_error">Fehler bei unseren Registrierungsservern. Entschuldigung.</string>
   <string name="error_registration_api_client_error">API-Fehler bei der Registrierung. Bitte ein Diagnoseprotokoll senden.</string>
   <string name="error_our_dav_server_error">Fehler bei unseren Synchronisationsservern. Entschuldigung.</string>
@@ -238,21 +222,21 @@
   <string name="error_invalid_encryption_password">Ungültiges Verschlüsselungspasswort.</string>
   <string name="error_invalid_mac_error">Entschlüsselungsfehler. Bitte ein Diagnoseprotokoll senden.</string>
   <string name="error_unknown_crypto_error">Unbekannter Kryptografiefehler Bitte ein Diagnoseprotokoll senden.</string>
-  <string name="error_url_cannot_be_empty">Die URL darf nicht leer sein</string>
-  <string name="error_username_empty">Der Benutzername darf nicht leer sein.</string>
-  <string name="error_spaces_in_username">Der Benutzername darf keine Leerzeichen enthalten.</string>
-  <string name="error_username_illegal">Der Benutzername muss ein \"@\" enthalten und aus mindestens 5 Zeichen bestehen.</string>
-  <string name="error_passwords_do_not_match">Die Passwörter stimmen nicht überein.</string>
-  <string name="error_password_too_short">Das Passwort ist zu kurz!</string>
-  <string name="error_username_already_registered">Der Benutzername ist bereits registriert. Bitte einen anderen wählen.</string>
-  <string name="error_card_number_could_not_be_verified">Die Kreditkartennummer konnte nicht überprüft werden</string>
-  <string name="error_card_expiration_could_not_be_verified">Das Ablaufdatum der Kreditkarte konnte nicht überprüft werden</string>
-  <string name="error_card_security_code_could_not_be_verified">Der Sicherheitscode der Kreditkarte konnte nicht überprüft werden</string>
+  <string name="error_url_cannot_be_empty">URL darf nicht leer sein.</string>
+  <string name="error_username_empty">Benutzername darf nicht leer sein.</string>
+  <string name="error_spaces_in_username">Benutzername darf keine Leerzeichen enthalten.</string>
+  <string name="error_username_illegal">Benutzername muss ein \"@\" enthalten und aus mindestens 5 Zeichen bestehen.</string>
+  <string name="error_passwords_do_not_match">Passwörter stimmen nicht überein.</string>
+  <string name="error_password_too_short">Passwort ist zu kurz!</string>
+  <string name="error_username_already_registered">Benutzername ist bereits registriert. Bitte einen anderen wählen.</string>
+  <string name="error_card_number_could_not_be_verified">Kreditkartennummer konnte nicht überprüft werden</string>
+  <string name="error_card_expiration_could_not_be_verified">Ablaufdatum der Kreditkarte konnte nicht überprüft werden</string>
+  <string name="error_card_security_code_could_not_be_verified">Sicherheitscode der Kreditkarte konnte nicht überprüft werden</string>
   <string name="error_your_card_could_not_be_verified">Ihre Kreditkarte konnte nicht überprüft werden</string>
   <string name="error_stripe_api_error">Unbekannter Fehler bei der Zahlung. Bitte erneut versuchen oder ein Diagnoseprotokoll senden.</string>
   <string name="error_android_account_manager_error">Unerwarteter Fehler in Androids Kontenverwaltung!</string>
   <!--misc errors-->
-  <string name="error_multiple_accounts_not_allowed">Flock-Nutzer können nur ein Konto haben.</string>
-  <string name="error_no_account_is_registered">Mit diesem Gerät ist kein Konto verbunden.</string>
-  <string name="error_password_unavailable_please_login">Das Passwort ist nicht verfügbar. Bitte anmelden.</string>
+  <string name="error_multiple_accounts_not_allowed">Flock-Nutzer können nur ein Benutzerkonto haben.</string>
+  <string name="error_no_account_is_registered">Dieses Gerät ist mit keinem Benutzerkonto verbunden.</string>
+  <string name="error_password_unavailable_please_login">Passwort ist nicht verfügbar. Bitte anmelden.</string>
 </resources>

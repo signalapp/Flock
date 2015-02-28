@@ -49,6 +49,7 @@
   <string name="notification_tap_to_correct_encryption_password">タップして暗号化パスワードを修正してください。</string>
   <string name="notification_flock_subscription_expired">Flock のサブスクリプションが期限切れです</string>
   <string name="notification_tap_to_update_subscription">タップしてサブスクリプションを更新してください。</string>
+  <string name="account_will_be_deleted_in_days_tap_to_update_subscription">あなたのアカウントは %1$d 日で削除されます。タップすると、サブスクリプションを更新します。</string>
   <!--status header stuff-->
   <string name="status_header_status_good">すべて動作しています!</string>
   <string name="status_header_status_account_login_failed">アカウントのログインに失敗しました</string>
@@ -67,7 +68,7 @@
   <string name="title_chose_sync_service">同期サービスを選択</string>
   <string name="flock_sync">Flock 同期</string>
   <string name="privacy_and_terms_of_service"><![CDATA[<a href="https://whispersystems.org/flock/legal.html">プライバシーと利用規約</a>]]></string>
-  <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">Flock 同期は Open Whisper Systems により実行される $%.2f/年 で利用できるサービスです。無償で30日間評価してください。支払情報は必要ありません。</string>
+  <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">Flock 同期は Open Whisper Systems が運営するサービスで $%.2f/年 で利用できます。 30 日間無償で評価してください。支払情報は必要ありません。</string>
   <string name="host_my_own">自分独自のホスト</string>
   <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">あなたは同期サービスとして独自に WebDAV 準拠のサーバーを実行および構成することを選択することができます。Flock で使用する前に、サーバーが一連のテストに合格する必要があります。</string>
   <!--SetupActivity, other server test-->
@@ -96,7 +97,7 @@
   <string name="title_import_account">アカウントのインポート</string>
   <string name="title_register_account">アカウントの登録</string>
   <string name="title_setup_account">アカウントのセットアップ</string>
-  <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">あなたのアカウントのユーザー名と、あなたのデータを暗号化するための強力なパスワードを選択してください。</string>
+  <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">データを暗号化するため、ユーザー名と強力なパスワードを選択してください。パスワードを忘れた場合はリセットできません。</string>
   <string name="do_you_have_a_flock_account">Flock アカウントをお持ちですか?</string>
   <string name="yes_log_me_in">はい、ログインします</string>
   <string name="no_register_me">いいえ、登録します</string>

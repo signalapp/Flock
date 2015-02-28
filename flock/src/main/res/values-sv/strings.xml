@@ -1,0 +1,242 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name">Flock</string>
+  <string name="at_flock_sync">\@flock</string>
+  <string name="support_email_address">rhodey@anhonesteffort.org</string>
+  <string name="begin">Börja</string>
+  <string name="next">Nästa</string>
+  <string name="skip">Hoppa över</string>
+  <string name="previous">Föregående</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Avbryt</string>
+  <string name="thanks">tack!</string>
+  <string name="yes">Ja</string>
+  <string name="no">Nej</string>
+  <string name="days">dagar</string>
+  <string name="addressbook">adressbok</string>
+  <string name="display_name_missing">Visningsnamn saknas</string>
+  <!--Notifications-->
+  <string name="notification_contact_import">Importera kontakter</string>
+  <string name="notification_importing_contacts">Importerar kontakter.</string>
+  <string name="notification_importing_contacts_from">Importerar kontakter från %1$s</string>
+  <string name="notification_import_complete_copied_contacts">Import färdig, kopierade %1$d kontakter.</string>
+  <string name="notification_import_complete_copied_contacts_failed">Import färdig, kopierade %1$d kontakter, %2$d misslyckades.</string>
+  <string name="notification_calendar_import">Importera kalender</string>
+  <string name="notification_importing_calendars">Importerar kalendrar.</string>
+  <string name="notification_importing_events_from">Importerar händelser från %1$s</string>
+  <string name="notification_import_complete_copied_events">Import färdig, kopierade %1$d händelser.</string>
+  <string name="notification_import_complete_copied_events_failed">Import färdig, kopierade %1$d händelser, %2$d misslyckades.</string>
+  <string name="notification_flock_login_error">Flock inloggningsfel</string>
+  <string name="notification_tap_to_correct_password">Tryck för att ange lösenord.</string>
+  <string name="notification_flock_encryption_error">Flock krypteringsfel</string>
+  <string name="notification_tap_to_correct_encryption_password">Tryck för att ange krypteringslösenord.</string>
+  <string name="notification_flock_subscription_expired">Flock-prenumeration utgången</string>
+  <string name="notification_tap_to_update_subscription">Tryck för att uppdatera prenumeration.</string>
+  <string name="account_will_be_deleted_in_days_tap_to_update_subscription">Ditt konto kommer att tas bort om %1$d dagar, klicka för att uppdatera prenumeration.</string>
+  <!--status header stuff-->
+  <string name="status_header_status_good">Allting fungerar!</string>
+  <string name="status_header_status_account_login_failed">Kontoinloggning misslyckades</string>
+  <string name="status_header_status_encryption_password_incorrect">Krypteringslösenord felaktigt</string>
+  <string name="status_header_status_sync_disabled">Android synk inaktiverad!</string>
+  <string name="status_header_status_auto_renew_error">Fel med automatisk förnyelse av prenumeration</string>
+  <string name="status_header_status_our_sync_service_error">Synk tillfälligt otillgänglig...</string>
+  <string name="status_header_status_their_sync_service_error">Fel i WebDAB-servern</string>
+  <string name="status_header_status_registration_service_error">Registreringstjänsten tillfälligt otillgänglig...</string>
+  <string name="status_header_sync_time">Synkroniserades senast den %1$s</string>
+  <string name="status_header_sync_in_progress">Synk pågår...</string>
+  <!--SetupActivity, intro-->
+  <string name="welcome_to_flock">Välkommen till Flock!</string>
+  <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock synkroniserar dina kontakter och kalendrar mellan flera enheter och skyddar samtidigt din integritet med stark kryptering.</string>
+  <!--SetupActivity, select service provider-->
+  <string name="title_chose_sync_service">Välj synktjänst</string>
+  <string name="flock_sync">Flock Synk</string>
+  <string name="privacy_and_terms_of_service"><![CDATA[<a href=\"https://whispersystems.org/flock/legal.html\">Integritet och villkor för tjänsten</a>]]></string>
+  <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">Flock Synk är en tjänst från Open Whispter Systems tillgänglig för $%.2f/år. Utvärdera kostnadsfritt i 30 dagar, ingen betalningsinformation krävs.</string>
+  <string name="host_my_own">Använd min egen server</string>
+  <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">Du kan välja att köra och konfigurera din egen WebDAV-kompaitbla server som synkroniseringstjänst. Innan servern används med Flock måste den klara en serie av tester.</string>
+  <!--SetupActivity, other server test-->
+  <string name="title_server_tests">Servertester</string>
+  <string name="tests_not_yet_started">Tester har inte startats ännu...</string>
+  <string name="tests_interrupted">Tester avbrutna...</string>
+  <string name="stop_tests">Stoppa tester</string>
+  <string name="restart_tests">Starta tester</string>
+  <string name="tests_completed_successfully">Testerna lyckades!</string>
+  <string name="test_dav_current_user_principal">DAV: current-user-principal</string>
+  <string name="test_error_carddav_current_user_principal">Servern stöder inte CardDAV well-known URI eller DAV: current-user-principal.</string>
+  <string name="test_error_caldav_current_user_principal">Servern stöder inte CalDAV well-known URI eller DAV: current-user-principal.</string>
+  <string name="test_carddav_addressbook_homeset">CardDAV: addressbook-homeset</string>
+  <string name="test_error_carddav_addressbook_homeset">Servern stöder inte CardDAV: addressbook-homeset.</string>
+  <string name="test_caldav_calendar_homeset">CalDAV: calendar-homeset</string>
+  <string name="test_error_caldav_calendar_homeset">Servern stöder inte CalDAV: calendar-homeset.</string>
+  <string name="test_caldav_create_and_delete_collections">DAV: skapa och radera samling</string>
+  <string name="test_error_caldav_create_and_delete_collections">Servern stöder inte att skapa och radera kalendersamlingar.</string>
+  <string name="test_caldav_create_and_edit_collection_properties">DAV: redigera samlingsegenskaper</string>
+  <string name="test_error_caldav_create_and_edit_collection_properties">Servern stöder inte skapande av DAV samlingsegenskaper.</string>
+  <string name="test_carddav_create_and_delete_contacts">CardDAV: skapa och radera kontakter</string>
+  <string name="test_error_carddav_create_and_delete_contacts">Servern stöder inte skapande och borttagning av kontakter.</string>
+  <string name="test_caldav_create_and_delete_events">CalDAV: skapa och ta bort händelser</string>
+  <string name="test_error_caldav_create_and_delete_events">Servern stöder inte skapande och borttagning av kalenderhändelser.</string>
+  <!--SetupActivity, setup account-->
+  <string name="title_import_account">Importera konto</string>
+  <string name="title_register_account">Registrera konto</string>
+  <string name="title_setup_account">Konfigurera konto</string>
+  <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">Välj ett användarnamn och ett starkt lösenord att kryptera din data med. Om du glömmer ditt lösenord kan det inte återställas.</string>
+  <string name="do_you_have_a_flock_account">Har du ett Flockkonto?</string>
+  <string name="yes_log_me_in">Ja, logga in mig</string>
+  <string name="no_register_me">Nej, registrera mig</string>
+  <string name="text_setup_account_with_other">Ange URL och uppgifter till din WebDAV-server och välj sen ett separat lösenord för kryptering.</string>
+  <string name="hint_username">användarnamn</string>
+  <string name="hint_password">lösenord</string>
+  <string name="hint_current_password">nuvarande lösenord</string>
+  <string name="hint_repeat_password">upprepa lösenord</string>
+  <string name="hint_href_webdav_host">https://example.com</string>
+  <string name="hint_encryption_password">krypteringslösenord</string>
+  <string name="hint_repeat_encryption_password">upprepa krypteringslösenord</string>
+  <string name="registering_account">registrera konto...</string>
+  <string name="account_register_failed">Kontoregistrering misslyckades.</string>
+  <string name="importing_contacts_and_calendars">Importerar kontakter och kalendrar...</string>
+  <string name="account_import_completed_with_errors">Import av konton avslutades med fel.</string>
+  <string name="account_import_failed">Import av konto misslyckades.</string>
+  <string name="importing_encryption_secrets">Importerar krypteringshemligheter...</string>
+  <!--SetupActivity, import-->
+  <string name="button_import">Importera</string>
+  <string name="local_storage">Lokal lagring</string>
+  <!--SetupActivity, import contacts-->
+  <string name="select_accounts_to_import_contacts_from">Välj konton att importera kontakter från</string>
+  <string name="contacts">kontakter</string>
+  <string name="title_import_contacts">Importera kontakter</string>
+  <string name="started_background_import_of_contacts">Påbörjade bakgrundsimport av %1$d kontakter</string>
+  <!--SetupActivity, import calendars-->
+  <string name="select_calendars_to_import">Välj kalendrar att importera</string>
+  <string name="title_import_calendars">Importera kalendrar</string>
+  <string name="started_background_import_of_calendars">Påbörjade bakgrundsimport av %1$d kalendrar</string>
+  <!--SetupActivity, select remote addressbook and calendars-->
+  <string name="select_a_single_remote_addressbook_in_which_to_store">Välj en enskild fjärradressbok att lagra Flock-kontakter i.</string>
+  <string name="select_the_calendars_you_would_like_to_sync_with_this_device">Välj de kalendrar du vill synka med den här enheten.</string>
+  <string name="setup_complete">Installation färdig!</string>
+  <!--My calendars and my addressbooks...-->
+  <string name="hint_display_name">visningsnamn</string>
+  <string name="heading_display_name">Visningsnamn</string>
+  <string name="heading_sync">Synk</string>
+  <string name="display_name_cannot_be_empty">Visningsnamn kan inte vara tomt.</string>
+  <!--My addressbooks-->
+  <string name="title_my_addressbooks">Mina adressböcker</string>
+  <string name="title_edit_selected_addressbooks">Redigera valda adressböcker</string>
+  <string name="title_addressbook_properties">Egenskaper för adressbok</string>
+  <string name="addressbooks_selected">valda adressböcker</string>
+  <string name="are_you_sure_you_want_to_delete_selected_addressbooks">Är det säkert att du vill radera valda adressböcker?</string>
+  <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">Du kan inte redigera adressböcker som inte har synkroniserats.</string>
+  <!--My calendars-->
+  <string name="title_my_calendars">Mina kalendrar</string>
+  <string name="title_edit_selected_calendars">Redigera valda kalendrar</string>
+  <string name="title_calendar_properties">Egenskaper för kalender</string>
+  <string name="title_delete_selected_calendars_dialog">Radera valda kalendrar?</string>
+  <string name="calendars_selected">valda kalendrar</string>
+  <string name="are_you_sure_you_want_to_delete_selected_calendars">Är det säkert att du vill radera valda kalendrar?</string>
+  <string name="you_cannot_edit_calendars_that_have_not_been_synced">Du kan inte redigera kalendrar som inte har synkroniserats.</string>
+  <!--PreferencesActivity-->
+  <string name="title_flock_settings">Flock inställningar</string>
+  <string name="preference_group_sync">Synk</string>
+  <string name="preference_title_sync_frequency">Synkfrekvens</string>
+  <string name="preference_title_sync_on_content_change">Synka vid förändring</string>
+  <string name="preference_description_sync_on_content_change">Synkronisera kontakter och kalendrar så fort de förändras</string>
+  <string name="preference_title_sync_now">Synka nu</string>
+  <string name="sync_requested_will_begin_when_possible">Synk begärd, kommer att börja när det är möjligt</string>
+  <string name="preference_group_contacts">Kontakter</string>
+  <string name="preference_group_calendars">Kalendrar</string>
+  <string name="preference_title_default_calendar_color">Standardfärg på kalender</string>
+  <string name="minutes">minuter</string>
+  <string name="new_calendars_will_be">Nya kalendrar kommer att bli %1$s</string>
+  <string name="preference_group_account">Konto</string>
+  <!--ChangeEncryptionPasswordActivity-->
+  <string name="title_change_encryption_password">Ändra krypteringslösenord</string>
+  <string name="button_save_password">Spara lösenord</string>
+  <string name="hint_new_password">nytt lösenord</string>
+  <string name="hint_new_password_repeat">upprepa nytt lösenord</string>
+  <string name="encryption_password_saved">Krypteringslösenord sparat!</string>
+  <string name="updating_encryption_secrets">uppdaterar krypteringshemligheter...</string>
+  <string name="password_change_failed">lösenordsbyte misslyckades.</string>
+  <!--ManageSubscriptionActivity-->
+  <string name="title_manage_subscription">Hantera prenumerationer</string>
+  <string name="days_remain">dagar återstår</string>
+  <string name="google_play">Google Play</string>
+  <string name="credit_card">Kreditkort</string>
+  <string name="when_subscribed_your_card_will_be_charged_once_per_year">När du prenumererar kommer ditt kort att belastas en gång per år och du kan avbryta när som helst.</string>
+  <string name="subscription_is_active">Prenumerationen är aktiv</string>
+  <string name="payment_failed">Betalning misslyckades</string>
+  <string name="start_subscription">Starta prenumeration</string>
+  <string name="cancel_subscription">Avsluta prenumeration</string>
+  <string name="are_you_sure_you_want_to_cancel_your_flock_subscription">Är du säker på att du vill avsluta din Flockprenumeration?</string>
+  <string name="your_subscription_is_active_well_charge_you_again_in_days">Din prenumeration är aktiv, vi kommer att debitera dig igen om %1$d dagar.</string>
+  <string name="google_play_error_please_update_google_play_services">Google Play-fel, vänligen uppdatera Google Play Services.</string>
+  <string name="purchase_failed_check_your_google_wallet">köp misslyckades, kontrollera din Google Wallet</string>
+  <!--EditAutoRenewActivity-->
+  <string name="usd_per_year">$%.2f/år</string>
+  <string name="save_card">Spara kort</string>
+  <string name="card_verified_and_saved">Kort verifierat och sparat!</string>
+  <string name="subscription_canceled">Prenumeration avslutad</string>
+  <string name="hint_card_cvc">CVC</string>
+  <string name="hint_card_expiration">MM/ÅÅ</string>
+  <string name="hint_card_number">5555 5555 5555 5555</string>
+  <!--SendBitcoinActivity-->
+  <string name="title_send_bitcoin">Skicka bitcoin</string>
+  <string name="mBTC_to">mBTC till</string>
+  <string name="address_copied_to_clipboard">Adress kopierad till urklipp.</string>
+  <string name="bitcoin_received">Bitcoin mottagna!</string>
+  <string name="minutes_until_address_expires">minuter innan adressen upphör</string>
+  <!--DeleteAccountActivity-->
+  <string name="title_unregister_account">Avregistrera konto</string>
+  <string name="if_you_chose_to_unregister_your_account_all_flock">Om du väljer att avregistrera ditt konto kommer alla Flock-kontakter, kalendrar och prenumerationshistorik att raderas permanent.</string>
+  <string name="are_you_sure_you_want_to_unregister_your_account">Är det säkert att du vill avregistrera ditt konto?</string>
+  <string name="account_has_been_unregistered">Kontot har avregistrerats.</string>
+  <!--DeleteAllContactsActivity-->
+  <string name="title_delete_all_contacts">Radera alla kontakter</string>
+  <string name="all_contacts_have_been_deleted">Alla kontakter har raderats.</string>
+  <string name="if_you_chose_to_delete_your_flock_contacts">Om du väljer att radera dina Flock-kontakter kommer de att tas bort från alla enheter som använder detta Flock-konto.</string>
+  <string name="are_you_sure_you_want_to_delete_all_flock_contacts">Är det säkert att du vill radera alla Flock-kontakter?</string>
+  <!--CorrectPasswordActivity-->
+  <string name="title_correct_sync_password">Rätta till synklösenord</string>
+  <string name="unable_to_login_to_sync_service_please_correct_your_password">Kan inte logga in till synktjänsten, vänligen rätta till ditt lösenord.</string>
+  <string name="login_successful">Inloggning lyckades!</string>
+  <!--CorrectEncryptionPasswordActivity-->
+  <string name="title_correct_encryption_password">Rätta till krypteringslösenord</string>
+  <string name="encryption_password_is_invalid_please_correct_your_encryption_password">Krypteringslösenord är felaktigt, vänligen rätta till ditt krypteringslösenord.</string>
+  <string name="password_corrected">Lösenordet har rättats till!</string>
+  <!--SendDebugLogActivity-->
+  <string name="send_debug_log">Skicka felsökningslogg</string>
+  <string name="flock_debug_log">Flock felsökningslogg</string>
+  <string name="something_strange_happened_send_us_your_debug_log">Någonting konstigt hände, skicka oss din felsökningslogg så kan vi fixa det.</string>
+  <string name="dont_ask_again">Fråga inte igen</string>
+  <string name="send_log">Skicka logg</string>
+  <!--ErrorToaster messages-->
+  <string name="error_login_unauthorized">Inloggning misslyckades. Felaktigt användarnamn eller lösenord</string>
+  <string name="error_registration_api_server_error">Våra registreringsservrar har problem, förlåt.</string>
+  <string name="error_registration_api_client_error">Klientregistrering API-fel, vänligen skicka felsökningsloggar.</string>
+  <string name="error_our_dav_server_error">Våra synkservrar har problem, förlåt.</string>
+  <string name="error_their_dav_server_error">Din synkserver beter sig inte som förväntat, kontrollera felsökningsloggar.</string>
+  <string name="error_dav_client_error">Fel med lokal lagring, vänligen skicka felsökningsloggar.</string>
+  <string name="error_connection_error">Anslutningsfel, vänligen kontrollera internetanslutningen.</string>
+  <string name="error_our_certificate_validation">Osäker synkanslutning, vänligen skicka felsökningsloggar.</string>
+  <string name="error_their_certificate_validation">Certifikatvalideringsfel, kontrollera felsökningsloggar.</string>
+  <string name="error_unknown_io_error">Okänt IO fel, vänligen skicka felsökningsloggar.</string>
+  <string name="error_invalid_encryption_password">Felaktigt krypteringslösenord.</string>
+  <string name="error_invalid_mac_error">Dekrypteringsfel, vänligen skicka felsökningsloggar.</string>
+  <string name="error_unknown_crypto_error">Okänt kryptografifel, vänligen skicka felsökningsloggar.</string>
+  <string name="error_url_cannot_be_empty">URL kan inte vara tom</string>
+  <string name="error_username_empty">Användarnamn kan inte vara tomt.</string>
+  <string name="error_spaces_in_username">Användarnamn får inte innehålla mellanslag.</string>
+  <string name="error_username_illegal">Användarnamn måste innehålla \'@\' och vara minst 5 tecken långt.</string>
+  <string name="error_passwords_do_not_match">Lösenorden matchar inte.</string>
+  <string name="error_password_too_short">Lösenordet är för kort!</string>
+  <string name="error_username_already_registered">Användarnamnet är redan registrerat, prova med ett annat.</string>
+  <string name="error_card_number_could_not_be_verified">Kortnumret kunde inte verifieras</string>
+  <string name="error_card_expiration_could_not_be_verified">Kortets utgångsdatum kunde inte verifieras</string>
+  <string name="error_card_security_code_could_not_be_verified">Kortets säkerhetskod kunde inte verifieras</string>
+  <string name="error_your_card_could_not_be_verified">Ditt kort kunde inte verifieras</string>
+  <string name="error_stripe_api_error">Okänt fel med betalningshanteringen, försök igen eller skicka felsökningsloggar.</string>
+  <string name="error_android_account_manager_error">Oväntat fel med Android AccountManager!</string>
+  <!--misc errors-->
+  <string name="error_multiple_accounts_not_allowed">Flockanvändare kan inte ha flera konton.</string>
+  <string name="error_no_account_is_registered">Inget konto är registrerat med den här enheten.</string>
+  <string name="error_password_unavailable_please_login">Lösenord otillgängligt, var god logga in.</string>
+</resources>

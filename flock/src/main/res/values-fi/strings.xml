@@ -1,0 +1,242 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name">Flock</string>
+  <string name="at_flock_sync">\@flock</string>
+  <string name="support_email_address">rhodey@anhonesteffort.org</string>
+  <string name="begin">Aloita</string>
+  <string name="next">Seuraava</string>
+  <string name="skip">Ohita</string>
+  <string name="previous">Edellinen</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Peruuta</string>
+  <string name="thanks">kiitos!</string>
+  <string name="yes">Kyllä</string>
+  <string name="no">Ei</string>
+  <string name="days">päivää</string>
+  <string name="addressbook">osoitekirja</string>
+  <string name="display_name_missing">Nimi puuttuu</string>
+  <!--Notifications-->
+  <string name="notification_contact_import">Tuo yhteystietoja</string>
+  <string name="notification_importing_contacts">Tuodaan yhteystietoja.</string>
+  <string name="notification_importing_contacts_from">Tuodaan yhteystietoja tililtä %1$s</string>
+  <string name="notification_import_complete_copied_contacts">Tuonti valmis, kopioitiin %1$d yhteystietoa.</string>
+  <string name="notification_import_complete_copied_contacts_failed">Tuonti valmis, kopioitiin %1$d yhteystietoa, %2$d epäonnistui.</string>
+  <string name="notification_calendar_import">Tuo kalenteri</string>
+  <string name="notification_importing_calendars">Tuodaan kalentereita.</string>
+  <string name="notification_importing_events_from">Tuodaan tapahtumia kalenterista %1$s</string>
+  <string name="notification_import_complete_copied_events">Tuonti valmis, kopioitiin %1$d tapahtumaa.</string>
+  <string name="notification_import_complete_copied_events_failed">Tuonti valmis, kopioitiin %1$d tapahtumaa, %2$d epäonnistui.</string>
+  <string name="notification_flock_login_error">Flock sisäänkirjautumisvirhe</string>
+  <string name="notification_tap_to_correct_password">Näpäytä korjataksesi salasanan.</string>
+  <string name="notification_flock_encryption_error">Flock salausvirhe</string>
+  <string name="notification_tap_to_correct_encryption_password">Näpäytä korjataksesi salausavaimen.</string>
+  <string name="notification_flock_subscription_expired">Flock-tilaus vanhentunut</string>
+  <string name="notification_tap_to_update_subscription">Näpäytä uudistaaksesi tilaus.</string>
+  <string name="account_will_be_deleted_in_days_tap_to_update_subscription">Tilisi poistetaan %1$d päivän kuluttua, näpäytä uudistaaksesi tilaus.</string>
+  <!--status header stuff-->
+  <string name="status_header_status_good">Kaikki on kunnossa!</string>
+  <string name="status_header_status_account_login_failed">Sisäänkirjautuminen epäonnistui</string>
+  <string name="status_header_status_encryption_password_incorrect">Salausavain on väärä</string>
+  <string name="status_header_status_sync_disabled">Android sync on pois päältä!</string>
+  <string name="status_header_status_auto_renew_error">Tilauksen automaattinen uusiminen epäonnistui</string>
+  <string name="status_header_status_our_sync_service_error">Synkronointi väliaikaisesti poissa käytöstä...</string>
+  <string name="status_header_status_their_sync_service_error">WebDAV-palvelimella tapahtui virhe</string>
+  <string name="status_header_status_registration_service_error">Rekisteröintipalvelu on väliaikaisesti poissa käytöstä...</string>
+  <string name="status_header_sync_time">Viimeksi synkroinoitu %1$s</string>
+  <string name="status_header_sync_in_progress">Synkronoidaan...</string>
+  <!--SetupActivity, intro-->
+  <string name="welcome_to_flock">Tervetuloa Flock:n!</string>
+  <string name="flock_syncs_your_contacts_and_calendars_between_multiple_devices">Flock synkronoi yhteystietosi ja kalenterisi useiden laitteiden välillä pitäen samalla huolta yksityisyydestäsi vahvan salauksen avulla.</string>
+  <!--SetupActivity, select service provider-->
+  <string name="title_chose_sync_service">Valitse synkronointipalvelu</string>
+  <string name="flock_sync">Flock Synkronointi</string>
+  <string name="privacy_and_terms_of_service"><![CDATA[<a href=\"https://whispersystems.org/flock/legal.html\">Yksityisyys ja käyttöehdot</a>]]></string>
+  <string name="flock_sync_is_a_service_run_by_open_whisper_systems_available">Flock Synkronointipalvelun tarjoaa Open Whisper Systems hintaan $%.2f/vuosi. Kokeile 30 päivää ilmaiseksi, ilman maksutietoja.</string>
+  <string name="host_my_own">Ylläpidä omaa palvelinta</string>
+  <string name="you_may_chose_to_run_and_configure_your_own_webdav_compliant_server">Voit ajaa omaa WebDAV-yhteensopivaa palvelinta ja konfiguroida sen synkronointia varten. Serverin on läpäistävä sarja testejä ennen kuin sitä voidaan käyttää Flock:n kanssa.</string>
+  <!--SetupActivity, other server test-->
+  <string name="title_server_tests">Palvelintestit</string>
+  <string name="tests_not_yet_started">Testien ajoa ei ole aloitettu...</string>
+  <string name="tests_interrupted">Testien ajo keskeytetty...</string>
+  <string name="stop_tests">Keskeytä testien ajo</string>
+  <string name="restart_tests">Uudelleenkäynnistä testien ajo</string>
+  <string name="tests_completed_successfully">Testit ajettu onnistuneesti!</string>
+  <string name="test_dav_current_user_principal">DAV: current-user-principal</string>
+  <string name="test_error_carddav_current_user_principal">Palvelimella ei ole tukea CardDAV well-known URI:lle tai DAV: current-user-principal:lle.</string>
+  <string name="test_error_caldav_current_user_principal">Palvelimella ei ole tukea CalDAV well-known URI:lle tai DAV: current-user-principal:lle.</string>
+  <string name="test_carddav_addressbook_homeset">CardDAV: addressbook-homeset</string>
+  <string name="test_error_carddav_addressbook_homeset">Palvelimella ei ole tukea CardDAV: addressbook-homeset:lle.</string>
+  <string name="test_caldav_calendar_homeset">CalDAV: calendar-homeset</string>
+  <string name="test_error_caldav_calendar_homeset">Palvelimella ei ole tukea CalDAV: calendar-homeset:lle.</string>
+  <string name="test_caldav_create_and_delete_collections">DAV: luo ja poista kokoelma</string>
+  <string name="test_error_caldav_create_and_delete_collections">Palvelin ei tue kalenterikokoelmien luomista ja poistamista.</string>
+  <string name="test_caldav_create_and_edit_collection_properties">DAV: muokkaa kokoelman ominaisuuksia</string>
+  <string name="test_error_caldav_create_and_edit_collection_properties">Palvelin ei tue DAV-kokoelmien ominaisuuksien luomista.</string>
+  <string name="test_carddav_create_and_delete_contacts">CardDAV: luo ja poista yhteystietoja</string>
+  <string name="test_error_carddav_create_and_delete_contacts">Palvelin ei tue yhteystietojen luomista ja poistamista.</string>
+  <string name="test_caldav_create_and_delete_events">CalDAV: luo ja poista tapahtumia</string>
+  <string name="test_error_caldav_create_and_delete_events">Palvelin ei tue kalenteritapahtumien luomista ja poistamista.</string>
+  <!--SetupActivity, setup account-->
+  <string name="title_import_account">Tuo tili</string>
+  <string name="title_register_account">Rekisteröi tili</string>
+  <string name="title_setup_account">Määrittele tilin asetukset</string>
+  <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">Valitse käyttäjänimi ja vahva salasana, jolla tietosi salataan. Jos unohdat salasanasi, tietojasi ei voida palauttaa.</string>
+  <string name="do_you_have_a_flock_account">Onko sinulla Flock-tili?</string>
+  <string name="yes_log_me_in">Kyllä, kirjaudun sisään</string>
+  <string name="no_register_me">Ei, luon tilin</string>
+  <string name="text_setup_account_with_other">Aseta URL ja kirjautumistietosi WebDAV-palvelimelle. Tämän jälkeen valitse erillinen sanasala salausta varten.</string>
+  <string name="hint_username">käyttäjänimi</string>
+  <string name="hint_password">salasana</string>
+  <string name="hint_current_password">nykyinen salasana</string>
+  <string name="hint_repeat_password">toista salasana</string>
+  <string name="hint_href_webdav_host">https://example.com</string>
+  <string name="hint_encryption_password">salausavain</string>
+  <string name="hint_repeat_encryption_password">toista salausavain</string>
+  <string name="registering_account">rekisteröidään tiliä...</string>
+  <string name="account_register_failed">Tilin rekisteröiminen epäonnistui.</string>
+  <string name="importing_contacts_and_calendars">Tuodaan yhteystietoja ja kalentereja...</string>
+  <string name="account_import_completed_with_errors">Tilin tuominen valmistui virheillä.</string>
+  <string name="account_import_failed">Tilin tuominen epäonnistui.</string>
+  <string name="importing_encryption_secrets">Tuodaan salattuja tietoja...</string>
+  <!--SetupActivity, import-->
+  <string name="button_import">Tuo</string>
+  <string name="local_storage">Lokaali varasto</string>
+  <!--SetupActivity, import contacts-->
+  <string name="select_accounts_to_import_contacts_from">Valitse tilit joista yhteystietoja tuodaan</string>
+  <string name="contacts">yhteystiedot</string>
+  <string name="title_import_contacts">Tuo yhteystietoja</string>
+  <string name="started_background_import_of_contacts">Aloitettiin tuonti tausta-ajona %1$d yhteystiedolle</string>
+  <!--SetupActivity, import calendars-->
+  <string name="select_calendars_to_import">Valitse tuotavat kalenterit</string>
+  <string name="title_import_calendars">Tuo kalentereja</string>
+  <string name="started_background_import_of_calendars">Aloitettiin tuonti tausta-ajona %1$d kalenterille</string>
+  <!--SetupActivity, select remote addressbook and calendars-->
+  <string name="select_a_single_remote_addressbook_in_which_to_store">Valitse yksi osoitekirja Flock-yhteystietojen tallennusta varten.</string>
+  <string name="select_the_calendars_you_would_like_to_sync_with_this_device">Valitse kalenterit, jotka haluat synkronoida tälle laitteelle.</string>
+  <string name="setup_complete">Asennus valmis!</string>
+  <!--My calendars and my addressbooks...-->
+  <string name="hint_display_name">nimi</string>
+  <string name="heading_display_name">nimi</string>
+  <string name="heading_sync">Synkronointi</string>
+  <string name="display_name_cannot_be_empty">Nimi ei voi olla tyhjä.</string>
+  <!--My addressbooks-->
+  <string name="title_my_addressbooks">Osoitekirjani</string>
+  <string name="title_edit_selected_addressbooks">Muokkaa valittuja osoitekirjoja</string>
+  <string name="title_addressbook_properties">Osoitekirjan ominaisuudet</string>
+  <string name="addressbooks_selected">osoitekirjaa valittu</string>
+  <string name="are_you_sure_you_want_to_delete_selected_addressbooks">Oletko varma että haluat poistaa valitut osoitekirjat?</string>
+  <string name="you_cannot_edit_addressbooks_that_have_not_been_synced">Et voi muokata synkronoimattomia osoitekirjoja.</string>
+  <!--My calendars-->
+  <string name="title_my_calendars">Kalenterini</string>
+  <string name="title_edit_selected_calendars">Muokkaa valittuja kalentereja</string>
+  <string name="title_calendar_properties">Kalenterin ominaisuudet</string>
+  <string name="title_delete_selected_calendars_dialog">Poista valitut kalenterit?</string>
+  <string name="calendars_selected">kalenteria valittu</string>
+  <string name="are_you_sure_you_want_to_delete_selected_calendars">Oletko varma että haluat poistaa valitut kalenterit?</string>
+  <string name="you_cannot_edit_calendars_that_have_not_been_synced">Et voi muokata synkronoimattomia kalentereja.</string>
+  <!--PreferencesActivity-->
+  <string name="title_flock_settings">Flock asetukset</string>
+  <string name="preference_group_sync">Synkronointi</string>
+  <string name="preference_title_sync_frequency">Synkronointitiheys</string>
+  <string name="preference_title_sync_on_content_change">Synkronoi muuttuessa</string>
+  <string name="preference_description_sync_on_content_change">Synkronoi yhteystiedot ja kalenterit niiden muuttuessa</string>
+  <string name="preference_title_sync_now">Synkronoi nyt</string>
+  <string name="sync_requested_will_begin_when_possible">Synkronointipyyntö lähetetty, aloitetaan heti kuin mahdollista</string>
+  <string name="preference_group_contacts">Yhteystiedot</string>
+  <string name="preference_group_calendars">Kalenterit</string>
+  <string name="preference_title_default_calendar_color">Kalenterin oletusväri</string>
+  <string name="minutes">minuuttia</string>
+  <string name="new_calendars_will_be">Uudet kalenterit ovat %1$s</string>
+  <string name="preference_group_account">Tili</string>
+  <!--ChangeEncryptionPasswordActivity-->
+  <string name="title_change_encryption_password">Muuta salausavainta</string>
+  <string name="button_save_password">Tallenna salasana</string>
+  <string name="hint_new_password">uusi salasana</string>
+  <string name="hint_new_password_repeat">toista uusi salasana</string>
+  <string name="encryption_password_saved">Salausavain tallennettu!</string>
+  <string name="updating_encryption_secrets">päivitetään salausavaimia...</string>
+  <string name="password_change_failed">salasanan vaihtaminen epäonnstui.</string>
+  <!--ManageSubscriptionActivity-->
+  <string name="title_manage_subscription">Hallitse tilausta</string>
+  <string name="days_remain">päivää jäljellä</string>
+  <string name="google_play">Google Play</string>
+  <string name="credit_card">Luottokortti</string>
+  <string name="when_subscribed_your_card_will_be_charged_once_per_year">Tilauksen ollessa voimassa luottokorttiasi veloitetaan kerran vuodessa. Voit peruttaa tilauksen koska tahansa.</string>
+  <string name="subscription_is_active">Tilaus on voimassa</string>
+  <string name="payment_failed">Maksaminen epäonnistui</string>
+  <string name="start_subscription">Aloita tilaus</string>
+  <string name="cancel_subscription">Peruuta tilaus</string>
+  <string name="are_you_sure_you_want_to_cancel_your_flock_subscription">Oletko varma, että haluat peruuttaa Flock-tilausen?</string>
+  <string name="your_subscription_is_active_well_charge_you_again_in_days">Tilauksesi on voimassa, laskutamme sinua uudelleen %1$d päivän kuluttua.</string>
+  <string name="google_play_error_please_update_google_play_services">Google Play-virhe, ole hyvä ja päivitä Google Play Services.</string>
+  <string name="purchase_failed_check_your_google_wallet">osto epäonnistui, tarkista Google Wallet</string>
+  <!--EditAutoRenewActivity-->
+  <string name="usd_per_year">$%.2f/vuosi</string>
+  <string name="save_card">Tallenna kortti</string>
+  <string name="card_verified_and_saved">Luottokortti varmistettu ja tallennettu!</string>
+  <string name="subscription_canceled">Tilaus peruutettu</string>
+  <string name="hint_card_cvc">CVC</string>
+  <string name="hint_card_expiration">KK/VV</string>
+  <string name="hint_card_number">5555 5555 5555 5555</string>
+  <!--SendBitcoinActivity-->
+  <string name="title_send_bitcoin">Lähetä bitcoineja</string>
+  <string name="mBTC_to">mBTC osoitteeseen</string>
+  <string name="address_copied_to_clipboard">Osoite kopiotu leikepöydälle.</string>
+  <string name="bitcoin_received">Bitcoin vastaanotettu!</string>
+  <string name="minutes_until_address_expires">minuuttia kunnes osoite vanhentuu</string>
+  <!--DeleteAccountActivity-->
+  <string name="title_unregister_account">Poista tili</string>
+  <string name="if_you_chose_to_unregister_your_account_all_flock">Jos päätit poistaa tilisi, kaikki Flock yhteystiedot, kalenterit sekä tilaushistoria poistetaan pysyvästi.</string>
+  <string name="are_you_sure_you_want_to_unregister_your_account">Oletko varma, että haluat poistaa tilisi?</string>
+  <string name="account_has_been_unregistered">Tili poistettu.</string>
+  <!--DeleteAllContactsActivity-->
+  <string name="title_delete_all_contacts">Poista kaikki yhteystiedot</string>
+  <string name="all_contacts_have_been_deleted">Kaikki yhteystiedot on poistettu.</string>
+  <string name="if_you_chose_to_delete_your_flock_contacts">Jos päätit poistaa Flock-yhteystietosi, ne tullaan poistamaan kaikilta laitteita jotka käyttävät tätä Flock-tiliä.</string>
+  <string name="are_you_sure_you_want_to_delete_all_flock_contacts">Oletko varma, että haluat poistaa kaikki Flock-yhteystietosi?</string>
+  <!--CorrectPasswordActivity-->
+  <string name="title_correct_sync_password">Oikea synkronointisalasana</string>
+  <string name="unable_to_login_to_sync_service_please_correct_your_password">Sisäänkirjautuminen epäonnistui, ole hyvä ja korjaa salasanasi.</string>
+  <string name="login_successful">Sisäänkirjautuminen onnistui!</string>
+  <!--CorrectEncryptionPasswordActivity-->
+  <string name="title_correct_encryption_password">Oikea salausavain</string>
+  <string name="encryption_password_is_invalid_please_correct_your_encryption_password">Salausavain on väärä, ole hyvä ja korjaa salausavaimesi.</string>
+  <string name="password_corrected">Salasana korjattu!</string>
+  <!--SendDebugLogActivity-->
+  <string name="send_debug_log">Lähetä debug-loki</string>
+  <string name="flock_debug_log">Flock debug-loki</string>
+  <string name="something_strange_happened_send_us_your_debug_log">Jotain kummallista on tapahtunut, lähetä meille debug-lokisi ja me korjaamme vian.</string>
+  <string name="dont_ask_again">Älä kysy uudestaan</string>
+  <string name="send_log">Lähetä loki</string>
+  <!--ErrorToaster messages-->
+  <string name="error_login_unauthorized">Sisäänkirjautuminen epäonnistui. Virheellinen käyttäjätunnus tai salasana</string>
+  <string name="error_registration_api_server_error">Rekisteröintipalvelimella on ongelmia, olemme pahoillamme.</string>
+  <string name="error_registration_api_client_error">Asiakasohjelman rekisteröinnin API-virhe, ole hyvä ja lähetä debug-lokit.</string>
+  <string name="error_our_dav_server_error">Synkronointipalvelimella on onglemia, olemme pahoillamme.</string>
+  <string name="error_their_dav_server_error">Synkronointipalvelin käyttäytyy kummallisesti, tarkista debug-lokit.</string>
+  <string name="error_dav_client_error">Virhe lokaalissa varastossa, ole hyvä ja lähetä debug-lokit.</string>
+  <string name="error_connection_error">Yhteysvirhe, ole hyvä ja tarkista internetyhteys.</string>
+  <string name="error_our_certificate_validation">Salaamaton synkronointiyhteys, ole hyvä ja lähetä debug-lokit.</string>
+  <string name="error_their_certificate_validation">Sertifikaatin varmentaminen epäonnistui, tarkista debug-lokit.</string>
+  <string name="error_unknown_io_error">Tuntematon IO-virhe, ole hyvä ja lähetä debug-lokit.</string>
+  <string name="error_invalid_encryption_password">Salausavain on väärä.</string>
+  <string name="error_invalid_mac_error">Salauksen purussa tapahtui virhe, ole hyvä ja lähetä debug-lokit.</string>
+  <string name="error_unknown_crypto_error">Tuntematon kryptografinen virhe, ole hyvä ja lähetä debug-lokit.</string>
+  <string name="error_url_cannot_be_empty">URL ei voi olla tyhjä</string>
+  <string name="error_username_empty">Käyttäjätunnus ei voi olla tyhjä.</string>
+  <string name="error_spaces_in_username">Käyttäjätunnus ei saa sisältää välilyöntejä.</string>
+  <string name="error_username_illegal">Käyttäjätunnuksen tulee sisältää \'@\' ja olla ainakin 5 merkkiä pitkä.</string>
+  <string name="error_passwords_do_not_match">Salasanat eivät täsmää.</string>
+  <string name="error_password_too_short">Salasana on liian lyhyt!</string>
+  <string name="error_username_already_registered">Käyttäjätunnus on jo käytössä, yritä toista.</string>
+  <string name="error_card_number_could_not_be_verified">Luottokortin numeroa ei voitu varmentaa</string>
+  <string name="error_card_expiration_could_not_be_verified">Luottokortin viimeistä voimassaolopäivää ei voitu varmentaa</string>
+  <string name="error_card_security_code_could_not_be_verified">Luottokortin CVC-koodia ei voitu varmentaa</string>
+  <string name="error_your_card_could_not_be_verified">Luottokorttiasi ei voitu varmentaa</string>
+  <string name="error_stripe_api_error">Tuntematon maksutapahtumavirhe, yritä uudestaan tai lähetä debug-lokit.</string>
+  <string name="error_android_account_manager_error">Odottamaton Android AccountManager-virhe!</string>
+  <!--misc errors-->
+  <string name="error_multiple_accounts_not_allowed">Flock-käyttäjällä ei voi olla useita tilejä.</string>
+  <string name="error_no_account_is_registered">Tiliä ei ole rekisteröity tälle laitteelle.</string>
+  <string name="error_password_unavailable_please_login">Salasana ei ole saatavilla, ole hyvä ja kirjaudu sisään.</string>
+</resources>
