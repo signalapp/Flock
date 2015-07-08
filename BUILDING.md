@@ -24,7 +24,7 @@ The following steps should help you (re)build flock from the command line.
 
 5. Execute Gradle:
 
-        ./gradlew build
+        ./gradlew build -Pskip-nonplay
 
 Setting up a development environment
 ------------------------------------
