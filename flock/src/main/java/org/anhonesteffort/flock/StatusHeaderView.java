@@ -175,7 +175,6 @@ public class StatusHeaderView extends LinearLayout {
       syncStatusText     = getContext().getString(R.string.notification_flock_subscription_expired);
       syncStatusDrawable = R.drawable.sad_cloud;
       if (!subscriptionNotificationShown) {
-        NotificationDrawer.showSubscriptionExpiredNotification(getContext());
         subscriptionNotificationShown = true;
       }
     }

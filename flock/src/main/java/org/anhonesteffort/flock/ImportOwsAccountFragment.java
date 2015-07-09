@@ -134,10 +134,6 @@ public class ImportOwsAccountFragment extends Fragment {
     Toast.makeText(getActivity(),
                    R.string.notification_flock_subscription_expired,
                    Toast.LENGTH_LONG).show();
-
-    Intent nextIntent = new Intent(getActivity(), ManageSubscriptionActivity.class);
-    nextIntent.putExtra(ManageSubscriptionActivity.KEY_DAV_ACCOUNT_BUNDLE, account.toBundle());
-    startActivity(nextIntent);
   }
 
   private void handleImportAccountAsync() {

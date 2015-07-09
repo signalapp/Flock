@@ -185,8 +185,6 @@ public abstract class AbstractSyncAdapter extends AbstractThreadedSyncAdapter {
     {
       NotificationDrawer.handleInvalidatePasswordAndShowAuthNotification(getContext());
     }
-    if (result.stats.numSkippedEntries > 0)
-      NotificationDrawer.showSubscriptionExpiredNotification(getContext());
 
     if (NotificationDrawer.isAuthNotificationDisabled(getContext(), getSyncScheduler().getAuthority()))
       NotificationDrawer.enableAuthNotifications(getContext(), getSyncScheduler().getAuthority());

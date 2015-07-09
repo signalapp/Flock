@@ -42,8 +42,8 @@ public class NotificationDrawer extends BroadcastReceiver {
   private static final String TAG = "org.anhonesteffort.flock.NotificationDrawer";
 
   private static final int ID_NOTIFICATION_AUTH         = 1020;
-  private static final int ID_NOTIFICATION_SUBSCRIPTION = 1021;
   private static final int ID_NOTIFICATION_DEBUG_LOG    = 1022;
+  private static final int ID_NOTIFICATION_EOL          = 1023;
 
   private static final String PREFERENCES_NAME            = "AbstractDavSyncAdapter.PREFERENCES_NAME";
   private static final String KEY_VOID_AUTH_NOTIFICATIONS = "KEY_VOID_AUTH_NOTIFICATIONS";
@@ -115,42 +115,21 @@ public class NotificationDrawer extends BroadcastReceiver {
     getNotificationManager(context).notify(ID_NOTIFICATION_AUTH, notificationBuilder.build());
   }
 
-  public static void cancelAuthNotification(Context context) {
-    getNotificationManager(context).cancel(ID_NOTIFICATION_AUTH);
-  }
-
-  public static void showSubscriptionExpiredNotification(Context context) {
-    Log.w(TAG, "showSubscriptionExpiredNotification()");
-
+  public static void handleNotifyEol(Context context) {
     NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
-    Intent                     clickIntent         = new Intent(context, ManageSubscriptionActivity.class);
+    Intent                     clickIntent         = new Intent(context, EolActivity.class);
 
-    notificationBuilder.setContentTitle(context.getString(R.string.notification_flock_subscription_expired));
+    notificationBuilder.setContentTitle(context.getString(R.string.flock_is_shutting_down));
+    notificationBuilder.setContentText(context.getString(R.string.tap_for_important_details));
     notificationBuilder.setSmallIcon(R.drawable.flock_actionbar_icon);
     notificationBuilder.setAutoCancel(true);
 
-    Optional<Long> daysRemaining = AccountStore.getDaysRemaining(context);
-
-    if (!daysRemaining.isPresent() || daysRemaining.get() > 0)
-      notificationBuilder.setContentText(context.getString(R.string.notification_tap_to_update_subscription));
-    else {
-      Integer limitDaysExpired = context.getResources().getInteger(R.integer.limit_days_expired);
-      Long    daysTillExpire   = limitDaysExpired - (-1 * daysRemaining.get());
-
-      if (daysTillExpire < 0)
-        daysTillExpire = 0L;
-
-      notificationBuilder.setContentText(context.getString(
-          R.string.account_will_be_deleted_in_days_tap_to_update_subscription,
-          daysTillExpire
-      ));
-    }
-
-    Optional<DavAccount> account = DavAccountHelper.getAccount(context);
-    clickIntent.putExtra(ManageSubscriptionActivity.KEY_DAV_ACCOUNT_BUNDLE, account.get().toBundle());
-
     notificationBuilder.setContentIntent(getPendingActivityIntent(context, clickIntent));
-    getNotificationManager(context).notify(ID_NOTIFICATION_SUBSCRIPTION, notificationBuilder.build());
+    getNotificationManager(context).notify(ID_NOTIFICATION_EOL, notificationBuilder.build());
+  }
+
+  public static void cancelAuthNotification(Context context) {
+    getNotificationManager(context).cancel(ID_NOTIFICATION_AUTH);
   }
 
   private static boolean isStopAskingForLogsSet(Context context) {

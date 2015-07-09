@@ -35,7 +35,6 @@ import android.widget.Toast;
 import com.chiralcode.colorpicker.ColorPickerPreference;
 
 import org.anhonesteffort.flock.util.guava.Optional;
-import org.anhonesteffort.flock.auth.DavAccount;
 import org.anhonesteffort.flock.sync.account.AccountSyncScheduler;
 import org.anhonesteffort.flock.sync.addressbook.AddressbookSyncScheduler;
 import org.anhonesteffort.flock.sync.calendar.CalendarsSyncScheduler;
@@ -58,7 +57,6 @@ public class PreferencesActivity extends PreferenceActivity
   public static final String KEY_PREF_ADDRESSBOOKS      = "pref_addressbooks";
 
   public static final String KEY_PREF_CATEGORY_ACCOUNT = "pref_category_account";
-  public static final String KEY_PREF_SUBSCRIPTION     = "pref_subscription";
   public static final String KEY_PREF_DELETE_ACCOUNT   = "pref_delete_account";
 
   private StatusHeaderView statusHeader;
@@ -201,28 +199,8 @@ public class PreferencesActivity extends PreferenceActivity
     if (!DavAccountHelper.isUsingOurServers(getBaseContext()))
       return;
 
-    Preference         manageSubscription =                      findPreference(KEY_PREF_SUBSCRIPTION);
     Preference         addressbooks       =                      findPreference(KEY_PREF_ADDRESSBOOKS);
     PreferenceCategory category           = (PreferenceCategory) findPreference(KEY_PREF_CATEGORY_CONTACTS);
-
-    if (manageSubscription != null) {
-      manageSubscription.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-          Optional<DavAccount> account = DavAccountHelper.getAccount(getBaseContext());
-          if (account.isPresent()) {
-            Intent nextIntent = new Intent(getBaseContext(), ManageSubscriptionActivity.class);
-            nextIntent.putExtra(ManageSubscriptionActivity.KEY_DAV_ACCOUNT_BUNDLE,
-                                account.get().toBundle());
-            startActivity(nextIntent);
-          }
-
-          return true;
-        }
-
-      });
-    }
 
     if (addressbooks != null)
       category.removePreference(addressbooks);
@@ -233,13 +211,10 @@ public class PreferencesActivity extends PreferenceActivity
       return;
 
     PreferenceCategory accountCategory    = (PreferenceCategory) findPreference(KEY_PREF_CATEGORY_ACCOUNT);
-    Preference         manageSubscription =                      findPreference(KEY_PREF_SUBSCRIPTION);
     Preference         deleteAccount      =                      findPreference(KEY_PREF_DELETE_ACCOUNT);
 
-    if (manageSubscription != null && deleteAccount != null) {
-      accountCategory.removePreference(manageSubscription);
+    if (deleteAccount != null)
       accountCategory.removePreference(deleteAccount);
-    }
   }
 
   @Override

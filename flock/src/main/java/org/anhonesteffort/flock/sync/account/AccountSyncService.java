@@ -18,14 +18,10 @@
 package org.anhonesteffort.flock.sync.account;
 
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
-
-import com.android.vending.billing.IInAppBillingService;
 
 import org.anhonesteffort.flock.DavAccountHelper;
 import org.anhonesteffort.flock.crypto.InvalidMacException;
@@ -45,7 +41,6 @@ import java.util.List;
  */
 public class AccountSyncService extends Service {
 
-  protected              IInAppBillingService billingService   = null;
   private   static       AccountSyncAdapter   sSyncAdapter     = null;
   private   static final Object               sSyncAdapterLock = new Object();
 
@@ -55,10 +50,6 @@ public class AccountSyncService extends Service {
       if (sSyncAdapter == null)
         sSyncAdapter = new AccountSyncAdapter(getApplicationContext());
     }
-
-    Intent serviceIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
-    serviceIntent.setPackage("com.android.vending");
-    bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
   }
 
   @Override
@@ -97,7 +88,7 @@ public class AccountSyncService extends Service {
       List<SyncWorker> workers = new LinkedList<>();
 
       if (DavAccountHelper.isUsingOurServers(davAccount))
-        workers.add(new AccountSyncWorker(getContext(), davAccount, billingService, syncResult));
+        workers.add(new AccountSyncWorker(getContext(), davAccount, syncResult));
 
       return workers;
     }
@@ -110,26 +101,4 @@ public class AccountSyncService extends Service {
 
     }
   }
-
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-
-    unbindService(serviceConnection);
-    billingService = null;
-  }
-
-  private ServiceConnection serviceConnection = new ServiceConnection() {
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-      billingService = null;
-    }
-
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-      billingService = IInAppBillingService.Stub.asInterface(service);
-    }
-
-  };
 }

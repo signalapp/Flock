@@ -20,6 +20,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <uses-permission android:name="com.android.vending.BILLING"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -106,15 +107,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="org.anhonesteffort.flock.ManageSubscriptionActivity"
-                  android:screenOrientation="portrait"
-                  android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize">
-            <intent-filter>
-                <action android:name="org.anhonesteffort.flock.ManageSubscriptionActivity"/>
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <activity android:name=".DeleteAllContactsActivity"
                   android:windowSoftInputMode="adjustPan"
                   android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize">
@@ -129,6 +121,13 @@
         <activity android:name="org.anhonesteffort.flock.SendDebugLogActivity"
                   android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
                   android:windowSoftInputMode="stateHidden"/>
+
+        <activity android:name="org.anhonesteffort.flock.EolActivity" >
+            <intent-filter>
+                <action android:name="org.anhonesteffort.flock.EolActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <service android:name="org.anhonesteffort.flock.auth.AccountAuthenticatorService">
             <intent-filter>
@@ -207,6 +206,9 @@
         <service android:name="org.anhonesteffort.flock.ChangeEncryptionPasswordService"
                  android:exported="false"/>
 
+        <service android:name="org.anhonesteffort.flock.ExportService"
+                 android:exported="false"/>
+
         <receiver android:name="org.anhonesteffort.flock.sync.SyncBooter">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -216,6 +218,14 @@
         <receiver android:name="org.anhonesteffort.flock.NotificationDrawer">
             <intent-filter>
                 <action android:name="org.anhonesteffort.flock.ACTION_STOP_ASKING_FOR_LOGS"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="org.anhonesteffort.flock.EolNotifier">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="org.anhonesteffort.flock.INTENT_ALARM_24_HOURS"/>
             </intent-filter>
         </receiver>
 

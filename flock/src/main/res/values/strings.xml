@@ -126,6 +126,7 @@
     <string name="title_register_account">Register Account</string>
     <string name="title_setup_account">Setup account</string>
     <string name="chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data">Choose a username and a strong password to encrypt your data, If your password is forgotten it cannot be reset.</string>
+    <string name="flock_is_shutting_down_permanently_account_registration_no_longer_allowed">Flock is shutting down permanently, account registration no longer allowed.</string>
 
     <string name="do_you_have_a_flock_account">Do you have a Flock account?</string>
     <string name="yes_log_me_in">Yes, log me in</string>
@@ -296,6 +297,25 @@
     <string name="dont_ask_again">Don\'t ask again</string>
     <string name="send_log">Send log</string>
 
+    <!-- Eol -->
+    <string name="flock_is_shutting_down">Flock is shutting down</string>
+    <string name="tap_for_important_details">Tap for important details</string>
+    <string name="shutting_down">Shutting down</string>
+    <string name="eol_paragraph_one">Flock will shutdown permanently on October 1st, 2015. Upon shutdown, all active subscriptions will be refunded and account information erased. We apologize for the inconvenience and thank you for supporting the project.</string>
+    <string name="eol_paragraph_two">Tap \'Export\' and your contacts and calendars will be copied to external storage in standard \'.vcf\' and \'.ics\' files, after this you may uninstall Flock.</string>
+    <string name="export">Export</string>
+    <string name="export_data">Export data</string>
+    <string name="export_started">Export started</string>
+    <string name="exporting_contacts_and_calendars">Exporting contacts and calendars</string>
+    <string name="export_complete">Export complete</string>
+    <string name="export_completed_successfully">Export completed successfully</string>
+    <string name="failed_to_copy_contacts_and_events">Failed to copy %1$d contacts and %2$d events</string>
+    <string name="export_failed">Export failed</string>
+    <string name="tap_to_login_then_retry_export">Tap to login then retry export</string>
+    <string name="try_making_more_storage_space_available">Try making more storage space available</string>
+    <string name="try_a_separate_export_app_if_error_continues">Try a separate export app if error continues</string>
+    <string name="flock_contacts_vcf">flock-contacts.vcf</string>
+    <string name="flock_calendar_ical">flock-calendar-%1$d.ics</string>
 
     <!-- ErrorToaster messages -->
     <string name="error_login_unauthorized">Login failed. Invalid username or password</string>

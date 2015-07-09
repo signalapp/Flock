@@ -30,49 +30,7 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:textAppearance="?android:attr/textAppearanceMedium"
-                  android:text="@string/chose_a_username_for_your_account_and_a_strong_password_to_encrypt_your_data"/>
-
-        <EditText android:id="@+id/account_username"
-                  android:layout_marginTop="8dp"
-                  android:singleLine="true"
-                  android:maxLines="1"
-                  android:layout_width="match_parent"
-                  android:layout_height="48dip"
-                  android:inputType="textEmailAddress"
-                  android:hint="@string/hint_username"/>
-
-        <EditText android:id="@+id/cipher_passphrase"
-                  android:singleLine="true"
-                  android:maxLines="1"
-                  android:layout_width="match_parent"
-                  android:layout_height="48dip"
-                  android:layout_marginTop="4dp"
-                  android:inputType="textPassword"
-                  android:hint="@string/hint_password" />
-
-        <ProgressBar android:id="@+id/progress_password_strength"
-                     android:layout_width="match_parent"
-                     android:layout_height="4dp"
-                     android:layout_marginLeft="4dp"
-                     android:layout_marginRight="4dp"
-                     android:visibility="invisible"
-                     style="?android:attr/progressBarStyleHorizontal"/>
-
-        <EditText android:id="@+id/cipher_passphrase_repeat"
-                  android:singleLine="true"
-                  android:maxLines="1"
-                  android:layout_width="match_parent"
-                  android:layout_height="48dip"
-                  android:inputType="textPassword"
-                  android:hint="@string/hint_repeat_password" />
-
-        <ProgressBar android:id="@+id/progress_password_strength_repeat"
-                     android:layout_width="match_parent"
-                     android:layout_height="4dp"
-                     android:layout_marginLeft="4dp"
-                     android:layout_marginRight="4dp"
-                     android:visibility="invisible"
-                     style="?android:attr/progressBarStyleHorizontal"/>
+                  android:text="@string/flock_is_shutting_down_permanently_account_registration_no_longer_allowed"/>
 
         <LinearLayout
             android:layout_width="match_parent"
