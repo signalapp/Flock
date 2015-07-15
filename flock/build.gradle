@@ -8,8 +8,8 @@ android {
 
     defaultConfig {
         applicationId "org.anhonesteffort.flock"
-        versionCode 28
-        versionName "0.9.6"
+        versionCode 29
+        versionName "0.9.7"
         minSdkVersion 16
         targetSdkVersion 21
     }
