@@ -1,3 +1,9 @@
+# This project is on ice.
+
+See the
+[announcement/post-mortem](https://gist.github.com/rhodey/873ae9d527d8d2a38213)
+and [discussion about DAV](https://github.com/WhisperSystems/Flock/issues/93).
+
 # Flock
 
 A secure contact and calendar syncing application for Android.
