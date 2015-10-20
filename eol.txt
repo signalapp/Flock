@@ -1,0 +1,20 @@
+// flock end of life
+
+1) client update
+     ** disable new account registration
+     ** disable subscription management
+     ** remind daily that eol is approaching
+     ** allow export of contacts & calendars to external storage
+
+2) publish client update and warn in play store details
+3) ** remove statsd code, deploy new servers, terminate statsd
+4) update translations while waiting for eol
+
+5) eol
+     remove apk from play store
+     terminate all flock amazon resources
+     refund active subscriptions
+     cancel active subscriptions
+     close stripe account
+     delete flock api project
+     delete flock payments

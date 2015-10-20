@@ -1,4 +1,4 @@
-# Flock
+# Flock (Discontinued)
 
 A secure contact and calendar syncing application for Android.
 
