@@ -232,7 +232,7 @@ public class ImportContactsFragment extends AccountAndKeyRequiredFragment
 
         else {
           rawContactsUri               = ContactsContract.RawContacts.CONTENT_URI;
-          cursor                       = client.query(rawContactsUri, null, ContactsContract.RawContacts.ACCOUNT_TYPE + " IS NULL", null, null);
+          cursor                       = client.query(rawContactsUri, null, ContactsContract.RawContacts.ACCOUNT_TYPE + " IN (NULL, 'com.android.localphone')", null, null);
           accountDetails.contact_count = cursor.getCount();
           Log.d(TAG, "local storage has " +  accountDetails.contact_count + " contacts");
         }
