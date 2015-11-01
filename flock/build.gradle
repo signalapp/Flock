@@ -19,6 +19,16 @@ android {
         nonplay { }
     }
 
+    variantFilter { variant ->
+        // If `-Pskip-nonplay` arg is provided, skip build flavor
+        // since libsupplychain library isn't yet public.
+        if (project.hasProperty('skip-nonplay')) {
+            if (variant.getFlavors().get(0).name.equals('nonplay')) {
+                variant.setIgnore(true);
+            }
+        }
+    }
+
     packagingOptions {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
